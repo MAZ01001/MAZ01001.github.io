@@ -168,7 +168,7 @@
                         if (element.dataset.machine) document.querySelector('[data-name="'+element.dataset.machine+'"]').classList.add("hlght");
                         for (const e of document.getElementsByTagName('item')) {
                             for (const sDName of element.dataset.name.split(' ')) {if (RegExp(sDName,'g').test(e.dataset.recipe)) {e.classList.add("hlghtcrf")}}
-                            for (const dName of e.dataset.name.split(' ')) {if (RegExp(dName,'g').test(element.dataset.recipe)) {e.classList.add("hlght")}}
+                            for (const dName of e.dataset.name.split(' ')) {if (RegExp(dName,'g').test(element.dataset.recipe)) {e.classList.add("hlght");e.classList.remove("hlghtcrf")}}
                         }
                         break;
                     default:
