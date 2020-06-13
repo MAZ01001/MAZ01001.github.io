@@ -177,7 +177,7 @@
             }
             if (event.button == 1) {
                 //middle mouse click on element
-                if (element.tagName.toLowerCase() == "item" && !(/resource/.test(element.dataset.type))) {
+                if (element.tagName.toLowerCase() == "item" && !(/resource/g.test(element.dataset.type))) {
                     element.classList.add('hlghtslf');
                     event.preventDefault();
                     let recipeNames = element.dataset.recipe.split(' '),
@@ -186,13 +186,13 @@
                     while (recipeNames.length > 0) {
                         for (const e of document.getElementsByTagName('item')) {
                             for (const singleRecipe of recipeNames) {
-                                if (RegExp(singleRecipe).test(e.dataset.name)) {
+                                if (RegExp(singleRecipe,'g').test(e.dataset.name)) {
                                     e.classList.add("hlght");
                                     if (singleRecipe == "biom") {for (const htele of document.querySelectorAll('[data-name="biom"]')) {
                                         htele.classList.add("hlght");
-                                        recipeNames.push(htele.dataset.recipe);
+                                        recipeNames = recipeNames.concat(htele.dataset.recipe.split(' '));
                                     }}
-                                    recipeGone.push(singleRecipe);
+                                    recipeGone = recipeGone.concat(e.dataset.name.split(' '));
                                     if (e.dataset.machine) machineSelect.push(e.dataset.machine);
                                     if (e.dataset.recipe) recipeNames = recipeNames.concat(e.dataset.recipe.split(' '));
                                     for (const gones of recipeGone) {while (recipeNames.indexOf(gones) != -1) {recipeNames.splice(recipeNames.indexOf(gones),1)}}
