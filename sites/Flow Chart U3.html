@@ -105,9 +105,10 @@
             padding: 1px 4px;
             margin: 1px auto;
         }
-        .hlght{background-color: #bbb;color: #000; font-style: italic;}
+        .hlght{background-color: #bbb;color: #000; font-style: normal;}
         .hlghtslf{background-color: #bbb;color: #000; font-weight: bold;}
-        item[data-type*="product"]:not(.hlght):not(.hlghtslf) {background-color: #444;}
+        .hlghtcrf{background-color: #bbb;color: #000; font-weight: italic;}
+        item[data-type*="product"]:not(.hlght):not(.hlghtslf):not(.hlghtcrf) {background-color: #444;}
         item[data-type="resource"] {border-color: #050;}
         item[data-type="liquid resource"] {border-color: #225;}
         item[data-type="resource ore"] {border-color: #555;}
@@ -132,7 +133,7 @@
     <script>
         function clickElement(element,event) {
             //event.button left=0 middle=1 right=2
-            for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf")}
+            for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
             if (event.button == 0) {
                 // left mouse clickElement
                 switch (element.tagName.toLowerCase()) {
@@ -164,12 +165,11 @@
                         break;
                     case "item":
                         element.classList.add('hlghtslf');
+                        if (element.dataset.machine) document.querySelector('[data-name="'+element.dataset.machine+'"]').classList.add("hlght");
                         for (const e of document.getElementsByTagName('item')) {
-                            if (element.dataset.machine) document.querySelector('[data-name="'+element.dataset.machine+'"]').classList.add("hlght");
-                            for (sDName of element.dataset.name.split(' ')) {if (RegExp(sDName,'g').test(e.dataset.recipe)) {e.classList.add("hlght")}}
-                            for (dName of e.dataset.name.split(' ')) {if (RegExp(dName,'g').test(element.dataset.recipe)) {e.classList.add("hlght")}}
+                            for (const sDName of element.dataset.name.split(' ')) {if (RegExp(sDName,'g').test(e.dataset.recipe)) {e.classList.add("hlghtcrf")}}
+                            for (const dName of e.dataset.name.split(' ')) {if (RegExp(dName,'g').test(element.dataset.recipe)) {e.classList.add("hlght")}}
                         }
-                        for (const e of document.getElementsByTagName('machnine')) {if (RegExp(element.dataset.machine).test(e.dataset.name)) {e.classList.add("hlght")}}
                         break;
                     default:
                         break;
