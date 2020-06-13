@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>wuerfel</title>
+    <style>
+        body {
+            background: #303030;
+        }
+        table {
+            border: 1px solid #ffffff;
+            border-collapse: collapse;
+            position: fixed;
+            margin-left: -150px;
+            margin-top: -182px;
+            top: 50%;
+            left: 50%;
+        }
+        td {
+            color: #ffffff;
+            background-color: #000000;
+            table-layout: fixed;
+            text-align: center;
+            width: 100px;
+            height: 100px;
+        }
+        div {
+            border-radius: 50px;
+            border: 50px solid #0f00;
+        }
+        #b {
+            border: 1px solid #000000;
+            background-color: #32cd32;
+            position: fixed;
+            width: 25px;
+            height: 25px;
+            margin-left: -12.5px;
+            margin-top: 157px;
+            top: 50%;
+            left: 50%;
+        }
+        #min {
+            border: 1px solid #000000;
+            position: fixed;
+            width: 40px;
+            height: 25px;
+            margin-left: -45px;
+            margin-top: 127px;
+            top: 50%;
+            left: 50%;
+        }
+        #max {
+            border: 1px solid #000000;
+            position: fixed;
+            width: 40px;
+            height: 25px;
+            margin-left: 5px;
+            margin-top: 127px;
+            top: 50%;
+            left: 50%;
+        }
+    </style>
+    <script lang="javascript">
+        var swcb = true,
+            logz = "";
+
+        function wuerfel(z) {
+
+            document.getElementById('d1').style.border = "50px solid #0f00";
+            document.getElementById('d2').style.border = "50px solid #0f00";
+            document.getElementById('d3').style.border = "50px solid #0f00";
+            document.getElementById('d4').style.border = "50px solid #0f00";
+            document.getElementById('d5').style.border = "50px solid #0f00";
+            document.getElementById('d6').style.border = "50px solid #0f00";
+            document.getElementById('d7').style.border = "50px solid #0f00";
+            document.getElementById('d8').style.border = "50px solid #0f00";
+            document.getElementById('d9').style.border = "50px solid #0f00";
+
+            switch (z) {
+                case 1:
+                    //5
+                    document.getElementById('d5').style.border = "50px solid #0f0f";
+                    break;
+                case 2:
+                    //37
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    break;
+                case 3:
+                    //357
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d5').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    break;
+                case 4:
+                    //1379
+                    document.getElementById('d1').style.border = "50px solid #0f0f";
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    document.getElementById('d9').style.border = "50px solid #0f0f";
+                    break;
+                case 5:
+                    //13579
+                    document.getElementById('d1').style.border = "50px solid #0f0f";
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d5').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    document.getElementById('d9').style.border = "50px solid #0f0f";
+                    break;
+                case 6:
+                    //134679
+                    document.getElementById('d1').style.border = "50px solid #0f0f";
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d4').style.border = "50px solid #0f0f";
+                    document.getElementById('d6').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    document.getElementById('d9').style.border = "50px solid #0f0f";
+                    break;
+                case 7:
+                    //1345679
+                    document.getElementById('d1').style.border = "50px solid #0f0f";
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d4').style.border = "50px solid #0f0f";
+                    document.getElementById('d5').style.border = "50px solid #0f0f";
+                    document.getElementById('d6').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    document.getElementById('d9').style.border = "50px solid #0f0f";
+                    break;
+                case 8:
+                    //12346789
+                    document.getElementById('d1').style.border = "50px solid #0f0f";
+                    document.getElementById('d2').style.border = "50px solid #0f0f";
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d4').style.border = "50px solid #0f0f";
+                    document.getElementById('d6').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    document.getElementById('d8').style.border = "50px solid #0f0f";
+                    document.getElementById('d9').style.border = "50px solid #0f0f";
+                    break;
+                case 9:
+                    //123456789
+                    document.getElementById('d1').style.border = "50px solid #0f0f";
+                    document.getElementById('d2').style.border = "50px solid #0f0f";
+                    document.getElementById('d3').style.border = "50px solid #0f0f";
+                    document.getElementById('d4').style.border = "50px solid #0f0f";
+                    document.getElementById('d5').style.border = "50px solid #0f0f";
+                    document.getElementById('d6').style.border = "50px solid #0f0f";
+                    document.getElementById('d7').style.border = "50px solid #0f0f";
+                    document.getElementById('d8').style.border = "50px solid #0f0f";
+                    document.getElementById('d9').style.border = "50px solid #0f0f";
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        function swcolor() {
+            if (swcb) {
+                document.getElementById('b').style = "background-color: #00ff00;";
+            } else {
+                document.getElementById('b').style = "background-color: #32cd32;";
+            }
+            swcb = !swcb;
+        }
+
+        function wuerfeln(min, max) {
+            if (min <= max) {
+                min = Math.round(min);
+                max = Math.round(max);
+            } else if (min > max) {
+                let swt = Math.round(max);
+                max = Math.round(min);
+                min = swt;
+            }
+            let r = Math.floor(Math.random() * (max - min + 1)) + min;
+            wuerfel(r); /*show*/
+            document.getElementById('b').value = r;
+            logz += r;
+        }
+
+        function charCount(str, l) {
+            var lc = 0;
+            for (let p = 0; p < str.length; p++) {
+                if (str.charAt(p) == l) {
+                    lc += 1;
+                }
+            }
+            return lc;
+        }
+
+        function stats(loggg) {
+            let X = [],
+                Y = loggg.length;
+            for (let i = 0; i <= 9; i++) {
+                X.push({
+                    numb: `"${i}"`,
+                    occ: charCount(loggg, i)
+                });
+            }
+            X.sort(function(a, b) {
+                return b.occ - a.occ
+            });
+            return {
+                total: Y,
+                logg: X
+            };
+        }
+
+        function displayStats(arr) {
+            let X = "",
+                Y = "",
+                Z = "",
+                spc = [];
+            for (let i = 0; i < arr.logg.length; i++) {
+                Z = "";
+                for (let i2 = arr.logg[i].occ.toString().length; i2 <= arr.logg[0].occ.toString().length; i2++) {
+                    Z += " ";
+                }
+                spc.push(Z);
+            }
+            X = arr.logg[0].occ + "x" + spc[0] + arr.logg[0].numb;
+            for (let i = 1; i < arr.logg.length; i++) {
+                X += `\n${arr.logg[i].occ}x${spc[i]}${arr.logg[i].numb}`;
+            }
+            Y = `total: ${arr.total}x\n${X}`;
+            //console.log(Y);
+            return Y;
+        }
+        //displayStats(stats(logz))→string/list
+    </script>
+</head>
+
+<body onload="alert('click on dice for stats');wuerfeln(document.getElementById('min').value,document.getElementById('max').value);">
+    <!--https://upload.wikimedia.org/wikipedia/commons/0/0e/Location_dot_green.svg online-pic-->
+    <table onclick="alert(displayStats(stats(logz)))">
+        <tr>
+            <td><div data-num="1" id="d1"></div></td>
+            <td><div data-num="2" id="d2"></div></td>
+            <td><div data-num="3" id="d3"></div></td>
+        </tr>
+        <tr>
+            <td><div data-num="4" id="d4"></div></td>
+            <td><div data-num="5" id="d5"></div></td>
+            <td><div data-num="6" id="d6"></div></td>
+        </tr>
+        <tr>
+            <td><div data-num="7" id="d7"></div></td>
+            <td><div data-num="8" id="d8"></div></td>
+            <td><div data-num="9" id="d9"></div></td>
+        </tr>
+    </table><br>
+    <input id="min" max="9" min="0" placeholder="min" type="number" value="1"> <input id="max" max="9" min="0" placeholder="max" type="number" value="6"><br>
+    <input autofocus="true" id="b" onclick="wuerfeln(document.getElementById('min').value,document.getElementById('max').value);swcolor();" type="button" value="0">
+    <!--/ #b → onblur="this.focus()" -->
+</body>
+
+</html>

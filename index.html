@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+    <style>
+        body {background-color: #2b2b2b;color: #0f0f;}
+        @keyframes banner {
+            0% {
+                background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 40px);
+                background-size: calc(100% + 57px) 100%;
+                background-position: 0px 0;
+            }
+            100% {
+                background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 40px);
+                background-size: calc(100% + 57px) 100%;
+                background-position: -57px 0;
+            }
+        }
+        @keyframes shadowcolor {
+            0% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#f00')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #f00);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #f00);
+            }
+            16.66% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#ff0')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #ff0);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #ff0);
+            }
+            33.33% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#0f0')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #0f0);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #0f0);
+            }
+            49.99% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#0ff')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #0ff);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #0ff);
+            }
+            66.66% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#00f')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #00f);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #00f);
+            }
+            83.33% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#f0f')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #f0f);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #f0f);
+            }
+            100% {
+                filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#f00')";
+                -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) #f00);
+                filter: drop-shadow(0px 0px var(--shadow,20px) #f00);
+            }
+        }
+        body>div>div{
+            background-color: #2b2b2b;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            overflow: auto;
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+            box-shadow: inset 4px 4px 10px 0px black;
+        }
+        body>div{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 50px;
+            height: 242px;
+            width: 540px;
+            box-shadow: 4px 4px 10px 0px black;
+            animation: banner 1s linear 0s infinite reverse backwards running;
+        }
+        body>img{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 80vh;
+            width: 80vw;
+            pointer-events: none;
+            --shadow: 20px;
+            filter: url(#drop-shadow);
+            animation: shadowcolor 5s linear -1s infinite normal backwards running;
+        }
+        h2>a[href],h3>a[href] {color: #0f0;}
+        social>a[href] {color: #08f;}
+        h2{
+            display: inline;
+            font-size: 3em;
+            margin-block-start: 0.4em;
+            margin-block-end: 0.1em;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0.013em 0.013em #000,
+                -0.013em 0.013em #000,
+                -0.013em -0.013em #000,
+                0.013em -0.01em #000,
+                0em 0.013em #000,
+                0em -0.013em #000,
+                0.013em 0em #000,
+                -0.013em 0em #000,
+                5px 3px 10px #0a0;
+            --shadow: 10px;
+            filter: url(#drop-shadow);
+            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
+            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+        }
+        h3{
+            display: inline;
+            font-size: 1.8em;
+            margin-block-start: 0.4em;
+            margin-block-end: 0.1em;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0.013em 0.013em #000,
+                -0.013em 0.013em #000,
+                -0.013em -0.013em #000,
+                0.013em -0.01em #000,
+                0em 0.013em #000,
+                0em -0.013em #000,
+                0.013em 0em #000,
+                -0.013em 0em #000,
+                5px 3px 10px #0a0;
+            --shadow: 10px;
+            filter: url(#drop-shadow);
+            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
+            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+        }
+        ::-webkit-scrollbar {width: 10px;height: 10px;}
+        ::-webkit-scrollbar-thumb {background: #008000;border-radius: 10px;}
+        ::-webkit-scrollbar-thumb:hover {background: #0F0F;}
+        ::-webkit-scrollbar-track {background: #000;}
+        ::-webkit-scrollbar-track-piece {background: #000;}
+        ::-webkit-scrollbar-corner {background-color: #000;}
+    </style>
+</head>
+<body>
+    <img src=".\logo.svg">
+    <div>
+        <div>
+            <h2><a href=".\sites\Flow Chart U3.html" target="_self" rel="noopener noreferrer">Satisfactory U3 Flow Chart</a></h2><br>
+            <h2><a href=".\sites\canvas ball.html" target="_self" rel="noopener noreferrer">Ball Screensaver</a></h2><br>
+            <h2><a href=".\sites\dice.html" target="_self" rel="noopener noreferrer">Small Dice</a></h2><br>
+            <h3><a href=".\sites\trash gang social media.html" target="_self" rel="noopener noreferrer">ＴＲＡＳＨ 新 ドラゴン social media links</a></h3><br>
+            <br><br>
+            <social>
+                <a href="https://www.youtube.com/channel/UCQHeetVlsN7Poqnovh5_eKA" target="_blank" rel="noopener noreferrer">youtube</a>
+                <span>&verbar;</span>
+                <a href="https://www.instagram.com/maz01001/" target="_blank" rel="noopener noreferrer">instagram</a>
+                <span>&verbar;</span>
+                <a href="https://soundcloud.com/maz-angst/likes" target="_blank" rel="noopener noreferrer">soundcloud</a>
+                <span>&verbar;</span>
+                <a href="https://www.reddit.com/user/MAZ00101" target="_blank" rel="noopener noreferrer">reddit</a>
+            </social>
+        </div>
+    </div>
+</body>
+</html>

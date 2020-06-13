@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bildschirmschoner</title>
+    <style>
+        body {
+            background-color: #2c2c2c;
+            padding: 0;
+            margin: 0;
+            margin-left: auto;
+            margin-right: auto;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="playField" style="border:2px solid #ff0000;"></canvas>
+    <script hidden='true'>
+        const times = []; //frame timestamps
+        let cnvhtml = document.getElementById('playField'), //canvas HTMLelement
+            cnv = cnvhtml.getContext("2d"), //canvas content
+            originFont = cnv.font, //original font
+            h = true, //horizontal movement {true=(+)}[x]
+            v = true, //vertical movement {false=(-)}[y]
+            x = innerWidth / 2, //x ball position
+            y = innerHeight / 2, //y ball position
+            r = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.1, //ball radius
+            movM = 8, //momentum {0 - inf}[speed]
+            movMTouch = false, //random speed at touch
+            movMTouchValue = {
+                min: 1,
+                max: movM * 2,
+                last: movM,
+            }, //speed at touch
+            ballSpeed = 0, //actual ball speed
+            c = 'rgb(255, 0, 0)', //ball color [RGB()]
+            cStage = 0, //color cycle
+            cStep = 10, //color cycle rate
+            cTouch = false, //touch or cycle
+            log = [], //cmd log
+            fps = NaN; //fps
+        cnvhtml.width = innerWidth - 4;
+        cnvhtml.height = innerHeight - 4;
+
+        function draw() {
+            //resize canvas
+            cnvhtml.width = innerWidth - 4;
+            cnvhtml.height = innerHeight - 4;
+            //ball
+            cTouch ? cStage = 0 : color(c, cStep);
+            r = (cnvhtml.width > cnvhtml.height ? cnvhtml.height : cnvhtml.width) * 0.1;
+            cnv.beginPath();
+            cnv.arc(x, y, r, 0, 2 * Math.PI);
+            cnv.stroke();
+            cnv.fillStyle = c;
+            cnv.fill();
+            //set speed and move ball
+            if (movMTouch) {
+                ballSpeed = movMTouchValue.last;
+            } else {
+                ballSpeed = movM;
+            }
+            if ((x + r) > (cnvhtml.width - 1)) {
+                //right
+                h = false;
+                cTouch ? colorTouch() : null;
+                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
+            }
+            if ((y + r) > (cnvhtml.height - 1)) {
+                //bottom
+                v = false;
+                cTouch ? colorTouch() : null;
+                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
+            }
+            if ((x - r) < 1) {
+                //left
+                h = true;
+                cTouch ? colorTouch() : null;
+                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
+            }
+            if ((y - r) < 1) {
+                //top
+                v = true;
+                cTouch ? colorTouch() : null;
+                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
+            }
+            if (v && h) {
+                x += ballSpeed; //next x position
+                y += ballSpeed; //next y position
+            } else if (v && !h) {
+                x -= ballSpeed; //next x position
+                y += ballSpeed; //next y position
+            } else if (!v && !h) {
+                x -= ballSpeed; //next x position
+                y -= ballSpeed; //next y position
+            } else if (!v && h) {
+                x += ballSpeed; //next x position
+                y -= ballSpeed; //next y position
+            }
+            //fps
+            cnv.font = '20px consolas';
+            cnv.fillStyle = '#00ff00';
+            cnv.fillText('fps:' + fps, 15, 30);
+            cnv.font = originFont;
+        }
+
+        window.addEventListener("mousedown", e => {
+            if ((typeof e === 'object') && (e.button == 1)) {
+                let tmp = '';
+                for (const key in logCmd()) {
+                    const element = log[key];
+                    tmp += key + ': ' + element + '\n';
+                }
+                tmp.slice(0, -2);
+                alert(tmp);
+            }
+        });
+
+        function color(color = 'rgb(255,0,0)', step = 1) {
+            let R = parseInt(color.slice(4, -1).split(',')[0]),
+                G = parseInt(color.slice(4, -1).split(',')[1]),
+                B = parseInt(color.slice(4, -1).split(',')[2]);
+            switch (cStage) {
+                case 0:
+                    if ((R == 255) && (G == 0) && (B == 0)) {
+                        cStage++;
+                        break;
+                    }
+                    if (B > 0) {
+                        (B - step) < 0 ? B = 0 : B -= step;
+                    }
+                    if (G > 0) {
+                        (G - step) < 0 ? G = 0 : G -= step;
+                    }
+                    if (R < 255) {
+                        (R + step) > 255 ? R = 255 : R += step;
+                    }
+                    break;
+                case 1:
+                    if ((R == 255) && (G == 0) && (B == 0)) {
+                        cStage++;
+                        break;
+                    }
+                    if (B > 0) {
+                        (B - step) < 0 ? B = 0 : B -= step;
+                    }
+                    break;
+                case 2:
+                    if ((R == 255) && (G == 255) && (B == 0)) {
+                        cStage++;
+                        break;
+                    }
+                    if (G < 255) {
+                        (G + step) > 255 ? G = 255 : G += step;
+                    }
+                    break;
+                case 3:
+                    if ((R == 0) && (G == 255) && (B == 0)) {
+                        cStage++;
+                        break;
+                    }
+                    if (R > 0) {
+                        (R - step) < 0 ? R = 0 : R -= step;
+                    }
+                    break;
+                case 4:
+                    if ((R == 0) && (G == 255) && (B == 255)) {
+                        cStage++;
+                        break;
+                    }
+                    if (B < 255) {
+                        (B + step) > 255 ? B = 255 : B += step;
+                    }
+                    break;
+                case 5:
+                    if ((R == 0) && (G == 0) && (B == 255)) {
+                        cStage++;
+                        break;
+                    }
+                    if (G > 0) {
+                        (G - step) < 0 ? G = 0 : G -= step;
+                    }
+                    break;
+                case 6:
+                    if ((R == 255) && (G == 0) && (B == 255)) {
+                        cStage = 1;
+                        break;
+                    }
+                    if (R < 255) {
+                        (R + step) > 255 ? R = 255 : R += step;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            c = `rgb(${R}, ${G}, ${B})`;
+        }
+
+        function colorTouch() {
+            let tmp = Math.round(Math.random() * 255),
+                tmp2 = Math.round(Math.random() * 255),
+                tmp3 = Math.round(Math.random() * 255);
+            c = `rgb(${tmp}, ${tmp2}, ${tmp3})`;
+        }
+
+        function mapRange(value, low1, high1, low2, high2) {
+            return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+        }
+
+        function randomInt(min = 0, max = 1, arrLength = 0, arr2Length = 0, arr3Length = 0) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            arrLength = Math.floor(arrLength);
+            arr2Length = Math.floor(arr2Length);
+            arr3Length = Math.floor(arr3Length);
+            if (min > max) {
+                let tmp = min;
+                min = max;
+                max = tmp;
+            }
+            if (arrLength > 0) {
+                let tmp = [];
+                for (let i = 0; i < arrLength; i++) {
+                    if (arr2Length > 0) {
+                        tmp[i] = [];
+                        for (let i2 = 0; i2 < arr2Length; i2++) {
+                            if (arr3Length > 0) {
+                                tmp[i][i2] = [];
+                                for (let i3 = 0; i3 < arr3Length; i3++) {
+                                    tmp[i][i2].push(Math.floor(Math.random() * (max - min + 1)) + min);
+                                }
+                            } else {
+                                tmp[i].push(Math.floor(Math.random() * (max - min + 1)) + min);
+                            }
+                        }
+                    } else {
+                        tmp.push(Math.floor(Math.random() * (max - min + 1)) + min);
+                    }
+                }
+                return tmp;
+            } else {
+                return (Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+        };
+
+        function refreshLoop() {
+            window.requestAnimationFrame(() => {
+                const now = performance.now();
+                while (times.length > 0 && times[0] <= now - 1000) {
+                    times.shift();
+                }
+                times.push(now);
+                fps = times.length;
+                draw(); /* repeat this function */
+                refreshLoop();
+            });
+        }
+
+        function logCmd() {
+            log.length = 0;
+            log = {
+                h: h,
+                v: v,
+                x: x,
+                y: y,
+                r: r,
+                movM: movM,
+                movMTouch: movMTouch,
+                movMTouchValue: 'min: ' + movMTouchValue.min + 'px, max: ' + movMTouchValue.max + 'px (last: ' + movMTouchValue.last + 'px)',
+                ballspeed: ballSpeed,
+                c: c,
+                cStage: cStage,
+                cStep: cStep,
+                cTouch: cTouch,
+                fps: fps,
+                cnvhtml_width: cnvhtml.width,
+                cnvhtml_height: cnvhtml.height
+            };
+            console.log(log);
+            return log;
+        }
+        logCmd();
+        refreshLoop();
+    </script>
+</body>
+
+</html>
