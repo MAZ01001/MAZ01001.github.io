@@ -1,307 +1,311 @@
-.\icon\Bacon_Agaric.png                                                    bacon_agaric
-.\icon\Beryl_Nut.png                                                       beryl_nut
-.\icon\Hard_Drive.png                                                      hard_drive
-.\icon\HUB_Parts.png                                                       hub_parts
-.\icon\Paleberry.png                                                       paleberry
+imSrc                                                                               idName                                              name                                                        wikiLink
 
 __________________________________________________________________________________________
 
-.\icon\awesome\Adequate_Pioneering.png                                             adequate_pioneering
-.\icon\awesome\Confusing_Creature.png                                              confusing_creature
-.\icon\awesome\Cup.png                                                             cup
-.\icon\awesome\FICSIT_Coupon.png                                                   ficsit_coupon
-.\icon\awesome\Golden_Nut.png                                                      golden_nut
-.\icon\awesome\Lizard_Doggo_Statue.png                                             lizard_doggo_statue
-.\icon\awesome\Pretty_Good_Pioneering.png                                          pretty_good_pioneering
-.\icon\awesome\Satisfactory_Pioneering.png                                         satisfactory_pioneering
-.\icon\awesome\Silver_Hog.png                                                      silver_hog
+.\\icon\\Bacon_Agaric.png                                                             bacon_agaric                                        Bacon Agaric                                                Bacon_Agaric
+.\\icon\\Beryl_Nut.png                                                                beryl_nut                                           Beryl Nut                                                   Beryl_Nut
+.\\icon\\Hard_Drive.png                                                               hard_drive                                          Hard Drive                                                  Hard_Drive
+.\\icon\\HUB_Parts.png                                                                hub_parts                                           HUB Parts                                                   HUB_Parts
+.\\icon\\Paleberry.png                                                                paleberry                                           Paleberry                                                   Paleberry
 
 __________________________________________________________________________________________
 
-.\icon\building\Assembler.png                                                       assembler
-.\icon\building\AWESOME_Shop.png                                                    awesome_shop
-.\icon\building\AWESOME_Sink.png                                                    awesome_sink
-.\icon\building\Biomass_Burner.png                                                  biomass_burner
-.\icon\building\Center_Door_Wall_(Plating).png                                      center_door_wall__plating
-.\icon\building\Center_Door_Wall_(Sheet_Metal).png                                  center_door_wall__sheet_metal
-.\icon\building\Coal_Generator.png                                                  coal_generator
-.\icon\building\Constructor.png                                                     constructor
-.\icon\building\Conveyor_Belt_Mk.1.png                                              conveyor_belt_mk1
-.\icon\building\Conveyor_Belt_Mk.2.png                                              conveyor_belt_mk2
-.\icon\building\Conveyor_Belt_Mk.3.png                                              conveyor_belt_mk3
-.\icon\building\Conveyor_Belt_Mk.4.png                                              conveyor_belt_mk4
-.\icon\building\Conveyor_Belt_Mk.5.png                                              conveyor_belt_mk5
-.\icon\building\Conveyor_Lift.png                                                   conveyor_lift_mk1
-.\icon\building\Conveyor_Lift_Mk.2.png                                              conveyor_lift_mk2
-.\icon\building\Conveyor_Lift_Mk.3.png                                              conveyor_lift_mk3
-.\icon\building\Conveyor_Lift_Mk.4.png                                              conveyor_lift_mk4
-.\icon\building\Conveyor_Lift_Mk.5.png                                              conveyor_lift_mk5
-.\icon\building\Conveyor_Merger.png                                                 conveyor_merger
-.\icon\building\Conveyor_Pole.png                                                   conveyor_pole
-.\icon\building\Conveyor_Splitter.png                                               conveyor_splitter
-.\icon\building\Conveyor_Wall_Mount.png                                             conveyor_wall_mount
-.\icon\building\Craft_Bench.png                                                     craft_bench
-.\icon\building\Double_Ramp_8m_x_2m.png                                             double_ramp_8m_x_2m
-.\icon\building\Double_Ramp_8m_x_4m.png                                             double_ramp_8m_x_4m
-.\icon\building\Double_Ramp_8m_x_8m.png                                             double_ramp_8m_x_8m
-.\icon\building\Double_Wall_Outlet.png                                              double_wall_outlet_mk1
-.\icon\building\Double_Wall_Outlet_Mk.2.png                                         double_wall_outlet_mk2
-.\icon\building\Double_Wall_Outlet_Mk.3.png                                         double_wall_outlet_mk3
-.\icon\building\Down_Corner_Ramp_8m_x_1m.png                                        down_corner_ramp_8m_x_1m
-.\icon\building\Down_Corner_Ramp_8m_x_2m.png                                        down_corner_ramp_8m_x_2m
-.\icon\building\Down_Corner_Ramp_8m_x_4m.png                                        down_corner_ramp_8m_x_4m
-.\icon\building\Empty_Platform.png                                                  empty_platform
-.\icon\building\Equipment_Workshop.png                                              equipment_workshop
-.\icon\building\Fence.png                                                           fence
-.\icon\building\Fluid_Buffer.png                                                    fluid_buffer
-.\icon\building\Fluid_Freight_Platform.png                                          fluid_freight_platform
-.\icon\building\Foundation_8m_x_1m.png                                              foundation_8m_x_1m
-.\icon\building\Foundation_8m_x_2m.png                                              foundation_8m_x_2m
-.\icon\building\Foundation_8m_x_4m.png                                              foundation_8m_x_4m
-.\icon\building\Foundry.png                                                         foundry
-.\icon\building\Frame_Foundation_8m_x_4m.png                                        frame_foundation_8m_x_4m
-.\icon\building\Frame_Window.png                                                    frame_window
-.\icon\building\Freight_Platform.png                                                freight_platform
-.\icon\building\Fuel_Generator.png                                                  fuel_generator
-.\icon\building\Gate_Wall.png                                                       gate_wall
-.\icon\building\Geo_Thermal_Generator.png                                           geo_thermal_generator
-.\icon\building\Glass_Foundation_8m_x_1m.png                                        glass_foundation_8m_x_1m
-.\icon\building\Hyper_Tube.png                                                      hyper_tube
-.\icon\building\Hyper_Tube_Entrance.png                                             hyper_tube_entrance
-.\icon\building\Hyper_Tube_Support.png                                              hyper_tube_support
-.\icon\building\Hyper_Tube_Wall_Hole.png                                            hyper_tube_wall_hole
-.\icon\building\Hyper_Tube_Wall_Support.png                                         hyper_tube_wall_support
-.\icon\building\Industrial_Fluid_Buffer.png                                         industrial_fluid_buffer
-.\icon\building\Industrial_Storage_Container.png                                    industrial_storage_container
-.\icon\building\Inner-Corner_Quarter_Pipe.png                                       inner_corner_quarter_pipe
-.\icon\building\Inverted_Inner-Corner_Quarter_Pipe.png                              inverted_inner_corner_quarter_pipe
-.\icon\building\Inverted_Outer-Corner_Quarter_Pipe.png                              inverted_outer_corner_quarter_pipe
-.\icon\building\Inverted_Quarter_Pipe.png                                           inverted_quarter_pipe
-.\icon\building\Inverted_Ramp_8m_x_1m.png                                           inverted_ramp_8m_x_1m
-.\icon\building\Inverted_Ramp_8m_x_2m.png                                           inverted_ramp_8m_x_2m
-.\icon\building\Inverted_Ramp_8m_x_4m.png                                           inverted_ramp_8m_x_4m
-.\icon\building\Jump_Pad.png                                                        jump_pad
-.\icon\building\Left_Door_Wall_(Plating).png                                        left_door_wall__plating
-.\icon\building\Left_Door_Wall_(Sheet_Metal).png                                    left_door_wall__sheet_metal
-.\icon\building\Lookout_Tower.png                                                   lookout_tower
-.\icon\building\M.A.M..png                                                          mam
-.\icon\building\Manufacturer.png                                                    manufacturer
-.\icon\building\Miner_Mk.1.png                                                      miner_mk1
-.\icon\building\Miner_Mk.2.png                                                      miner_mk2
-.\icon\building\Miner_Mk.3.png                                                      miner_mk3
-.\icon\building\Nuclear_Power_Plant.png                                             nuclear_power_plant
-.\icon\building\Oil_Extractor.png                                                   oil_extractor
-.\icon\building\Oil_Pump.png                                                        oil_pump
-.\icon\building\Outer-Corner_Quarter_Pipe.png                                       outer_corner_quarter_pipe
-.\icon\building\Panel_Window.png                                                    panel_window
-.\icon\building\Personal_Storage_Box.png                                            personal_storage_box
-.\icon\building\Pillar_Base.png                                                     pillar_base
-.\icon\building\Pillar_Middle.png                                                   pillar_middle
-.\icon\building\Pillar_Top.png                                                      pillar_top
-.\icon\building\Pipeline.png                                                        pipeline
-.\icon\building\Pipeline_Junction_Cross.png                                         pipeline_junction_cross
-.\icon\building\Pipeline_Pump.png                                                   pipeline_pump
-.\icon\building\Pipeline_Support.png                                                pipeline_support
-.\icon\building\Pipeline_Wall_Hole.png                                              pipeline_wall_hole
-.\icon\building\Pipeline_Wall_Support.png                                           pipeline_wall_support
-.\icon\building\Portable_Miner.png                                                  portable_miner
-.\icon\building\Power_Line.png                                                      power_line
-.\icon\building\Power_Pole.png                                                      power_pole_mk1
-.\icon\building\Power_Pole_Mk.2.png                                                 power_pole_mk2
-.\icon\building\Power_Pole_Mk.3.png                                                 power_pole_mk3
-.\icon\building\Programmable_Splitter.png                                           programmable_splitter
-.\icon\building\Quarter_Pipe.png                                                    quarter_pipe
-.\icon\building\Radar_Tower.png                                                     radar_tower
-.\icon\building\Railway.png                                                         railway
-.\icon\building\Ramp_8m_x_1m.png                                                    ramp_8m_x_1m
-.\icon\building\Ramp_8m_x_2m.png                                                    ramp_8m_x_2m
-.\icon\building\Ramp_8m_x_4m.png                                                    ramp_8m_x_4m
-.\icon\building\Refinery.png                                                        refinery
-.\icon\building\Reinforced_Window.png                                               reinforced_window
-.\icon\building\Right_Door_Wall_(Plating).png                                       right_door_wall__plating
-.\icon\building\Right_Door_Wall_(Sheet_Metal).png                                   right_door_wall__sheet_metal
-.\icon\building\Single_Window.png                                                   single_window
-.\icon\building\Smart_Splitter.png                                                  smart_splitter
-.\icon\building\Smelter.png                                                         smelter
-.\icon\building\Space_Elevator.png                                                  space_elevator
-.\icon\building\Stackable_Conveyor_Pole.png                                         stackable_conveyor_pole
-.\icon\building\Stackable_Hyper_Tube_Support.png                                    stackable_hyper_tube_support
-.\icon\building\Stackable_Pipeline_Support.png                                      stackable_pipeline_support
-.\icon\building\Stairs_Left.png                                                     stairs_left
-.\icon\building\Stairs_Right.png                                                    stairs_right
-.\icon\building\Storage_Container.png                                               storage_container
-.\icon\building\The_HUB.png                                                         the_hub
-.\icon\building\Tilted_Jump_Pad.png                                                 tilted_jump_pad
-.\icon\building\Train_Station.png                                                   train_station
-.\icon\building\Truck_Station.png                                                   truck_station
-.\icon\building\U-Jelly_Landing_Pad.png                                             u_jelly_landing_pad
-.\icon\building\Up_Corner_8m_x_1m_Inverted.png                                      up_corner_8m_x_1m_inverted
-.\icon\building\Up_Corner_8m_x_2m_Inverted.png                                      up_corner_8m_x_2m_inverted
-.\icon\building\Up_Corner_8m_x_4m_Inverted.png                                      up_corner_8m_x_4m_inverted
-.\icon\building\Up_Corner_Ramp_8m_x_1m.png                                          up_corner_ramp_8m_x_1m
-.\icon\building\Up_Corner_Ramp_8m_x_2m.png                                          up_corner_ramp_8m_x_2m
-.\icon\building\Up_Corner_Ramp_8m_x_4m.png                                          up_corner_ramp_8m_x_4m
-.\icon\building\Walkway_Crossing.png                                                walkway_crossing
-.\icon\building\Walkway_Ramp.png                                                    walkway_ramp
-.\icon\building\Walkway_Straight.png                                                walkway_straight
-.\icon\building\Walkway_T-Crossing.png                                              walkway_t_crossing
-.\icon\building\Walkway_Turn.png                                                    walkway_turn
-.\icon\building\Wall_(Plating).png                                                  wall__plating
-.\icon\building\Wall_(Sheet_Metal).png                                              wall__sheet_metal
-.\icon\building\Wall_Conveyor_Perpendicular_(Plating).png                           wall_conveyor_perpendicular__plating
-.\icon\building\Wall_Conveyor_Perpendicular_(Sheet_Metal).png                       wall_conveyor_perpendicular__sheet_metal
-.\icon\building\Wall_Conveyor_x1_(Plating).png                                      wall_conveyor_x1__plating
-.\icon\building\Wall_Conveyor_x1_(Sheet_Metal).png                                  wall_conveyor_x1__sheet_metal
-.\icon\building\Wall_Conveyor_x2_(Plating).png                                      wall_conveyor_x2__plating
-.\icon\building\Wall_Conveyor_x2_(Sheet_Metal).png                                  wall_conveyor_x2__sheet_metal
-.\icon\building\Wall_Conveyor_x3_(Plating).png                                      wall_conveyor_x3__plating
-.\icon\building\Wall_Conveyor_x3_(Sheet_Metal).png                                  wall_conveyor_x3__sheet_metal
-.\icon\building\Wall_Outlet.png                                                     wall_outlet
-.\icon\building\Wall_Outlet_Mk.2.png                                                wall_outlet_mk2
-.\icon\building\Wall_Outlet_Mk.3.png                                                wall_outlet_mk3
-.\icon\building\Water_Extractor.png                                                 water_extractor
+.\\icon\\awesome\\Adequate_Pioneering.png                                              adequate_pioneering                                 Adequate Pioneering                                         Adequate_Pioneering
+.\\icon\\awesome\\Confusing_Creature.png                                               confusing_creature                                  Confusing Creature                                          Confusing_Creature
+.\\icon\\awesome\\Cup.png                                                              cup                                                 Cup                                                         Cup
+.\\icon\\awesome\\FICSIT_Coupon.png                                                    ficsit_coupon                                       FICSIT Coupon                                               FICSIT_Coupon
+.\\icon\\awesome\\Golden_Nut.png                                                       golden_nut                                          Golden Nut                                                  Golden_Nut
+.\\icon\\awesome\\Lizard_Doggo_Statue.png                                              lizard_doggo_statue                                 Lizard Doggo Statue                                         Lizard_Doggo_Statue
+.\\icon\\awesome\\Pretty_Good_Pioneering.png                                           pretty_good_pioneering                              Pretty Good Pioneering                                      Pretty_Good_Pioneering
+.\\icon\\awesome\\Satisfactory_Pioneering.png                                          satisfactory_pioneering                             Satisfactory Pioneering                                     Satisfactory_Pioneering
+.\\icon\\awesome\\Silver_Hog.png                                                       silver_hog                                          Silver Hog                                                  Silver_Hog
 
 __________________________________________________________________________________________
 
-.\icon\equipment\Blade_Runners.png                                                   blade_runners
-.\icon\equipment\Chainsaw.png                                                        chainsaw
-.\icon\equipment\Color_Gun.png                                                       color_gun
-.\icon\equipment\Gas_mask.png                                                        gas_mask
-.\icon\equipment\Hazmat_Suit.png                                                     hazmat_suit
-.\icon\equipment\Jetpack.png                                                         jetpack
-.\icon\equipment\Medicinal_Inhaler.png                                               medicinal_inhaler
-.\icon\equipment\Nobelisk_Detonator.png                                              nobelisk_detonator
-.\icon\equipment\Object_Scanner.png                                                  object_scanner
-.\icon\equipment\Parachute.png                                                       parachute
-.\icon\equipment\Rebar_Gun.png                                                       rebar_gun
-.\icon\equipment\Rifle.png                                                           rifle
-.\icon\equipment\Xeno-Basher.png                                                     xeno_basher
-.\icon\equipment\Xeno-Zapper.png                                                     xeno_zapper
+.\\icon\\building\\Assembler.png                                                       assembler                                           Assembler                                                   Assembler
+.\\icon\\building\\AWESOME_Shop.png                                                    awesome_shop                                        AWESOME Shop                                                AWESOME_Shop
+.\\icon\\building\\AWESOME_Sink.png                                                    awesome_sink                                        AWESOME Sink                                                AWESOME_Sink
+.\\icon\\building\\Biomass_Burner.png                                                  biomass_burner                                      Biomass Burner                                              Biomass_Burner
+.\\icon\\building\\Center_Door_Wall_(Plating).png                                      center_door_wall__plating                           Center Door Wall (Plating)                                  Center_Door_Wall_(Plating)
+.\\icon\\building\\Center_Door_Wall_(Sheet_Metal).png                                  center_door_wall__sheet_metal                       Center Door Wall (Sheet Metal)                              Center_Door_Wall_(Sheet_Metal)
+.\\icon\\building\\Coal_Generator.png                                                  coal_generator                                      Coal Generator                                              Coal_Generator
+.\\icon\\building\\Constructor.png                                                     constructor                                         Constructor                                                 Constructor
+.\\icon\\building\\Conveyor_Belt_Mk.1.png                                              conveyor_belt_mk1                                   Conveyor Belt Mk.1                                          Conveyor_Belt_Mk.1
+.\\icon\\building\\Conveyor_Belt_Mk.2.png                                              conveyor_belt_mk2                                   Conveyor Belt Mk.2                                          Conveyor_Belt_Mk.2
+.\\icon\\building\\Conveyor_Belt_Mk.3.png                                              conveyor_belt_mk3                                   Conveyor Belt Mk.3                                          Conveyor_Belt_Mk.3
+.\\icon\\building\\Conveyor_Belt_Mk.4.png                                              conveyor_belt_mk4                                   Conveyor Belt Mk.4                                          Conveyor_Belt_Mk.4
+.\\icon\\building\\Conveyor_Belt_Mk.5.png                                              conveyor_belt_mk5                                   Conveyor Belt Mk.5                                          Conveyor_Belt_Mk.5
+.\\icon\\building\\Conveyor_Lift.png                                                   conveyor_lift_mk1                                   Conveyor Lift                                               Conveyor_Lift
+.\\icon\\building\\Conveyor_Lift_Mk.2.png                                              conveyor_lift_mk2                                   Conveyor Lift Mk.2                                          Conveyor_Lift_Mk.2
+.\\icon\\building\\Conveyor_Lift_Mk.3.png                                              conveyor_lift_mk3                                   Conveyor Lift Mk.3                                          Conveyor_Lift_Mk.3
+.\\icon\\building\\Conveyor_Lift_Mk.4.png                                              conveyor_lift_mk4                                   Conveyor Lift Mk.4                                          Conveyor_Lift_Mk.4
+.\\icon\\building\\Conveyor_Lift_Mk.5.png                                              conveyor_lift_mk5                                   Conveyor Lift Mk.5                                          Conveyor_Lift_Mk.5
+.\\icon\\building\\Conveyor_Merger.png                                                 conveyor_merger                                     Conveyor Merger                                             Conveyor_Merger
+.\\icon\\building\\Conveyor_Pole.png                                                   conveyor_pole                                       Conveyor Pole                                               Conveyor_Pole
+.\\icon\\building\\Conveyor_Splitter.png                                               conveyor_splitter                                   Conveyor Splitter                                           Conveyor_Splitter
+.\\icon\\building\\Conveyor_Wall_Mount.png                                             conveyor_wall_mount                                 Conveyor Wall Mount                                         Conveyor_Wall_Mount
+.\\icon\\building\\Craft_Bench.png                                                     craft_bench                                         Craft Bench                                                 Craft_Bench
+.\\icon\\building\\Double_Ramp_8m_x_2m.png                                             double_ramp_8m_x_2m                                 Double Ramp 8m x 2m                                         Double_Ramp_8m_x_2m
+.\\icon\\building\\Double_Ramp_8m_x_4m.png                                             double_ramp_8m_x_4m                                 Double Ramp 8m x 4m                                         Double_Ramp_8m_x_4m
+.\\icon\\building\\Double_Ramp_8m_x_8m.png                                             double_ramp_8m_x_8m                                 Double Ramp 8m x 8m                                         Double_Ramp_8m_x_8m
+.\\icon\\building\\Double_Wall_Outlet.png                                              double_wall_outlet_mk1                              Double Wall Outlet                                          Double_Wall_Outlet
+.\\icon\\building\\Double_Wall_Outlet_Mk.2.png                                         double_wall_outlet_mk2                              Double Wall Outlet Mk.2                                     Double_Wall_Outlet_Mk.2
+.\\icon\\building\\Double_Wall_Outlet_Mk.3.png                                         double_wall_outlet_mk3                              Double Wall Outlet Mk.3                                     Double_Wall_Outlet_Mk.3
+.\\icon\\building\\Down_Corner_Ramp_8m_x_1m.png                                        down_corner_ramp_8m_x_1m                            Down Corner Ramp 8m x 1m                                    Down_Corner_Ramp_8m_x_1m
+.\\icon\\building\\Down_Corner_Ramp_8m_x_2m.png                                        down_corner_ramp_8m_x_2m                            Down Corner Ramp 8m x 2m                                    Down_Corner_Ramp_8m_x_2m
+.\\icon\\building\\Down_Corner_Ramp_8m_x_4m.png                                        down_corner_ramp_8m_x_4m                            Down Corner Ramp 8m x 4m                                    Down_Corner_Ramp_8m_x_4m
+.\\icon\\building\\Empty_Platform.png                                                  empty_platform                                      Empty Platform                                              Empty_Platform
+.\\icon\\building\\Equipment_Workshop.png                                              equipment_workshop                                  Equipment Workshop                                          Equipment_Workshop
+.\\icon\\building\\Fence.png                                                           fence                                               Fence                                                       Fence
+.\\icon\\building\\Fluid_Buffer.png                                                    fluid_buffer                                        Fluid Buffer                                                Fluid_Buffer
+.\\icon\\building\\Fluid_Freight_Platform.png                                          fluid_freight_platform                              Fluid Freight Platform                                      Fluid_Freight_Platform
+.\\icon\\building\\Foundation_8m_x_1m.png                                              foundation_8m_x_1m                                  Foundation 8m x 1m                                          Foundation_8m_x_1m
+.\\icon\\building\\Foundation_8m_x_2m.png                                              foundation_8m_x_2m                                  Foundation 8m x 2m                                          Foundation_8m_x_2m
+.\\icon\\building\\Foundation_8m_x_4m.png                                              foundation_8m_x_4m                                  Foundation 8m x 4m                                          Foundation_8m_x_4m
+.\\icon\\building\\Foundry.png                                                         foundry                                             Foundry                                                     Foundry
+.\\icon\\building\\Frame_Foundation_8m_x_4m.png                                        frame_foundation_8m_x_4m                            Frame Foundation 8m x 4m                                    Frame_Foundation_8m_x_4m
+.\\icon\\building\\Frame_Window.png                                                    frame_window                                        Frame Window                                                Frame_Window
+.\\icon\\building\\Freight_Platform.png                                                freight_platform                                    Freight Platform                                            Freight_Platform
+.\\icon\\building\\Fuel_Generator.png                                                  fuel_generator                                      Fuel Generator                                              Fuel_Generator
+.\\icon\\building\\Gate_Wall.png                                                       gate_wall                                           Gate Wall                                                   Gate_Wall
+.\\icon\\building\\Geo_Thermal_Generator.png                                           geo_thermal_generator                               Geo Thermal Generator                                       Geo_Thermal_Generator
+.\\icon\\building\\Glass_Foundation_8m_x_1m.png                                        glass_foundation_8m_x_1m                            Glass Foundation 8m x 1m                                    Glass_Foundation_8m_x_1m
+.\\icon\\building\\Hyper_Tube.png                                                      hyper_tube                                          Hyper Tube                                                  Hyper_Tube
+.\\icon\\building\\Hyper_Tube_Entrance.png                                             hyper_tube_entrance                                 Hyper Tube Entrance                                         Hyper_Tube_Entrance
+.\\icon\\building\\Hyper_Tube_Support.png                                              hyper_tube_support                                  Hyper Tube Support                                          Hyper_Tube_Support
+.\\icon\\building\\Hyper_Tube_Wall_Hole.png                                            hyper_tube_wall_hole                                Hyper Tube Wall Hole                                        Hyper_Tube_Wall_Hole
+.\\icon\\building\\Hyper_Tube_Wall_Support.png                                         hyper_tube_wall_support                             Hyper Tube Wall Support                                     Hyper_Tube_Wall_Support
+.\\icon\\building\\Industrial_Fluid_Buffer.png                                         industrial_fluid_buffer                             Industrial Fluid Buffer                                     Industrial_Fluid_Buffer
+.\\icon\\building\\Industrial_Storage_Container.png                                    industrial_storage_container                        Industrial Storage Container                                Industrial_Storage_Container
+.\\icon\\building\\Inner-Corner_Quarter_Pipe.png                                       inner_corner_quarter_pipe                           Inner-Corner Quarter Pipe                                   Inner-Corner_Quarter_Pipe
+.\\icon\\building\\Inverted_Inner-Corner_Quarter_Pipe.png                              inverted_inner_corner_quarter_pipe                  Inverted Inner-Corner Quarter Pipe                          Inverted_Inner-Corner_Quarter_Pipe
+.\\icon\\building\\Inverted_Outer-Corner_Quarter_Pipe.png                              inverted_outer_corner_quarter_pipe                  Inverted Outer-Corner Quarter Pipe                          Inverted_Outer-Corner_Quarter_Pipe
+.\\icon\\building\\Inverted_Quarter_Pipe.png                                           inverted_quarter_pipe                               Inverted Quarter Pipe                                       Inverted_Quarter_Pipe
+.\\icon\\building\\Inverted_Ramp_8m_x_1m.png                                           inverted_ramp_8m_x_1m                               Inverted Ramp 8m x 1m                                       Inverted_Ramp_8m_x_1m
+.\\icon\\building\\Inverted_Ramp_8m_x_2m.png                                           inverted_ramp_8m_x_2m                               Inverted Ramp 8m x 2m                                       Inverted_Ramp_8m_x_2m
+.\\icon\\building\\Inverted_Ramp_8m_x_4m.png                                           inverted_ramp_8m_x_4m                               Inverted Ramp 8m x 4m                                       Inverted_Ramp_8m_x_4m
+.\\icon\\building\\Jump_Pad.png                                                        jump_pad                                            Jump Pad                                                    Jump_Pad
+.\\icon\\building\\Left_Door_Wall_(Plating).png                                        left_door_wall__plating                             Left Door Wall (Plating)                                    Left_Door_Wall_(Plating)
+.\\icon\\building\\Left_Door_Wall_(Sheet_Metal).png                                    left_door_wall__sheet_metal                         Left Door Wall (Sheet Metal)                                Left_Door_Wall_(Sheet_Metal)
+.\\icon\\building\\Lookout_Tower.png                                                   lookout_tower                                       Lookout Tower                                               Lookout_Tower
+.\\icon\\building\\M.A.M..png                                                          mam                                                 M.A.M.                                                      M.A.M.
+.\\icon\\building\\Manufacturer.png                                                    manufacturer                                        Manufacturer                                                Manufacturer
+.\\icon\\building\\Miner_Mk.1.png                                                      miner_mk1                                           Miner Mk.1                                                  Miner_Mk.1
+.\\icon\\building\\Miner_Mk.2.png                                                      miner_mk2                                           Miner Mk.2                                                  Miner_Mk.2
+.\\icon\\building\\Miner_Mk.3.png                                                      miner_mk3                                           Miner Mk.3                                                  Miner_Mk.3
+.\\icon\\building\\Nuclear_Power_Plant.png                                             nuclear_power_plant                                 Nuclear Power Plant                                         Nuclear_Power_Plant
+.\\icon\\building\\Oil_Extractor.png                                                   oil_extractor                                       Oil Extractor                                               Oil_Extractor
+.\\icon\\building\\Oil_Pump.png                                                        oil_pump                                            Oil Pump                                                    Oil_Pump
+.\\icon\\building\\Outer-Corner_Quarter_Pipe.png                                       outer_corner_quarter_pipe                           Outer-Corner Quarter Pipe                                   Outer-Corner_Quarter_Pipe
+.\\icon\\building\\Panel_Window.png                                                    panel_window                                        Panel Window                                                Panel_Window
+.\\icon\\building\\Personal_Storage_Box.png                                            personal_storage_box                                Personal Storage Box                                        Personal_Storage_Box
+.\\icon\\building\\Pillar_Base.png                                                     pillar_base                                         Pillar Base                                                 Pillar_Base
+.\\icon\\building\\Pillar_Middle.png                                                   pillar_middle                                       Pillar Middle                                               Pillar_Middle
+.\\icon\\building\\Pillar_Top.png                                                      pillar_top                                          Pillar Top                                                  Pillar_Top
+.\\icon\\building\\Pipeline.png                                                        pipeline                                            Pipeline                                                    Pipeline
+.\\icon\\building\\Pipeline_Junction_Cross.png                                         pipeline_junction_cross                             Pipeline Junction Cross                                     Pipeline_Junction_Cross
+.\\icon\\building\\Pipeline_Pump.png                                                   pipeline_pump                                       Pipeline Pump                                               Pipeline_Pump
+.\\icon\\building\\Pipeline_Support.png                                                pipeline_support                                    Pipeline Support                                            Pipeline_Support
+.\\icon\\building\\Pipeline_Wall_Hole.png                                              pipeline_wall_hole                                  Pipeline Wall Hole                                          Pipeline_Wall_Hole
+.\\icon\\building\\Pipeline_Wall_Support.png                                           pipeline_wall_support                               Pipeline Wall Support                                       Pipeline_Wall_Support
+.\\icon\\building\\Portable_Miner.png                                                  portable_miner                                      Portable Miner                                              Portable_Miner
+.\\icon\\building\\Power_Line.png                                                      power_line                                          Power Line                                                  Power_Line
+.\\icon\\building\\Power_Pole.png                                                      power_pole_mk1                                      Power Pole                                                  Power_Pole
+.\\icon\\building\\Power_Pole_Mk.2.png                                                 power_pole_mk2                                      Power Pole Mk.2                                             Power_Pole_Mk.2
+.\\icon\\building\\Power_Pole_Mk.3.png                                                 power_pole_mk3                                      Power Pole Mk.3                                             Power_Pole_Mk.3
+.\\icon\\building\\Programmable_Splitter.png                                           programmable_splitter                               Programmable Splitter                                       Programmable_Splitter
+.\\icon\\building\\Quarter_Pipe.png                                                    quarter_pipe                                        Quarter Pipe                                                Quarter_Pipe
+.\\icon\\building\\Radar_Tower.png                                                     radar_tower                                         Radar Tower                                                 Radar_Tower
+.\\icon\\building\\Railway.png                                                         railway                                             Railway                                                     Railway
+.\\icon\\building\\Ramp_8m_x_1m.png                                                    ramp_8m_x_1m                                        Ramp 8m x 1m                                                Ramp_8m_x_1m
+.\\icon\\building\\Ramp_8m_x_2m.png                                                    ramp_8m_x_2m                                        Ramp 8m x 2m                                                Ramp_8m_x_2m
+.\\icon\\building\\Ramp_8m_x_4m.png                                                    ramp_8m_x_4m                                        Ramp 8m x 4m                                                Ramp_8m_x_4m
+.\\icon\\building\\Refinery.png                                                        refinery                                            Refinery                                                    Refinery
+.\\icon\\building\\Reinforced_Window.png                                               reinforced_window                                   Reinforced Window                                           Reinforced_Window
+.\\icon\\building\\Right_Door_Wall_(Plating).png                                       right_door_wall__plating                            Right Door Wall (Plating)                                   Right_Door_Wall_(Plating)
+.\\icon\\building\\Right_Door_Wall_(Sheet_Metal).png                                   right_door_wall__sheet_metal                        Right Door Wall (Sheet Metal)                               Right_Door_Wall_(Sheet_Metal)
+.\\icon\\building\\Single_Window.png                                                   single_window                                       Single Window                                               Single_Window
+.\\icon\\building\\Smart_Splitter.png                                                  smart_splitter                                      Smart Splitter                                              Smart_Splitter
+.\\icon\\building\\Smelter.png                                                         smelter                                             Smelter                                                     Smelter
+.\\icon\\building\\Space_Elevator.png                                                  space_elevator                                      Space Elevator                                              Space_Elevator
+.\\icon\\building\\Stackable_Conveyor_Pole.png                                         stackable_conveyor_pole                             Stackable Conveyor Pole                                     Stackable_Conveyor_Pole
+.\\icon\\building\\Stackable_Hyper_Tube_Support.png                                    stackable_hyper_tube_support                        Stackable Hyper Tube Support                                Stackable_Hyper_Tube_Support
+.\\icon\\building\\Stackable_Pipeline_Support.png                                      stackable_pipeline_support                          Stackable Pipeline Support                                  Stackable_Pipeline_Support
+.\\icon\\building\\Stairs_Left.png                                                     stairs_left                                         Stairs Left                                                 Stairs_Left
+.\\icon\\building\\Stairs_Right.png                                                    stairs_right                                        Stairs Right                                                Stairs_Right
+.\\icon\\building\\Storage_Container.png                                               storage_container                                   Storage Container                                           Storage_Container
+.\\icon\\building\\The_HUB.png                                                         the_hub                                             The HUB                                                     The_HUB
+.\\icon\\building\\Tilted_Jump_Pad.png                                                 tilted_jump_pad                                     Tilted Jump Pad                                             Tilted_Jump_Pad
+.\\icon\\building\\Train_Station.png                                                   train_station                                       Train Station                                               Train_Station
+.\\icon\\building\\Truck_Station.png                                                   truck_station                                       Truck Station                                               Truck_Station
+.\\icon\\building\\U-Jelly_Landing_Pad.png                                             u_jelly_landing_pad                                 U-Jelly Landing Pad                                         U-Jelly_Landing_Pad
+.\\icon\\building\\Up_Corner_8m_x_1m_Inverted.png                                      up_corner_8m_x_1m_inverted                          Up Corner 8m x 1m Inverted                                  Up_Corner_8m_x_1m_Inverted
+.\\icon\\building\\Up_Corner_8m_x_2m_Inverted.png                                      up_corner_8m_x_2m_inverted                          Up Corner 8m x 2m Inverted                                  Up_Corner_8m_x_2m_Inverted
+.\\icon\\building\\Up_Corner_8m_x_4m_Inverted.png                                      up_corner_8m_x_4m_inverted                          Up Corner 8m x 4m Inverted                                  Up_Corner_8m_x_4m_Inverted
+.\\icon\\building\\Up_Corner_Ramp_8m_x_1m.png                                          up_corner_ramp_8m_x_1m                              Up Corner Ramp 8m x 1m                                      Up_Corner_Ramp_8m_x_1m
+.\\icon\\building\\Up_Corner_Ramp_8m_x_2m.png                                          up_corner_ramp_8m_x_2m                              Up Corner Ramp 8m x 2m                                      Up_Corner_Ramp_8m_x_2m
+.\\icon\\building\\Up_Corner_Ramp_8m_x_4m.png                                          up_corner_ramp_8m_x_4m                              Up Corner Ramp 8m x 4m                                      Up_Corner_Ramp_8m_x_4m
+.\\icon\\building\\Walkway_Crossing.png                                                walkway_crossing                                    Walkway Crossing                                            Walkway_Crossing
+.\\icon\\building\\Walkway_Ramp.png                                                    walkway_ramp                                        Walkway Ramp                                                Walkway_Ramp
+.\\icon\\building\\Walkway_Straight.png                                                walkway_straight                                    Walkway Straight                                            Walkway_Straight
+.\\icon\\building\\Walkway_T-Crossing.png                                              walkway_t_crossing                                  Walkway T-Crossing                                          Walkway_T-Crossing
+.\\icon\\building\\Walkway_Turn.png                                                    walkway_turn                                        Walkway Turn                                                Walkway_Turn
+.\\icon\\building\\Wall_(Plating).png                                                  wall__plating                                       Wall (Plating)                                              Wall_(Plating)
+.\\icon\\building\\Wall_(Sheet_Metal).png                                              wall__sheet_metal                                   Wall (Sheet Metal)                                          Wall_(Sheet_Metal)
+.\\icon\\building\\Wall_Conveyor_Perpendicular_(Plating).png                           wall_conveyor_perpendicular__plating                Wall Conveyor Perpendicular (Plating)                       Wall_Conveyor_Perpendicular_(Plating)
+.\\icon\\building\\Wall_Conveyor_Perpendicular_(Sheet_Metal).png                       wall_conveyor_perpendicular__sheet_metal            Wall Conveyor Perpendicular (Sheet Metal)                   Wall_Conveyor_Perpendicular_(Sheet_Metal)
+.\\icon\\building\\Wall_Conveyor_x1_(Plating).png                                      wall_conveyor_x1__plating                           Wall Conveyor x1 (Plating)                                  Wall_Conveyor_x1_(Plating)
+.\\icon\\building\\Wall_Conveyor_x1_(Sheet_Metal).png                                  wall_conveyor_x1__sheet_metal                       Wall Conveyor x1 (Sheet Metal)                              Wall_Conveyor_x1_(Sheet_Metal)
+.\\icon\\building\\Wall_Conveyor_x2_(Plating).png                                      wall_conveyor_x2__plating                           Wall Conveyor x2 (Plating)                                  Wall_Conveyor_x2_(Plating)
+.\\icon\\building\\Wall_Conveyor_x2_(Sheet_Metal).png                                  wall_conveyor_x2__sheet_metal                       Wall Conveyor x2 (Sheet Metal)                              Wall_Conveyor_x2_(Sheet_Metal)
+.\\icon\\building\\Wall_Conveyor_x3_(Plating).png                                      wall_conveyor_x3__plating                           Wall Conveyor x3 (Plating)                                  Wall_Conveyor_x3_(Plating)
+.\\icon\\building\\Wall_Conveyor_x3_(Sheet_Metal).png                                  wall_conveyor_x3__sheet_metal                       Wall Conveyor x3 (Sheet Metal)                              Wall_Conveyor_x3_(Sheet_Metal)
+.\\icon\\building\\Wall_Outlet.png                                                     wall_outlet                                         Wall Outlet                                                 Wall_Outlet
+.\\icon\\building\\Wall_Outlet_Mk.2.png                                                wall_outlet_mk2                                     Wall Outlet Mk.2                                            Wall_Outlet_Mk.2
+.\\icon\\building\\Wall_Outlet_Mk.3.png                                                wall_outlet_mk3                                     Wall Outlet Mk.3                                            Wall_Outlet_Mk.3
+.\\icon\\building\\Water_Extractor.png                                                 water_extractor                                     Water Extractor                                             Water_Extractor
 
 __________________________________________________________________________________________
 
-.\icon\fluid\Alumina_Solution.png                                                alumina_solution
-.\icon\fluid\Fuel.png                                                            fuel
-.\icon\fluid\Heavy_Oil_Residue.png                                               heavy_oil_residue
-.\icon\fluid\Liquid_Biofuel.png                                                  liquid_biofuel
-.\icon\fluid\Sulfuric_Acid.png                                                   sulfuric_acid
-.\icon\fluid\Water.png                                                           water
+.\\icon\\equipment\\Blade_Runners.png                                                  blade_runners                                       Blade Runners                                               Blade_Runners
+.\\icon\\equipment\\Chainsaw.png                                                       chainsaw                                            Chainsaw                                                    Chainsaw
+.\\icon\\equipment\\Color_Gun.png                                                      color_gun                                           Color Gun                                                   Color_Gun
+.\\icon\\equipment\\Gas_mask.png                                                       gas_mask                                            Gas mask                                                    Gas_mask
+.\\icon\\equipment\\Hazmat_Suit.png                                                    hazmat_suit                                         Hazmat Suit                                                 Hazmat_Suit
+.\\icon\\equipment\\Jetpack.png                                                        jetpack                                             Jetpack                                                     Jetpack
+.\\icon\\equipment\\Medicinal_Inhaler.png                                              medicinal_inhaler                                   Medicinal Inhaler                                           Medicinal_Inhaler
+.\\icon\\equipment\\Nobelisk_Detonator.png                                             nobelisk_detonator                                  Nobelisk Detonator                                          Nobelisk_Detonator
+.\\icon\\equipment\\Object_Scanner.png                                                 object_scanner                                      Object Scanner                                              Object_Scanner
+.\\icon\\equipment\\Parachute.png                                                      parachute                                           Parachute                                                   Parachute
+.\\icon\\equipment\\Rebar_Gun.png                                                      rebar_gun                                           Rebar Gun                                                   Rebar_Gun
+.\\icon\\equipment\\Rifle.png                                                          rifle                                               Rifle                                                       Rifle
+.\\icon\\equipment\\Xeno-Basher.png                                                    xeno_basher                                         Xeno-Basher                                                 Xeno-Basher
+.\\icon\\equipment\\Xeno-Zapper.png                                                    xeno_zapper                                         Xeno-Zapper                                                 Xeno-Zapper
 
 __________________________________________________________________________________________
 
-.\icon\fluid\alt\Turbofuel.png                                                       turbofuel
+.\\icon\\fluid\\Alumina_Solution.png                                                   alumina_solution                                    Alumina Solution                                            Alumina_Solution
+.\\icon\\fluid\\Fuel.png                                                               fuel                                                Fuel                                                        Fuel
+.\\icon\\fluid\\Heavy_Oil_Residue.png                                                  heavy_oil_residue                                   Heavy Oil Residue                                           Heavy_Oil_Residue
+.\\icon\\fluid\\Liquid_Biofuel.png                                                     liquid_biofuel                                      Liquid Biofuel                                              Liquid_Biofuel
+.\\icon\\fluid\\Sulfuric_Acid.png                                                      sulfuric_acid                                       Sulfuric Acid                                               Sulfuric_Acid
+.\\icon\\fluid\\Water.png                                                              water                                               Water                                                       Water
 
 __________________________________________________________________________________________
 
-.\icon\item\A.I._Limiter.png                                                    ai_limiter
-.\icon\item\Adaptive_Control_Unit.png                                           adaptive_control_unit
-.\icon\item\Alclad_Aluminum_Sheet.png                                           alclad_aluminum_sheet
-.\icon\item\Alien_Carapace.png                                                  alien_carapace
-.\icon\item\Alien_Organs.png                                                    alien_organs
-.\icon\item\Aluminum_Ingot.png                                                  aluminum_ingot
-.\icon\item\Aluminum_Scrap.png                                                  aluminum_scrap
-.\icon\item\Automated_Wiring.png                                                automated_wiring
-.\icon\item\Battery.png                                                         battery
-.\icon\item\Bauxite.png                                                         bauxite
-.\icon\item\Beacon.png                                                          beacon
-.\icon\item\Biofuel.png                                                         biofuel
-.\icon\item\Biomass.png                                                         biomass
-.\icon\item\Black_Powder.png                                                    black_powder
-.\icon\item\Cable.png                                                           cable
-.\icon\item\Caterium_Ingot.png                                                  caterium_ingot
-.\icon\item\Caterium_Ore.png                                                    caterium_ore
-.\icon\item\Circuit_Board.png                                                   circuit_board
-.\icon\item\Coal.png                                                            coal
-.\icon\item\Color_Cartridge.png                                                 color_cartridge
-.\icon\item\Computer.png                                                        computer
-.\icon\item\Concrete.png                                                        concrete
-.\icon\item\Copper_Ingot.png                                                    copper_ingot
-.\icon\item\Copper_Ore.png                                                      copper_ore
-.\icon\item\Copper_Sheet.png                                                    copper_sheet
-.\icon\item\Crude_Oil.png                                                       crude_oil
-.\icon\item\Crystal_Oscillator.png                                              crystal_oscillator
-.\icon\item\Electromagnetic_Control_Rod.png                                     electromagnetic_control_rod
-.\icon\item\Empty_Canister.png                                                  empty_canister
-.\icon\item\Encased_Industrial_Beam.png                                         encased_industrial_beam
-.\icon\item\Fabric.png                                                          fabric
-.\icon\item\Flower_Petals.png                                                   flower_petals
-.\icon\item\Gas_Filter.png                                                      gas_filter
-.\icon\item\Green_Power_Slug.png                                                green_power_slug
-.\icon\item\Heat_Sink.png                                                       heat_sink
-.\icon\item\Heavy_Modular_Frame.png                                             heavy_modular_frame
-.\icon\item\High-Speed_Connector.png                                            high_speed_connector
-.\icon\item\Iodine_Infused_Filter.png                                           iodine_infused_filter
-.\icon\item\Iron_Ingot.png                                                      iron_ingot
-.\icon\item\Iron_Ore.png                                                        iron_ore
-.\icon\item\Iron_Plate.png                                                      iron_plate
-.\icon\item\Iron_Rod.png                                                        iron_rod
-.\icon\item\Limestone.png                                                       limestone
-.\icon\item\Modular_Engine.png                                                  modular_engine
-.\icon\item\Modular_Frame.png                                                   modular_frame
-.\icon\item\Modular_Frame_Light.png                                             modular_frame_light
-.\icon\item\Motor.png                                                           motor
-.\icon\item\Mycelia.png                                                         mycelia
-.\icon\item\Nobelisk.png                                                        nobelisk
-.\icon\item\Nuclear_Fuel_Rod.png                                                nuclear_fuel_rod
-.\icon\item\Nuclear_Waste.png                                                   nuclear_waste
-.\icon\item\Packaged_Fuel.png                                                   packaged_fuel
-.\icon\item\Packaged_Heavy_Oil_Residue.png                                      packaged_heavy_oil_residue
-.\icon\item\Packaged_Liquid_Biofuel.png                                         packaged_liquid_biofuel
-.\icon\item\Packaged_Oil.png                                                    packaged_oil
-.\icon\item\Packaged_Turbofuel.png                                              packaged_turbofuel
-.\icon\item\Packaged_Water.png                                                  packaged_water
-.\icon\item\Petroleum_Coke.png                                                  petroleum_coke
-.\icon\item\Plastic.png                                                         plastic
-.\icon\item\Polymer_Resin.png                                                   polymer_resin
-.\icon\item\Power_Shard.png                                                     power_shard
-.\icon\item\Purple_Power_Slug.png                                               purple_power_slug
-.\icon\item\Quartz_Crystal.png                                                  quartz_crystal
-.\icon\item\Quickwire.png                                                       quickwire
-.\icon\item\Radio_Control_Unit.png                                              radio_control_unit
-.\icon\item\Raw_Quartz.png                                                      raw_quartz
-.\icon\item\Reinforced_Iron_Plate.png                                           reinforced_iron_plate
-.\icon\item\Rifle_Cartridge.png                                                 rifle_cartridge
-.\icon\item\Rotor.png                                                           rotor
-.\icon\item\Rubber.png                                                          rubber
-.\icon\item\Screw.png                                                           screw
-.\icon\item\Silica.png                                                          silica
-.\icon\item\Smart_Plating.png                                                   smart_plating
-.\icon\item\Solid_Biofuel.png                                                   solid_biofuel
-.\icon\item\Spiked_Rebar.png                                                    spiked_rebar
-.\icon\item\Stator.png                                                          stator
-.\icon\item\Steel_Beam.png                                                      steel_beam
-.\icon\item\Steel_Ingot.png                                                     steel_ingot
-.\icon\item\Steel_Pipe.png                                                      steel_pipe
-.\icon\item\Sulfur.png                                                          sulfur
-.\icon\item\Supercomputer.png                                                   supercomputer
-.\icon\item\Turbo_Motor.png                                                     turbo_motor
-.\icon\item\Uranium.png                                                         uranium
-.\icon\item\Uranium_Cell.png                                                    uranium_cell
-.\icon\item\Uranium_Pellet.png                                                  uranium_pellet
-.\icon\item\Versatile_Framework.png                                             versatile_framework
-.\icon\item\Wire.png                                                            wire
-.\icon\item\Wood.png                                                            wood
-.\icon\item\Yellow_Power_Slug.png                                               yellow_power_slug
+.\\icon\\fluid\\alt\\Turbofuel.png                                                      turbofuel                                           Turbofuel                                                   Turbofuel
 
 __________________________________________________________________________________________
 
-.\icon\item\alt\Compacted_Coal.png                                                  compacted_coal
+.\\icon\\item\\A.I._Limiter.png                                                        ai_limiter                                          A.I. Limiter                                                A.I._Limiter
+.\\icon\\item\\Adaptive_Control_Unit.png                                               adaptive_control_unit                               Adaptive Control Unit                                       Adaptive_Control_Unit
+.\\icon\\item\\Alclad_Aluminum_Sheet.png                                               alclad_aluminum_sheet                               Alclad Aluminum Sheet                                       Alclad_Aluminum_Sheet
+.\\icon\\item\\Alien_Carapace.png                                                      alien_carapace                                      Alien Carapace                                              Alien_Carapace
+.\\icon\\item\\Alien_Organs.png                                                        alien_organs                                        Alien Organs                                                Alien_Organs
+.\\icon\\item\\Aluminum_Ingot.png                                                      aluminum_ingot                                      Aluminum Ingot                                              Aluminum_Ingot
+.\\icon\\item\\Aluminum_Scrap.png                                                      aluminum_scrap                                      Aluminum Scrap                                              Aluminum_Scrap
+.\\icon\\item\\Automated_Wiring.png                                                    automated_wiring                                    Automated Wiring                                            Automated_Wiring
+.\\icon\\item\\Battery.png                                                             battery                                             Battery                                                     Battery
+.\\icon\\item\\Bauxite.png                                                             bauxite                                             Bauxite                                                     Bauxite
+.\\icon\\item\\Beacon.png                                                              beacon                                              Beacon                                                      Beacon
+.\\icon\\item\\Biofuel.png                                                             biofuel                                             Biofuel                                                     Biofuel
+.\\icon\\item\\Biomass.png                                                             biomass                                             Biomass                                                     Biomass
+.\\icon\\item\\Black_Powder.png                                                        black_powder                                        Black Powder                                                Black_Powder
+.\\icon\\item\\Cable.png                                                               cable                                               Cable                                                       Cable
+.\\icon\\item\\Caterium_Ingot.png                                                      caterium_ingot                                      Caterium Ingot                                              Caterium_Ingot
+.\\icon\\item\\Caterium_Ore.png                                                        caterium_ore                                        Caterium Ore                                                Caterium_Ore
+.\\icon\\item\\Circuit_Board.png                                                       circuit_board                                       Circuit Board                                               Circuit_Board
+.\\icon\\item\\Coal.png                                                                coal                                                Coal                                                        Coal
+.\\icon\\item\\Color_Cartridge.png                                                     color_cartridge                                     Color Cartridge                                             Color_Cartridge
+.\\icon\\item\\Computer.png                                                            computer                                            Computer                                                    Computer
+.\\icon\\item\\Concrete.png                                                            concrete                                            Concrete                                                    Concrete
+.\\icon\\item\\Copper_Ingot.png                                                        copper_ingot                                        Copper Ingot                                                Copper_Ingot
+.\\icon\\item\\Copper_Ore.png                                                          copper_ore                                          Copper Ore                                                  Copper_Ore
+.\\icon\\item\\Copper_Sheet.png                                                        copper_sheet                                        Copper Sheet                                                Copper_Sheet
+.\\icon\\item\\Crude_Oil.png                                                           crude_oil                                           Crude Oil                                                   Crude_Oil
+.\\icon\\item\\Crystal_Oscillator.png                                                  crystal_oscillator                                  Crystal Oscillator                                          Crystal_Oscillator
+.\\icon\\item\\Electromagnetic_Control_Rod.png                                         electromagnetic_control_rod                         Electromagnetic Control Rod                                 Electromagnetic_Control_Rod
+.\\icon\\item\\Empty_Canister.png                                                      empty_canister                                      Empty Canister                                              Empty_Canister
+.\\icon\\item\\Encased_Industrial_Beam.png                                             encased_industrial_beam                             Encased Industrial Beam                                     Encased_Industrial_Beam
+.\\icon\\item\\Fabric.png                                                              fabric                                              Fabric                                                      Fabric
+.\\icon\\item\\Flower_Petals.png                                                       flower_petals                                       Flower Petals                                               Flower_Petals
+.\\icon\\item\\Gas_Filter.png                                                          gas_filter                                          Gas Filter                                                  Gas_Filter
+.\\icon\\item\\Green_Power_Slug.png                                                    green_power_slug                                    Green Power Slug                                            Green_Power_Slug
+.\\icon\\item\\Heat_Sink.png                                                           heat_sink                                           Heat Sink                                                   Heat_Sink
+.\\icon\\item\\Heavy_Modular_Frame.png                                                 heavy_modular_frame                                 Heavy Modular Frame                                         Heavy_Modular_Frame
+.\\icon\\item\\High-Speed_Connector.png                                                high_speed_connector                                High-Speed Connector                                        High-Speed_Connector
+.\\icon\\item\\Iodine_Infused_Filter.png                                               iodine_infused_filter                               Iodine Infused Filter                                       Iodine_Infused_Filter
+.\\icon\\item\\Iron_Ingot.png                                                          iron_ingot                                          Iron Ingot                                                  Iron_Ingot
+.\\icon\\item\\Iron_Ore.png                                                            iron_ore                                            Iron Ore                                                    Iron_Ore
+.\\icon\\item\\Iron_Plate.png                                                          iron_plate                                          Iron Plate                                                  Iron_Plate
+.\\icon\\item\\Iron_Rod.png                                                            iron_rod                                            Iron Rod                                                    Iron_Rod
+.\\icon\\item\\Limestone.png                                                           limestone                                           Limestone                                                   Limestone
+.\\icon\\item\\Modular_Engine.png                                                      modular_engine                                      Modular Engine                                              Modular_Engine
+.\\icon\\item\\Modular_Frame.png                                                       modular_frame                                       Modular Frame                                               Modular_Frame
+.\\icon\\item\\Modular_Frame_Light.png                                                 modular_frame_light                                 Modular Frame Light                                         Modular_Frame_Light
+.\\icon\\item\\Motor.png                                                               motor                                               Motor                                                       Motor
+.\\icon\\item\\Mycelia.png                                                             mycelia                                             Mycelia                                                     Mycelia
+.\\icon\\item\\Nobelisk.png                                                            nobelisk                                            Nobelisk                                                    Nobelisk
+.\\icon\\item\\Nuclear_Fuel_Rod.png                                                    nuclear_fuel_rod                                    Nuclear Fuel Rod                                            Nuclear_Fuel_Rod
+.\\icon\\item\\Nuclear_Waste.png                                                       nuclear_waste                                       Nuclear Waste                                               Nuclear_Waste
+.\\icon\\item\\Packaged_Fuel.png                                                       packaged_fuel                                       Packaged Fuel                                               Packaged_Fuel
+.\\icon\\item\\Packaged_Heavy_Oil_Residue.png                                          packaged_heavy_oil_residue                          Packaged Heavy Oil Residue                                  Packaged_Heavy_Oil_Residue
+.\\icon\\item\\Packaged_Liquid_Biofuel.png                                             packaged_liquid_biofuel                             Packaged Liquid Biofuel                                     Packaged_Liquid_Biofuel
+.\\icon\\item\\Packaged_Oil.png                                                        packaged_oil                                        Packaged Oil                                                Packaged_Oil
+.\\icon\\item\\Packaged_Turbofuel.png                                                  packaged_turbofuel                                  Packaged Turbofuel                                          Packaged_Turbofuel
+.\\icon\\item\\Packaged_Water.png                                                      packaged_water                                      Packaged Water                                              Packaged_Water
+.\\icon\\item\\Petroleum_Coke.png                                                      petroleum_coke                                      Petroleum Coke                                              Petroleum_Coke
+.\\icon\\item\\Plastic.png                                                             plastic                                             Plastic                                                     Plastic
+.\\icon\\item\\Polymer_Resin.png                                                       polymer_resin                                       Polymer Resin                                               Polymer_Resin
+.\\icon\\item\\Power_Shard.png                                                         power_shard                                         Power Shard                                                 Power_Shard
+.\\icon\\item\\Purple_Power_Slug.png                                                   purple_power_slug                                   Purple Power Slug                                           Purple_Power_Slug
+.\\icon\\item\\Quartz_Crystal.png                                                      quartz_crystal                                      Quartz Crystal                                              Quartz_Crystal
+.\\icon\\item\\Quickwire.png                                                           quickwire                                           Quickwire                                                   Quickwire
+.\\icon\\item\\Radio_Control_Unit.png                                                  radio_control_unit                                  Radio Control Unit                                          Radio_Control_Unit
+.\\icon\\item\\Raw_Quartz.png                                                          raw_quartz                                          Raw Quartz                                                  Raw_Quartz
+.\\icon\\item\\Reinforced_Iron_Plate.png                                               reinforced_iron_plate                               Reinforced Iron Plate                                       Reinforced_Iron_Plate
+.\\icon\\item\\Rifle_Cartridge.png                                                     rifle_cartridge                                     Rifle Cartridge                                             Rifle_Cartridge
+.\\icon\\item\\Rotor.png                                                               rotor                                               Rotor                                                       Rotor
+.\\icon\\item\\Rubber.png                                                              rubber                                              Rubber                                                      Rubber
+.\\icon\\item\\Screw.png                                                               screw                                               Screw                                                       Screw
+.\\icon\\item\\Silica.png                                                              silica                                              Silica                                                      Silica
+.\\icon\\item\\Smart_Plating.png                                                       smart_plating                                       Smart Plating                                               Smart_Plating
+.\\icon\\item\\Solid_Biofuel.png                                                       solid_biofuel                                       Solid Biofuel                                               Solid_Biofuel
+.\\icon\\item\\Spiked_Rebar.png                                                        spiked_rebar                                        Spiked Rebar                                                Spiked_Rebar
+.\\icon\\item\\Stator.png                                                              stator                                              Stator                                                      Stator
+.\\icon\\item\\Steel_Beam.png                                                          steel_beam                                          Steel Beam                                                  Steel_Beam
+.\\icon\\item\\Steel_Ingot.png                                                         steel_ingot                                         Steel Ingot                                                 Steel_Ingot
+.\\icon\\item\\Steel_Pipe.png                                                          steel_pipe                                          Steel Pipe                                                  Steel_Pipe
+.\\icon\\item\\Sulfur.png                                                              sulfur                                              Sulfur                                                      Sulfur
+.\\icon\\item\\Supercomputer.png                                                       supercomputer                                       Supercomputer                                               Supercomputer
+.\\icon\\item\\Turbo_Motor.png                                                         turbo_motor                                         Turbo Motor                                                 Turbo_Motor
+.\\icon\\item\\Uranium.png                                                             uranium                                             Uranium                                                     Uranium
+.\\icon\\item\\Uranium_Cell.png                                                        uranium_cell                                        Uranium Cell                                                Uranium_Cell
+.\\icon\\item\\Uranium_Pellet.png                                                      uranium_pellet                                      Uranium Pellet                                              Uranium_Pellet
+.\\icon\\item\\Versatile_Framework.png                                                 versatile_framework                                 Versatile Framework                                         Versatile_Framework
+.\\icon\\item\\Wire.png                                                                wire                                                Wire                                                        Wire
+.\\icon\\item\\Wood.png                                                                wood                                                Wood                                                        Wood
+.\\icon\\item\\Yellow_Power_Slug.png                                                   yellow_power_slug                                   Yellow Power Slug                                           Yellow_Power_Slug
 
 __________________________________________________________________________________________
 
-.\icon\vehicle\Electric_Locomotive.png                                             electric_locomotive
-.\icon\vehicle\Explorer.png                                                        explorer
-.\icon\vehicle\Freight_Car.png                                                     freight_car
-.\icon\vehicle\Tractor.png                                                         tractor
-.\icon\vehicle\Truck.png                                                           truck
+.\\icon\\item\\alt\\Compacted_Coal.png                                                  compacted_coal                                      Compacted Coal                                              Compacted_Coal
 
 __________________________________________________________________________________________
 
-.\icon\vehicle\awesome\Cyber_Wagon.png                                                     cyber_wagon
-.\icon\vehicle\awesome\Factory_Cart.png                                                    factory_cart
+.\\icon\\vehicle\\Electric_Locomotive.png                                              electric_locomotive                                 Electric Locomotive                                         Electric_Locomotive
+.\\icon\\vehicle\\Explorer.png                                                         explorer                                            Explorer                                                    Explorer
+.\\icon\\vehicle\\Freight_Car.png                                                      freight_car                                         Freight Car                                                 Freight_Car
+.\\icon\\vehicle\\Tractor.png                                                          tractor                                             Tractor                                                     Tractor
+.\\icon\\vehicle\\Truck.png                                                            truck                                               Truck                                                       Truck
 
 __________________________________________________________________________________________
 
-.\icon\wip\Mercer_Sphere.png                                                   mercer_sphere
-.\icon\wip\Somersloop.png                                                      somersloop
-.\icon\wip\S.A.M._Ore.png                                                      sam_ore
+.\\icon\\vehicle\\awesome\\Cyber_Wagon.png                                              cyber_wagon                                         Cyber Wagon                                                 Cyber_Wagon
+.\\icon\\vehicle\\awesome\\Factory_Cart.png                                             factory_cart                                        Factory Cart                                                Factory_Cart
+
+__________________________________________________________________________________________
+
+.\\icon\\wip\\Mercer_Sphere.png                                                        mercer_sphere                                       Mercer Sphere                                               Mercer_Sphere
+.\\icon\\wip\\Somersloop.png                                                           somersloop                                          Somersloop                                                  Somersloop
+.\\icon\\wip\\S.A.M._Ore.png                                                           sam_ore                                             S.A.M. Ore                                              S.A.M._Ore
