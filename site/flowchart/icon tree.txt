@@ -1,15 +1,5 @@
-imSrc                                                                               idName                                              name                                                        wikiLink
-
-__________________________________________________________________________________________
-
-.\\icon\\Bacon_Agaric.png                                                             bacon_agaric                                        Bacon Agaric                                                Bacon_Agaric
-.\\icon\\Beryl_Nut.png                                                                beryl_nut                                           Beryl Nut                                                   Beryl_Nut
-.\\icon\\Hard_Drive.png                                                               hard_drive                                          Hard Drive                                                  Hard_Drive
 .\\icon\\HUB_Parts.png                                                                hub_parts                                           HUB Parts                                                   HUB_Parts
 .\\icon\\Paleberry.png                                                                paleberry                                           Paleberry                                                   Paleberry
-
-__________________________________________________________________________________________
-
 .\\icon\\awesome\\Adequate_Pioneering.png                                              adequate_pioneering                                 Adequate Pioneering                                         Adequate_Pioneering
 .\\icon\\awesome\\Confusing_Creature.png                                               confusing_creature                                  Confusing Creature                                          Confusing_Creature
 .\\icon\\awesome\\Cup.png                                                              cup                                                 Cup                                                         Cup
@@ -19,9 +9,6 @@ ________________________________________________________________________________
 .\\icon\\awesome\\Pretty_Good_Pioneering.png                                           pretty_good_pioneering                              Pretty Good Pioneering                                      Pretty_Good_Pioneering
 .\\icon\\awesome\\Satisfactory_Pioneering.png                                          satisfactory_pioneering                             Satisfactory Pioneering                                     Satisfactory_Pioneering
 .\\icon\\awesome\\Silver_Hog.png                                                       silver_hog                                          Silver Hog                                                  Silver_Hog
-
-__________________________________________________________________________________________
-
 .\\icon\\building\\Assembler.png                                                       assembler                                           Assembler                                                   Assembler
 .\\icon\\building\\AWESOME_Shop.png                                                    awesome_shop                                        AWESOME Shop                                                AWESOME_Shop
 .\\icon\\building\\AWESOME_Sink.png                                                    awesome_sink                                        AWESOME Sink                                                AWESOME_Sink
@@ -164,9 +151,6 @@ ________________________________________________________________________________
 .\\icon\\building\\Wall_Outlet_Mk.2.png                                                wall_outlet_mk2                                     Wall Outlet Mk.2                                            Wall_Outlet_Mk.2
 .\\icon\\building\\Wall_Outlet_Mk.3.png                                                wall_outlet_mk3                                     Wall Outlet Mk.3                                            Wall_Outlet_Mk.3
 .\\icon\\building\\Water_Extractor.png                                                 water_extractor                                     Water Extractor                                             Water_Extractor
-
-__________________________________________________________________________________________
-
 .\\icon\\equipment\\Blade_Runners.png                                                  blade_runners                                       Blade Runners                                               Blade_Runners
 .\\icon\\equipment\\Chainsaw.png                                                       chainsaw                                            Chainsaw                                                    Chainsaw
 .\\icon\\equipment\\Color_Gun.png                                                      color_gun                                           Color Gun                                                   Color_Gun
@@ -181,22 +165,13 @@ ________________________________________________________________________________
 .\\icon\\equipment\\Rifle.png                                                          rifle                                               Rifle                                                       Rifle
 .\\icon\\equipment\\Xeno-Basher.png                                                    xeno_basher                                         Xeno-Basher                                                 Xeno-Basher
 .\\icon\\equipment\\Xeno-Zapper.png                                                    xeno_zapper                                         Xeno-Zapper                                                 Xeno-Zapper
-
-__________________________________________________________________________________________
-
 .\\icon\\fluid\\Alumina_Solution.png                                                   alumina_solution                                    Alumina Solution                                            Alumina_Solution
 .\\icon\\fluid\\Fuel.png                                                               fuel                                                Fuel                                                        Fuel
 .\\icon\\fluid\\Heavy_Oil_Residue.png                                                  heavy_oil_residue                                   Heavy Oil Residue                                           Heavy_Oil_Residue
 .\\icon\\fluid\\Liquid_Biofuel.png                                                     liquid_biofuel                                      Liquid Biofuel                                              Liquid_Biofuel
 .\\icon\\fluid\\Sulfuric_Acid.png                                                      sulfuric_acid                                       Sulfuric Acid                                               Sulfuric_Acid
 .\\icon\\fluid\\Water.png                                                              water                                               Water                                                       Water
-
-__________________________________________________________________________________________
-
 .\\icon\\fluid\\alt\\Turbofuel.png                                                      turbofuel                                           Turbofuel                                                   Turbofuel
-
-__________________________________________________________________________________________
-
 .\\icon\\item\\A.I._Limiter.png                                                        ai_limiter                                          A.I. Limiter                                                A.I._Limiter
 .\\icon\\item\\Adaptive_Control_Unit.png                                               adaptive_control_unit                               Adaptive Control Unit                                       Adaptive_Control_Unit
 .\\icon\\item\\Alclad_Aluminum_Sheet.png                                               alclad_aluminum_sheet                               Alclad Aluminum Sheet                                       Alclad_Aluminum_Sheet
@@ -286,26 +261,14 @@ ________________________________________________________________________________
 .\\icon\\item\\Wire.png                                                                wire                                                Wire                                                        Wire
 .\\icon\\item\\Wood.png                                                                wood                                                Wood                                                        Wood
 .\\icon\\item\\Yellow_Power_Slug.png                                                   yellow_power_slug                                   Yellow Power Slug                                           Yellow_Power_Slug
-
-__________________________________________________________________________________________
-
 .\\icon\\item\\alt\\Compacted_Coal.png                                                  compacted_coal                                      Compacted Coal                                              Compacted_Coal
-
-__________________________________________________________________________________________
-
 .\\icon\\vehicle\\Electric_Locomotive.png                                              electric_locomotive                                 Electric Locomotive                                         Electric_Locomotive
 .\\icon\\vehicle\\Explorer.png                                                         explorer                                            Explorer                                                    Explorer
 .\\icon\\vehicle\\Freight_Car.png                                                      freight_car                                         Freight Car                                                 Freight_Car
 .\\icon\\vehicle\\Tractor.png                                                          tractor                                             Tractor                                                     Tractor
 .\\icon\\vehicle\\Truck.png                                                            truck                                               Truck                                                       Truck
-
-__________________________________________________________________________________________
-
 .\\icon\\vehicle\\awesome\\Cyber_Wagon.png                                              cyber_wagon                                         Cyber Wagon                                                 Cyber_Wagon
 .\\icon\\vehicle\\awesome\\Factory_Cart.png                                             factory_cart                                        Factory Cart                                                Factory_Cart
-
-__________________________________________________________________________________________
-
 .\\icon\\wip\\Mercer_Sphere.png                                                        mercer_sphere                                       Mercer Sphere                                               Mercer_Sphere
 .\\icon\\wip\\Somersloop.png                                                           somersloop                                          Somersloop                                                  Somersloop
 .\\icon\\wip\\S.A.M._Ore.png                                                           sam_ore                                             S.A.M. Ore                                              S.A.M._Ore

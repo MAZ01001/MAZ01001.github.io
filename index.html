@@ -6,16 +6,7 @@
     <style>
         body {background-color: #2b2b2b;color: #0f0f;}
         @keyframes banner {
-            0% {
-                background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 40px);
-                background-size: calc(100% + 57px) 100%;
-                background-position: 0px 0;
-            }
-            100% {
-                background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 40px);
-                background-size: calc(100% + 57px) 100%;
-                background-position: -57px 0;
-            }
+            100% {background-position: -56px 0;}
         }
         @keyframes shadowcolor {
             0% {
@@ -76,15 +67,18 @@
             height: 200px;
             width: 540px;
             box-shadow: 4px 4px 10px 0px black;
+            background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 39px);
+            background-size: calc(100% + 58px) 100%;
+            background-position: 0px 0;
             animation: banner 1s linear 0s infinite reverse backwards running;
         }
         body>img{
             position: fixed;
             top: 50%;
             left: 50%;
+            overflow: hidden;
             transform: translate(-50%, -50%);
-            height: 80vh;
-            width: 80vw;
+            height: max(100vh,1000px);
             pointer-events: none;
             --shadow: 20px;
             filter: url(#drop-shadow);
@@ -95,6 +89,27 @@
         h2{
             display: inline;
             font-size: 3em;
+            margin-block-start: 0.4em;
+            margin-block-end: 0.1em;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0.013em 0.013em #000,
+                -0.013em 0.013em #000,
+                -0.013em -0.013em #000,
+                0.013em -0.01em #000,
+                0em 0.013em #000,
+                0em -0.013em #000,
+                0.013em 0em #000,
+                -0.013em 0em #000,
+                5px 3px 10px #0a0;
+            --shadow: 10px;
+            filter: url(#drop-shadow);
+            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
+            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+        }
+        h3{
+            display: inline;
+            font-size: 2em;
             margin-block-start: 0.4em;
             margin-block-end: 0.1em;
             font-family: 'Times New Roman', Times, serif;
@@ -125,7 +140,7 @@
     <img src=".\img\logo.svg">
     <div>
         <div>
-            <h2><a href=".\site\flowchart\Flow Chart U3.html" target="_self" rel="noopener noreferrer">Satisfactory U3 Flow Chart</a></h2><br>
+            <h3><a href=".\site\flowchart\Flow Chart U3.html" target="_self" rel="noopener noreferrer">Unofficial U3 Flow Chart for Satisfactory</a></h3><br>
             <h2><a href=".\site\canvas ball.html" target="_self" rel="noopener noreferrer">Ball Screensaver</a></h2><br>
             <h2><a href=".\site\dice.html" target="_self" rel="noopener noreferrer">Small Dice</a></h2><br>
             <br><br>

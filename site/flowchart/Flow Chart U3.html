@@ -129,6 +129,31 @@
         }
         .topic{white-space: nowrap;}
         .inline{display: inline-table;white-space: normal;width: calc(100% - 150px);}
+        :root{ /*variables*/
+            --click-x:0px;
+            --click-y:0px;
+            --menu-height:0px;
+            --max-height:0px;
+        }
+        #menuBoxLimit{
+            position: fixed;
+            z-index: 40;
+            width: max(20vw,300px); /*set~*/
+            height: --max-height;
+            overflow: hidden;
+            background-color: #fff;
+            pointer-events: none; /*see if that influences other elements if >> *:not(#menuBoxLimit){pointer-events: auto;}*/
+        }
+        #menuBox{
+            position: absolute;
+            z-index: 50;
+            width: fit-content;
+            height: fit-content;
+            overflow-y: overlay;
+            background-color: #fff;
+            transform: translate(-0%,-100%);
+            top: min(calc(--click-y + --menu-height),100%);
+        }
     </style>
     <script>
         function clickElement(element,event) {
@@ -204,8 +229,36 @@
                     for (const machine of document.getElementsByTagName('machine')) {for (const selectingM of machineSelect) {if (machine.dataset.name==selectingM) {machine.classList.add("hlght")}}}
                 }
             }
-            // if (event.button == 2) console.log(event.clientX,event.clientY)
+            if (event.button == 2) {
+                event.preventDefault();
+                let placeMenuNoRight = (event.clientX+Math.max(300,document.documentElement.clientWidth*0.2))>document.documentElement.clientWidth,
+                    placeMenuNoLeft = (event.clientX-Math.max(300,document.documentElement.clientWidth*0.2))<0,
+                    placeMenuSpaceRight = event.clientX>(document.documentElement.clientWidth-event.clientX),
+                    menuBox = document.getElementById('menuBox'),
+                    menuBoxLimit = document.getElementById('menuBoxLimit');
+                let toLeft = placeMenuNoRight?(placeMenuNoLeft?(placeMenuSpaceRight?false:true):true):false;
+                menuBoxLimit.style.transform = toLeft?'translate(-100%,0)':'translate(0,0)';
+                //hk__set css variables
+                document.documentElement.style.setProperty('--click-x',event.clientX+"px");
+                document.documentElement.style.setProperty('--click-y',event.clientY+"px");
+                document.documentElement.style.setProperty('--max-height',document.documentElement.scrollHeight+"px"); // site height all (clientHeight for visible)
+                document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px"); // update as much as possible
+                //ho__↓ todo! ↓
+                if (event.target == menuBox) {
+                    menuBox.hidden = false;
+                    menuBoxLimit.hidden=false;
+                    document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
+                } else {
+                    menuBox.hidden=true;
+                    menuBoxLimit.hidden=true;
+                }
+            }
         }
+        document.body.addEventListener('resize', event => {
+            document.documentElement.style.setProperty('--max-height',document.documentElement.scrollHeight+"px");
+            if(!document.getElementById('menuBox').hidden)document.documentElement.style.setProperty('--menu-height',document.getElementById('menuBox').offsetHeight+"px");
+        });
+        //HR__UPDATE MESSAGE__NO ALERT
         const message="hilighting:\n├─leftclick:\n│   └─on item: select required materials and materials that require self.\n│   └─on machine: select all materials using self.\n├─middleclick:\n│   └─on crafting: select all materials and machines recuired.\n└─rightclick:\n    └─on selection: clear all selections (doubleclick too).\n[materials are ordered in manufacturing order and products are highlighted]";
     </script>
     </head>
@@ -448,6 +501,6 @@
                 <br><small>(<u>"Turbofuel" and "Compacted Coal" are unlocked exclusively as Alternate Recipes by researching Hard Drives.</u>)</small>
             </div>
         </div>
-        
+        <div id="menuBoxLimit" hidden><div id="menuBox" hidden></div></div>
     </body>
 </html>
