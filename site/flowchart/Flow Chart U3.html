@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Satisfactory U3 Flow Chart</title>
+    <title>unofficial U3 Flow Chart for Satisfactory in HTML</title>
     <style>
         body {background-color: #2b2b2bff;color: #0f0f;margin: 0;}
         @keyframes banner {
@@ -21,8 +21,8 @@
             margin: 0;
             padding: 0;
             overflow: auto;
-            height: calc(100vh - 102px);
             width: 100%;
+            height: 100%;
             --shadow: 10px;
             filter: url(#drop-shadow);
             filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#000')";
@@ -31,18 +31,21 @@
         }
         .contentbox>*:not(.header):not(hr){margin: 8px;}
         .header{
-            position: static;
             text-shadow: -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, 1px 1px 0 #000;
             animation: banner 2s linear 0s infinite reverse backwards running;
             width: 100%;
-            height: 102px;
+            height: 15em;
             margin: 0;
             overflow: hidden;
             white-space: nowrap;
         }
-        .header h1{
+        .header>div>div{text-align: center;}
+        .header>div>div>a{
             display: inline;
-            font-size: 4em;
+            font-size: 5em;
+            color: #000;
+            text-decoration: none;
+            text-align: center;
             margin-block-start: 0.4em;
             margin-block-end: 0.1em;
             font-family: 'Times New Roman', Times, serif;
@@ -61,14 +64,72 @@
             -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
             filter: drop-shadow(0px 0px var(--shadow,10px) #070);
         }
-        .header>div{
+        .header>div>div>span{
+            display: inline;
+            font-size: 3em;
+            text-align: center;
+            margin: 0;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0.013em 0.013em #000,
+                -0.013em 0.013em #000,
+                -0.013em -0.013em #000,
+                0.013em -0.01em #000,
+                0em 0.013em #000,
+                0em -0.013em #000,
+                0.013em 0em #000,
+                -0.013em 0em #000,
+                5px 3px 10px #0a0a;
+            --shadow: 10px;
+            filter: url(#drop-shadow);
+            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
+            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+        }
+        .header>div:not(#info){
             width:fit-content;
             padding: 0px;
-            outline: 40px solid #000;
-            background-color:#000;
+            outline: 40px solid #000e;
+            background-color:#000e;
             display: block;
             margin: auto;
-            height: 102px;
+            height: 100%;
+        }
+        .header>div#info{
+            position: fixed;
+            text-align: center;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-shadow: none;
+            top: 0;
+            left: 0;
+            color: #0f0;
+            background-image: radial-gradient(#000,#000,#000, #fff0,#fff0);
+            padding: 0.5em 1em;
+            border-radius: 2em;
+        }
+        .header>div#info:hover{
+            color: #ff0;
+            background-image: radial-gradient(#00f,#00f,#00f, #fff0,#fff0);
+            cursor: help;
+        }
+        info#InFObOxiD{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background-color: #000;
+            outline: 1000px solid #000e;
+            text-align: left;
+            height: auto;
+            padding: 1.8em;
+            cursor: pointer;
+            z-index: 100;
+            font-family: consolas,serif;
+            font-weight: normal;
+            color: #fff;
+            font-size: medium;
+            border: 1px solid white;
+            white-space: nowrap;
         }
         .header a[href]:not(.header>div>a) {display: inline;color: #0af;font-style: italic;}
         ::-webkit-scrollbar {width: 10px;height: 10px;}
@@ -105,19 +166,14 @@
             padding: 1px 4px;
             margin: 1px auto;
         }
-        .hlght{background-color: #bbb;color: #000;}
-        .hlghtslf{background-color: #bbb;color: #000; font-weight: bold;}
-        .hlghtcrf{background-color: #bbb;color: #000; font-style: italic;}
-        item[data-type*="product"]:not(.hlght):not(.hlghtslf):not(.hlghtcrf) {background-color: #444;}
-        item[data-type="resource"] {border-color: #050;}
-        item[data-type="liquid resource"] {border-color: #225;}
-        item[data-type="resource ore"] {border-color: #555;}
-        machine[data-name="c"],item[data-machine="c"] {border-color: #0bf;}
-        machine[data-name="a"],item[data-machine="a"] {border-color: #0b0;}
-        machine[data-name="m"],item[data-machine="m"] {border-color: #f0f;}
-        machine[data-name="s"],item[data-machine="s"] {border-color: #00f;}
-        machine[data-name="f"],item[data-machine="f"] {border-color: #f90;}
-        machine[data-name="r"],item[data-machine="r"] {border-color: #f00;}
+        machine.element {border-color: #444;}
+        machine.element.hlght,machine.element.hlghtslf {border-color: #aaa;}
+        .hlghtcrf:not(.hlghtslf){background-color: #0af;border-color: #ef0;color: #000; font-style: italic;}
+        .hlght:not(.hlghtslf){background-color: #f30;border-color: #777;color: #ff0;}
+        .hlghtslf{background-color: #ff0;border-color: #060;color: #000; font-weight: bold;}
+        .hlghtcrf.hlghtslf{font-style: italic;}
+        item[data-type*="product"] {border-color: #555;}
+        .element:hover {border-color: #0f0;cursor: pointer;}
         .noselect {
             /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
             -webkit-touch-callout: none; /* iOS Safari */
@@ -137,30 +193,51 @@
         }
         #menuBoxLimit{
             position: fixed;
-            z-index: 40;
-            width: max(20vw,300px); /*set~*/
+            top: 0;
+            bottom: 0;
+            left: var(--click-x);
             height: var(--max-height);
-            overflow: hidden;
-            background-color: #fff;
-            pointer-events: none; /*see if that influences other elements if >> *:not(#menuBoxLimit){pointer-events: auto;}*/
+            overflow: visible;
+            pointer-events: none;
         }
         #menuBox{
-            position: absolute;
+            position: fixed;
             z-index: 50;
-            width: fit-content;
+            width: max(10vw,250px);
             height: fit-content;
             overflow-y: overlay;
-            background-color: #fff;
+            border-radius: 10px;
+            background-color: #000d;
+            pointer-events: auto;
+            user-select: text;
+            padding: 20px;
             transform: translate(-0%,-100%);
             top: min(calc(var(--click-y) + var(--menu-height)),100%);
         }
     </style>
     <script>
-        function clickElement(element,event) {
+    function clickElement(element,event) {
+            if (element == document.body && event.type=="dblclick") {
+                let exit = false;
+                event.path.forEach(e=>{if(e==document.getElementById('menuBox'))exit=true;});
+                if (exit) return false;
+                for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
+                document.getElementById('menuBoxLimit').hidden=true;
+                return false;
+            }
+            if (element == document.body && event.type=="click") {
+                let exit = false;
+                for (let i = event.path.length-5; i >= 0; i--) {const element = event.path[i];if(/element/.test(element.classList.value)||element==document.getElementById('menuBox')){exit=true;break;}}
+                if (exit||event.ctrlKey) return false;
+                for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
+                document.getElementById('menuBoxLimit').hidden=true;
+                return false;
+            }
             //event.button left=0 middle=1 right=2
-            for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
+            if(!event.ctrlKey && event.button != 2)for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
+            document.getElementById('menuBoxLimit').hidden=true;
             if (event.button == 0) {
-                // left mouse clickElement
+                // left mouse click
                 switch (element.tagName.toLowerCase()) {
                     case "machine":
                         element.classList.add('hlghtslf');
@@ -201,8 +278,8 @@
                 }
             }
             if (event.button == 1) {
-                //middle mouse click on element
-                if (element.tagName.toLowerCase() == "item" && !(/resource/g.test(element.dataset.type))) {
+                // middle mouse click
+                if (element.tagName.toLowerCase() == "item" && !(/resource/.test(element.dataset.type))) {
                     element.classList.add('hlghtslf');
                     event.preventDefault();
                     let recipeNames = element.dataset.recipe.split(' '),
@@ -230,41 +307,57 @@
                 }
             }
             if (event.button == 2) {
+                // context menu
                 event.preventDefault();
-                let placeMenuNoRight = (event.clientX+Math.max(300,document.documentElement.clientWidth*0.2))>document.documentElement.clientWidth,
-                    placeMenuNoLeft = (event.clientX-Math.max(300,document.documentElement.clientWidth*0.2))<0,
+                let placeMenuNoRight = (event.clientX+Math.max(200,document.documentElement.clientWidth*0.1))>document.documentElement.clientWidth,
+                    placeMenuNoLeft = (event.clientX-Math.max(200,document.documentElement.clientWidth*0.1))<0,
                     placeMenuSpaceRight = event.clientX>(document.documentElement.clientWidth-event.clientX),
                     menuBox = document.getElementById('menuBox'),
                     menuBoxLimit = document.getElementById('menuBoxLimit');
                 let toLeft = placeMenuNoRight?(placeMenuNoLeft?(placeMenuSpaceRight?false:true):true):false;
+                menuBoxLimit.hidden=false;
                 menuBoxLimit.style.transform = toLeft?'translate(-100%,0)':'translate(0,0)';
-                //hk__set css variables
-                document.documentElement.style.setProperty('--click-x',event.clientX+"px");
+                document.documentElement.style.setProperty('--click-x',(toLeft?event.clientX-3:event.clientX+3)+"px");
                 document.documentElement.style.setProperty('--click-y',event.clientY+"px");
-                document.documentElement.style.setProperty('--max-height',document.documentElement.scrollHeight+"px"); // site height all (clientHeight for visible)
+                document.documentElement.style.setProperty('--max-height',document.documentElement.clientHeight+"px"); // site height all (clientHeight for visible)
                 document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px"); // update as much as possible
                 //ho__↓ todo! ↓
-                if (event.target == menuBox) {
-                    menuBox.hidden = false;
-                    menuBoxLimit.hidden=false;
-                    document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
-                } else {
-                    menuBox.hidden=true;
-                    menuBoxLimit.hidden=true;
-                }
+                menuBox.innerHTML=`<h2>${element.innerText}</h2>`;
+                //ho__↑ todo! ↑
+                document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
             }
+            return false;
         }
-        document.body.addEventListener('resize', event => {
-            document.documentElement.style.setProperty('--max-height',document.documentElement.scrollHeight+"px");
-            if(!document.getElementById('menuBox').hidden)document.documentElement.style.setProperty('--menu-height',document.getElementById('menuBox').offsetHeight+"px");
-        });
-        //HR__UPDATE MESSAGE__NO ALERT
-        const message="hilighting:\n├─leftclick:\n│   └─on item: select required materials and materials that require self.\n│   └─on machine: select all materials using self.\n├─middleclick:\n│   └─on crafting: select all materials and machines recuired.\n└─rightclick:\n    └─on selection: clear all selections (doubleclick too).\n[materials are ordered in manufacturing order and products are highlighted]";
+        function infoMenu() {
+            //HR__UPDATE MESSAGE__NO ALERT
+            const message="\u2588hilighting:<br>│<br>├─\u2588leftclick:<br>│   │<br>│   ├─on item: select required materials and materials that require self.<br>│   │<br>│   └─on machine: select all materials using self.<br>│<br>├─\u2588middleclick:<br>│   │<br>│   └─on crafting: select all materials and machines recuired.<br>│<br>└─\u2588rightclick:<br>&nbsp;   │<br>&nbsp;   └─on selection: clear all selections (doubleclick too).<br><br>[materials are ordered in manufacturing order and products are highlighted]";
+            let infoBox = document.createElement('info');
+            infoBox.id='InFObOxiD'
+            infoBox.innerHTML="<h2>The Unofficial U3 Flow Chart For Satisfactory</h2><br><br>"+message;
+            infoBox.onclick=e=>{document.body.removeChild(document.getElementById('InFObOxiD'))};
+            document.body.appendChild(infoBox);
+        }
     </script>
     </head>
-    <body onload="setTimeout(e => {alert(message)},100)" ondblclick="clickElement(this,event)" class="noselect">
-        <div class="header"><div><a href="https://www.satisfactorygame.com/" target="_blank" rel="noopener noreferrer"><h1>SATISFACTORY</h1></a><br><a href="https://satisfactory.gamepedia.com/Template:ItemNav" target="_blank" rel="noopener noreferrer">satisfactory wiki</a></div></div>
+    <body onload="infoMenu()" ondblclick="clickElement(this,event)" onclick="clickElement(this,event)" class="noselect">
+        <script>
+            document.body.addEventListener('resize', event => {
+                document.documentElement.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
+                if(!document.getElementById('menuBoxLimit').hidden)document.documentElement.style.setProperty('--menu-height',document.getElementById('menuBox').offsetHeight+"px");
+            });
+        </script>
         <div class="contentbox">
+            <div class="header">
+                <div id="info" onclick="infoMenu()">Info</div>
+                <div>
+                    <div>
+                        <span>unofficial</span>
+                        <br><a href="https://www.satisfactorygame.com/" target="_blank" rel="noopener noreferrer" title="official game-site">SATISFACTORY</a><br>
+                        <span>U3 Flow Chart</span>
+                    </div>
+                    <br><a href="https://satisfactory.gamepedia.com/Template:ItemNav" target="_blank" rel="noopener noreferrer" title="official game-wiki">satisfactory wiki</a>
+                </div>
+            </div>
             <div class="topic" data-name="Machines">
                 <h2>Machines</h2>
                 <div class="inline">
@@ -496,11 +589,10 @@
             <hr style="border-radius: 2px;border: 2px solid black;">
             <div name="Alternate recipes">
                 <h2>Alternate recipes</h2><h3>[WIP]</h3>
-                <!-- <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="alternate X" data-name="X" data-recipe="X" data-machine="X"><span>X</span></item><br> -->
-                <i><a href="https://satisfactory.gamepedia.com/Hard_Drive#Alternate_Recipes" target="_blank" rel="noopener noreferrer">list of alternate recipes.</a></i>
+                <i><a href="https://satisfactory.gamepedia.com/Hard_Drive#Alternate_Recipes" target="_blank" rel="noopener noreferrer" title="W I P">list of alternate recipes.</a></i>
                 <br><small>(<u>"Turbofuel" and "Compacted Coal" are unlocked exclusively as Alternate Recipes by researching Hard Drives.</u>)</small>
             </div>
         </div>
-        <div id="menuBoxLimit" hidden><div id="menuBox" hidden></div></div>
+        <div id="menuBoxLimit" hidden><div id="menuBox"><p>Hello, World!</p></div></div>
     </body>
 </html>
