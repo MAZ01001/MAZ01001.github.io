@@ -1,83 +1,71 @@
-function isNotEmpty(object = {}) {for(let content in object){return true;}return false;}
+function hasContent(object = {}) {for(let key in object){if(object.hasOwnProperty(key)){return true;}}return false;}
 let dataObjects = {
-    'example_part':{
+    'example_part':{ //! example only
         idName:'example_part', // lowercase name as id (only word char [a-z0-9_])
         name:'Example Part', // main-product
         imgSrc:'.\\icon\\HUB_Parts.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Satisfactory_Wiki', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
         spaceElevatorMaterial:false,
         equipment:false,
         alternateItem:false,
-        wip:false,
+        wip:true,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
+        },
+        contentShopPack:{
+            /*
+            // packName:'Example Part',
+            */
+            'example_part':0, // item and num in shop
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
             }
         },
-        /*
-        generator:{ // all at clockspeed 100%
-            energie:0, // electricity produced in MW total
-            fuel:{ //~ IN
-                item:{
-                    'example_part':{ // idName of item fuel
-                        energie:0, // brings x MW per item
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        time:0, // burn time in sec
-                        consumption:0 // consumtion rate per min [60/this.time]
-                    }
-                },
-                liquid:{
-                    'example_part':{ // idName of liquid fuel
-                        energie:0, // brings x MW per m^3
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        time:0, // burn time in sec
-                        consumption:0 // consumtion rate m^3 per min [60/this.time]
-                    }
-                },
-                cooling:{
-                    consumption:45 // water consumtion rate m^3 per min
-                }
-            },
-            by_product:{ //~ OUT
-                idName:'nuclear_waste', // idName by-product
-                production:5 // waste rate per min
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
-        */
         recipes:{
             default:{
                 machine:'constructor', // machine idName needed to produce
@@ -162,6 +150,36 @@ let dataObjects = {
                 }
             }
         }
+        /*
+        // generator:{ // all at clockspeed 100%
+        //     energie:0, // electricity produced in MW total
+        //     fuel:{ //~ IN
+        //         item:{
+        //             'example_part':{ // idName of item fuel
+        //                 energie:0, // brings x MW per item
+        //                 num:0, // num produced per cycle (fluid is m^3) for by-product
+        //                 time:0, // burn time in sec
+        //                 consumption:0 // consumtion rate per min [60/this.time]
+        //             }
+        //         },
+        //         liquid:{
+        //             'example_part':{ // idName of liquid fuel
+        //                 energie:0, // brings x MW per m^3
+        //                 num:0, // num produced per cycle (fluid is m^3) for by-product
+        //                 time:0, // burn time in sec
+        //                 consumption:0 // consumtion rate m^3 per min [60/this.time]
+        //             }
+        //         },
+        //         cooling:{
+        //             consumption:45 // water consumtion rate m^3 per min
+        //         }
+        //     },
+        //     by_product:{ //~ OUT
+        //         idName:'nuclear_waste', // idName by-product
+        //         production:5 // waste rate per min
+        //     }
+        // }
+        */
     },
     'bacon_agaric':{
         idName:'bacon_agaric', // lowercase name as id (only word char [a-z0-9_])
@@ -170,30 +188,16 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Bacon_Agaric', // gamepedia link
         info:'Can be eaten to restore two health segments.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:50, // x max per itemslot
-        liquid:false,
+        stackSize:50, // x max per itemslot (-1 if not an item)
         resource:true,
         plant:true,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        consumable:true,
         craftingWorkshop:true,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:true,
-        alternateItem:false,
-        wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{},
-        recipes:{
-            default:{},
-            packing:{},
-            unpacking:{},
-            alternates:{}
-        }
     },
     'beryl_nut':{
         idName:'beryl_nut', // lowercase name as id (only word char [a-z0-9_])
@@ -202,30 +206,16 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Beryl_Nut', // gamepedia link
         info:'Can be eaten to restore half a health segment.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:100, // x max per itemslot
-        liquid:false,
+        stackSize:100, // x max per itemslot (-1 if not an item)
         resource:true,
         plant:true,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        consumable:true,
         craftingWorkshop:true,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:true,
-        alternateItem:false,
-        wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{},
-        recipes:{
-            default:{},
-            packing:{},
-            unpacking:{},
-            alternates:{}
-        }
     },
     'hard_drive':{
         idName:'hard_drive', // lowercase name as id (only word char [a-z0-9_])
@@ -234,2039 +224,352 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hard_Drive', // gamepedia link
         info:'A hard drive with Ficsit data. Analyze it in the M.A.M. to salvage its contents.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:100, // x max per itemslot
-        liquid:false,
+        stackSize:100, // x max per itemslot (-1 if not an item)
         resource:true,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{},
-        recipes:{
-            default:{},
-            packing:{},
-            unpacking:{},
-            alternates:{}
-        }
     },
     'hub_parts':{
         idName:'hub_parts', // lowercase name as id (only word char [a-z0-9_])
         name:'HUB Parts', // main-product
         imgSrc:'.\\icon\\HUB_Parts.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/HUB_Parts', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The parts required to build the basic structure of The HUB.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        buildingMaterial:true,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'paleberry':{
         idName:'paleberry', // lowercase name as id (only word char [a-z0-9_])
         name:'Paleberry', // main-product
         imgSrc:'.\\icon\\Paleberry.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Paleberry', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Can be eaten to restore one health segment.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:50, // x max per itemslot (-1 if not an item)
+        resource:true,
+        plant:true,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        consumable:true,
+        craftingWorkshop:true,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'adequate_pioneering':{
         idName:'adequate_pioneering', // lowercase name as id (only word char [a-z0-9_])
         name:'Adequate Pioneering', // main-product
         imgSrc:'.\\icon\\awesome\\Adequate_Pioneering.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Adequate_Pioneering', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the Running Character', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:25, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'adequate_pioneering':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[3,2,2], // w,h,d in meters (0.00m float)
+        },
     },
     'confusing_creature':{
         idName:'confusing_creature', // lowercase name as id (only word char [a-z0-9_])
         name:'Confusing Creature', // main-product
         imgSrc:'.\\icon\\awesome\\Confusing_Creature.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Confusing_Creature', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the Space Giraffe', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:200, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'confusing_creature':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[2.5,5.5,3], // w,h,d in meters (0.00m float)
+        },
     },
     'cup':{
         idName:'cup', // lowercase name as id (only word char [a-z0-9_])
         name:'Cup', // main-product
         imgSrc:'.\\icon\\awesome\\Cup.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Cup', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Standard issue Cup for melee range.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        awesomeShop:true, // from awesomeShop
+        couponCost:1, // coupon cost (-1 can't be purchased)
+        equipment:true,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'example_part':0, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'ficsit_coupon':{
         idName:'ficsit_coupon', // lowercase name as id (only word char [a-z0-9_])
         name:'FICSIT Coupon', // main-product
         imgSrc:'.\\icon\\awesome\\FICSIT_Coupon.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/FICSIT_Coupon', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
-        sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        info:'A special FICSIT bonus program Coupon, obtained through the AWESOME Sink. Can be redeemed in the AWESOME Shop for bonus milestones and rewards.', // information about the item
+        sinkValue:1, // value in the awesome-sink (-1 for can't be sinked)
+        stackSize:500, // x max per itemslot (-1 if not an item)
+        awesomeShop:true, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'golden_nut':{
         idName:'golden_nut', // lowercase name as id (only word char [a-z0-9_])
         name:'Golden Nut', // main-product
         imgSrc:'.\\icon\\awesome\\Golden_Nut.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Golden_Nut', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the golden nut', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:1000, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'golden_nut':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[2.5,3,1], // w,h,d in meters (0.00m float)
+        },
     },
     'lizard_doggo_statue':{
         idName:'lizard_doggo_statue', // lowercase name as id (only word char [a-z0-9_])
         name:'Lizard Doggo Statue', // main-product
         imgSrc:'.\\icon\\awesome\\Lizard_Doggo_Statue.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Lizard_Doggo_Statue', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the Lizard Doggo', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:100, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'lizard_doggo_statue':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[2,2,4], // w,h,d in meters (0.00m float)
+        },
     },
     'pretty_good_pioneering':{
         idName:'pretty_good_pioneering', // lowercase name as id (only word char [a-z0-9_])
         name:'Pretty Good Pioneering', // main-product
         imgSrc:'.\\icon\\awesome\\Pretty_Good_Pioneering.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Pretty_Good_Pioneering', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the Clapping Character', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:50, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'pretty_good_pioneering':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[2,3,2], // w,h,d in meters (0.00m float)
+        },
     },
     'satisfactory_pioneering':{
         idName:'satisfactory_pioneering', // lowercase name as id (only word char [a-z0-9_])
         name:'Satisfactory Pioneering', // main-product
         imgSrc:'.\\icon\\awesome\\Satisfactory_Pioneering.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Satisfactory_Pioneering', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the Character Spinning the Build Gun', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:150, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'satisfactory_pioneering':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[1.5,3.5,1.5], // w,h,d in meters (0.00m float)
+        },
     },
     'silver_hog':{
         idName:'silver_hog', // lowercase name as id (only word char [a-z0-9_])
         name:'Silver Hog', // main-product
         imgSrc:'.\\icon\\awesome\\Silver_Hog.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Silver_Hog', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'The statue of the Silver Pouncing Hog. Perfect as a hood ornament.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:1, // x max per itemslot (-1 if not an item)
+        statue:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:50, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+        contentShopPack:{
+            'silver_hog':1, // item and num in shop
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+        building:{
+            dimensions:[1,2,4], // w,h,d in meters (0.00m float)
+        },
     },
     'assembler':{
         idName:'assembler', // lowercase name as id (only word char [a-z0-9_])
         name:'Assembler', // main-product
         imgSrc:'.\\icon\\building\\Assembler.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Assembler', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Crafts two parts into another part.\nCan be automated by feeding parts into it with a conveyor belt connected to the input. The produced parts can be automatically extracted by connecting a conveyor belt to the output.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
+        building:{
+            inputs:2,
+            outputs:1,
+            power:15, // power usage in MW
+            dimensions:[10,8,15], // w,h,d in meters (0.00m float)
+            items:{
+                'reinforced_iron_plate':8, // num needed of (idName) for building the building
+                'rotor':4,
+                'cable':10
             }
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'awesome_shop':{
         idName:'awesome_shop', // lowercase name as id (only word char [a-z0-9_])
         name:'AWESOME Shop', // main-product
         imgSrc:'.\\icon\\building\\AWESOME_Shop.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/AWESOME_Shop', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Redeem your FICSIT Coupons here!\nFor those employees going the extra kilometer we have set aside special bonus milestones and rewards! Get your Coupons in the AWESOME Sink program now!\n*No refunds possible.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
+        awesomeShop:true, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
+        building:{
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[4,5,6], // w,h,d in meters (0.00m float)
+            items:{
+                'screw':200, // num needed of (idName) for building the building
+                'iron_plate':10,
+                'cable':30
             }
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'awesome_sink':{
         idName:'awesome_sink', // lowercase name as id (only word char [a-z0-9_])
         name:'AWESOME Sink', // main-product
         imgSrc:'.\\icon\\building\\AWESOME_Sink.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/AWESOME_Sink', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Got excess resources? Fear not, for FICSIT does not waste! The newly developed AWESOME Sink turns any useful part straight into research data, as fast as you can supply it!\nParticipating employees will be compensated with Coupons to spend at the AWESOME Shop.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
+        building:{
+            inputs:1,
+            outputs:0,
+            power:30, // power usage in MW
+            dimensions:[16,24,13], // w,h,d in meters (0.00m float)
+            items:{
+                'reinforced_iron_plate':15, // num needed of (idName) for building the building
+                'cable':30,
+                'concrete':45
             }
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'biomass_burner':{
         idName:'biomass_burner', // lowercase name as id (only word char [a-z0-9_])
         name:'Biomass Burner', // main-product
         imgSrc:'.\\icon\\building\\Biomass_Burner.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Biomass_Burner', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Burns various forms of biomass to generate electricity for the power grid. Has no input and must therefore be fed biomass manually.\nResource consumption will automatically be lowered to meet power demands.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
+        building:{
+            generatorEnergie:30, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            dimensions:[8,7,8], // w,h,d in meters (0.00m float)
+            items:{
+                'iron_plate':15, // num needed of (idName) for building the building
+                'iron_rod':15,
+                'wire':25
             }
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
-    'center_door_wall__plating':{
+    'center_door_wall__plating':{//hr__todo#################################################
         idName:'center_door_wall__plating', // lowercase name as id (only word char [a-z0-9_])
         name:'Center Door Wall (Plating)', // main-product
         imgSrc:'.\\icon\\building\\Center_Door_Wall_(Plating).png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Center_Door_Wall_(Plating)', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Snaps to foundations and other walls. Use these to make buildings with several floors.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
-        liquid:false,
-        resource:false,
-        plant:false,
-        ore:false,
-        building:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -2275,31 +578,43 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
+        },
+        contentShopPack:{
+            'center_door_wall__plating':1, // item and num in shop
+            'left_door_wall__plating':1,
+            'right_door_wall__plating':1,
+            'gate_wall':1
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -2394,12 +709,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Center_Door_Wall_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -2408,31 +729,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -2527,12 +854,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Coal_Generator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -2541,31 +874,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -2660,12 +999,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Constructor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -2674,31 +1019,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -2793,12 +1144,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Belt_Mk.1', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -2807,31 +1164,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -2926,12 +1289,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Belt_Mk.2', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -2940,31 +1309,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3059,12 +1434,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Belt_Mk.3', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3073,31 +1454,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3192,12 +1579,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Belt_Mk.4', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3206,31 +1599,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3325,12 +1724,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Belt_Mk.5', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3339,31 +1744,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3458,12 +1869,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Lift', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3472,31 +1889,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3591,12 +2014,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Lift_Mk.2', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3605,31 +2034,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3724,12 +2159,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Lift_Mk.3', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3738,31 +2179,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3857,12 +2304,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Lift_Mk.4', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -3871,31 +2324,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -3990,12 +2449,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Lift_Mk.5', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4004,31 +2469,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4123,12 +2594,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Merger', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4137,31 +2614,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4256,12 +2739,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Pole', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4270,31 +2759,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4389,12 +2884,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Splitter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4403,31 +2904,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4522,12 +3029,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Conveyor_Wall_Mount', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4536,31 +3049,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4655,12 +3174,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Craft_Bench', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4669,31 +3194,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4788,12 +3319,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Double_Ramp_8m_x_2m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4802,31 +3339,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -4921,12 +3464,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Double_Ramp_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -4935,31 +3484,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5054,12 +3609,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Double_Ramp_8m_x_8m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5068,31 +3629,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5187,12 +3754,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Double_Wall_Outlet', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5201,31 +3774,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5320,12 +3899,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Double_Wall_Outlet_Mk.2', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5334,31 +3919,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5453,12 +4044,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Double_Wall_Outlet_Mk.3', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5467,31 +4064,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5586,12 +4189,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Down_Corner_Ramp_8m_x_1m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5600,31 +4209,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5719,12 +4334,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Down_Corner_Ramp_8m_x_2m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5733,31 +4354,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5852,12 +4479,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Down_Corner_Ramp_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5866,31 +4499,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -5985,12 +4624,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Empty_Platform', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -5999,31 +4644,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6118,12 +4769,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Equipment_Workshop', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6132,31 +4789,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6251,12 +4914,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Fence', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6265,31 +4934,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6384,12 +5059,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Fluid_Buffer', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6398,31 +5079,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6517,12 +5204,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Fluid_Freight_Platform', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6531,31 +5224,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6650,12 +5349,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Foundation_8m_x_1m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6664,31 +5369,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6783,12 +5494,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Foundation_8m_x_2m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6797,31 +5514,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -6916,12 +5639,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Foundation_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -6930,31 +5659,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7049,12 +5784,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Foundry', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7063,31 +5804,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7182,12 +5929,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Frame_Foundation_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7196,31 +5949,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7315,12 +6074,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Frame_Window', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7329,31 +6094,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7448,12 +6219,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Freight_Platform', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7462,31 +6239,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7581,12 +6364,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Fuel_Generator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7595,31 +6384,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7714,12 +6509,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Gate_Wall', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7728,31 +6529,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7847,12 +6654,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Geo_Thermal_Generator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7861,31 +6674,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -7980,12 +6799,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Glass_Foundation_8m_x_1m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -7994,31 +6819,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8113,12 +6944,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hyper_Tube', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8127,31 +6964,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8246,12 +7089,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hyper_Tube_Entrance', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8260,31 +7109,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8379,12 +7234,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hyper_Tube_Support', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8393,31 +7254,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8512,12 +7379,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hyper_Tube_Wall_Hole', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8526,31 +7399,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8645,12 +7524,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hyper_Tube_Wall_Support', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8659,31 +7544,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8778,12 +7669,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Industrial_Fluid_Buffer', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8792,31 +7689,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -8911,12 +7814,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Industrial_Storage_Container', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -8925,31 +7834,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9044,12 +7959,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inner-Corner_Quarter_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9058,31 +7979,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9177,12 +8104,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inverted_Inner-Corner_Quarter_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9191,31 +8124,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9310,12 +8249,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inverted_Outer-Corner_Quarter_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9324,31 +8269,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9443,12 +8394,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inverted_Quarter_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9457,31 +8414,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9576,12 +8539,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inverted_Ramp_8m_x_1m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9590,31 +8559,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9709,12 +8684,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inverted_Ramp_8m_x_2m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9723,31 +8704,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9842,12 +8829,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Inverted_Ramp_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9856,31 +8849,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -9975,12 +8974,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Jump_Pad', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -9989,31 +8994,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10108,12 +9119,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Left_Door_Wall_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10122,31 +9139,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10241,12 +9264,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Left_Door_Wall_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10255,31 +9284,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10374,12 +9409,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Lookout_Tower', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10388,31 +9429,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10507,12 +9554,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/M.A.M.', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10521,31 +9574,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10640,12 +9699,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Manufacturer', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10654,31 +9719,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10773,12 +9844,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Miner_Mk.1', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10787,31 +9864,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -10906,12 +9989,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Miner_Mk.2', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -10920,31 +10009,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11039,12 +10134,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Miner_Mk.3', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11053,31 +10154,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11172,12 +10279,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Nuclear_Power_Plant', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11186,31 +10299,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11305,12 +10424,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Oil_Extractor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11319,31 +10444,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11438,12 +10569,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Oil_Pump', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11452,31 +10589,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11571,12 +10714,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Outer-Corner_Quarter_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11585,31 +10734,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11704,12 +10859,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Panel_Window', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11718,31 +10879,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11837,12 +11004,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Personal_Storage_Box', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11851,31 +11024,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -11970,12 +11149,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pillar_Base', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -11984,31 +11169,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12103,12 +11294,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pillar_Middle', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12117,31 +11314,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12236,12 +11439,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pillar_Top', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12250,31 +11459,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12369,12 +11584,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pipeline', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12383,31 +11604,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12502,12 +11729,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pipeline_Junction_Cross', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12516,31 +11749,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12635,12 +11874,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pipeline_Pump', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12649,31 +11894,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12768,12 +12019,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pipeline_Support', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12782,31 +12039,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -12901,12 +12164,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pipeline_Wall_Hole', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -12915,31 +12184,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13034,12 +12309,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Pipeline_Wall_Support', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13048,31 +12329,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13167,12 +12454,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Portable_Miner', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13181,31 +12474,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13300,12 +12599,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Power_Line', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13314,31 +12619,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13433,12 +12744,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Power_Pole', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13447,31 +12764,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13566,12 +12889,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Power_Pole_Mk.2', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13580,31 +12909,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13699,12 +13034,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Power_Pole_Mk.3', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13713,31 +13054,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13832,12 +13179,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Programmable_Splitter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13846,31 +13199,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -13965,12 +13324,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Quarter_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -13979,31 +13344,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14098,12 +13469,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Radar_Tower', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14112,31 +13489,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14231,12 +13614,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Railway', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14245,31 +13634,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14364,12 +13759,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Ramp_8m_x_1m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14378,31 +13779,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14497,12 +13904,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Ramp_8m_x_2m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14511,31 +13924,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14630,12 +14049,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Ramp_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14644,31 +14069,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14763,12 +14194,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Refinery', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14777,31 +14214,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -14896,12 +14339,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Reinforced_Window', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -14910,31 +14359,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15029,12 +14484,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Right_Door_Wall_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15043,31 +14504,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15162,12 +14629,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Right_Door_Wall_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15176,31 +14649,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15295,12 +14774,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Single_Window', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15309,31 +14794,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15428,12 +14919,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Smart_Splitter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15442,31 +14939,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15561,12 +15064,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Smelter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15575,31 +15084,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15694,12 +15209,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Space_Elevator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15708,31 +15229,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15827,12 +15354,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Stackable_Conveyor_Pole', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15841,31 +15374,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -15960,12 +15499,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Stackable_Hyper_Tube_Support', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -15974,31 +15519,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16093,12 +15644,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Stackable_Pipeline_Support', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16107,31 +15664,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16226,12 +15789,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Stairs_Left', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16240,31 +15809,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16359,12 +15934,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Stairs_Right', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16373,31 +15954,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16492,12 +16079,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Storage_Container', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16506,31 +16099,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16625,12 +16224,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/The_HUB', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16639,31 +16244,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16758,12 +16369,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Tilted_Jump_Pad', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16772,31 +16389,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -16891,12 +16514,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Train_Station', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -16905,31 +16534,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17024,12 +16659,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Truck_Station', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17038,31 +16679,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17157,12 +16804,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/U-Jelly_Landing_Pad', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17171,31 +16824,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17290,12 +16949,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Up_Corner_8m_x_1m_Inverted', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17304,31 +16969,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17423,12 +17094,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Up_Corner_8m_x_2m_Inverted', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17437,31 +17114,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17556,12 +17239,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Up_Corner_8m_x_4m_Inverted', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17570,31 +17259,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17689,12 +17384,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Up_Corner_Ramp_8m_x_1m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17703,31 +17404,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17822,12 +17529,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Up_Corner_Ramp_8m_x_2m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17836,31 +17549,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -17955,12 +17674,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Up_Corner_Ramp_8m_x_4m', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -17969,31 +17694,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18088,12 +17819,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Walkway_Crossing', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18102,31 +17839,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18221,12 +17964,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Walkway_Ramp', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18235,31 +17984,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18354,12 +18109,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Walkway_Straight', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18368,31 +18129,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18487,12 +18254,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Walkway_T-Crossing', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18501,31 +18274,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18620,12 +18399,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Walkway_Turn', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18634,31 +18419,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18753,12 +18544,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18767,31 +18564,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -18886,12 +18689,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -18900,31 +18709,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19019,12 +18834,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_Perpendicular_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19033,31 +18854,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19152,12 +18979,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_Perpendicular_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19166,31 +18999,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19285,12 +19124,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_x1_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19299,31 +19144,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19418,12 +19269,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_x1_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19432,31 +19289,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19551,12 +19414,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_x2_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19565,31 +19434,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19684,12 +19559,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_x2_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19698,31 +19579,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19817,12 +19704,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_x3_(Plating)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19831,31 +19724,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -19950,12 +19849,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Conveyor_x3_(Sheet_Metal)', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -19964,31 +19869,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20083,12 +19994,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Outlet', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20097,31 +20014,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20216,12 +20139,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Outlet_Mk.2', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20230,31 +20159,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20349,12 +20284,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wall_Outlet_Mk.3', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20363,31 +20304,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20482,12 +20429,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Water_Extractor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20496,31 +20449,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20615,12 +20574,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Blade_Runners', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20629,31 +20594,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20748,12 +20719,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Chainsaw', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20762,31 +20739,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -20881,12 +20864,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Color_Gun', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -20895,31 +20884,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21014,12 +21009,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Gas_mask', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21028,31 +21029,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21147,12 +21154,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Hazmat_Suit', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21161,31 +21174,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21280,12 +21299,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Jetpack', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21294,31 +21319,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21413,12 +21444,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Medicinal_Inhaler', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21427,31 +21464,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21546,12 +21589,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Nobelisk_Detonator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21560,31 +21609,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21679,12 +21734,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Object_Scanner', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21693,31 +21754,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21812,12 +21879,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Parachute', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21826,31 +21899,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -21945,12 +22024,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Rebar_Gun', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -21959,31 +22044,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22078,12 +22169,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Rifle', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22092,31 +22189,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22211,12 +22314,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Xeno-Basher', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22225,31 +22334,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22344,12 +22459,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Xeno-Zapper', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22358,31 +22479,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22477,12 +22604,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Alumina_Solution', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22491,31 +22624,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22610,12 +22749,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Fuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22624,31 +22769,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22743,12 +22894,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Heavy_Oil_Residue', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22757,31 +22914,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -22876,12 +23039,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Liquid_Biofuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -22890,31 +23059,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23009,12 +23184,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Sulfuric_Acid', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23023,31 +23204,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23142,12 +23329,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Water', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23156,31 +23349,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23275,12 +23474,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Turbofuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23289,31 +23494,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23408,12 +23619,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/A.I._Limiter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23422,31 +23639,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23541,12 +23764,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Adaptive_Control_Unit', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23555,31 +23784,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23674,12 +23909,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Alclad_Aluminum_Sheet', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23688,31 +23929,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23807,12 +24054,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Alien_Carapace', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23821,31 +24074,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -23940,12 +24199,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Alien_Organs', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -23954,31 +24219,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24073,12 +24344,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Aluminum_Ingot', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24087,31 +24364,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24206,12 +24489,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Aluminum_Scrap', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24220,31 +24509,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24339,12 +24634,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Automated_Wiring', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24353,31 +24654,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24472,12 +24779,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Battery', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24486,31 +24799,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24605,12 +24924,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Bauxite', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24619,31 +24944,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24738,12 +25069,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Beacon', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24752,31 +25089,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -24871,12 +25214,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Biofuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -24885,31 +25234,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25004,12 +25359,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Biomass', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25018,31 +25379,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25137,12 +25504,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Black_Powder', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25151,31 +25524,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25270,12 +25649,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Cable', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25284,31 +25669,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25403,12 +25794,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Caterium_Ingot', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25417,31 +25814,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25536,12 +25939,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Caterium_Ore', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25550,31 +25959,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25669,12 +26084,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Circuit_Board', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25683,31 +26104,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25802,12 +26229,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Coal', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25816,31 +26249,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -25935,12 +26374,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Color_Cartridge', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -25949,31 +26394,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26068,12 +26519,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Computer', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26082,31 +26539,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26201,12 +26664,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Concrete', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26215,31 +26684,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26334,12 +26809,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Copper_Ingot', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26348,31 +26829,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26467,12 +26954,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Copper_Ore', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26481,31 +26974,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26600,12 +27099,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Copper_Sheet', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26614,31 +27119,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26733,12 +27244,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Crude_Oil', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26747,31 +27264,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26866,12 +27389,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Crystal_Oscillator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -26880,31 +27409,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -26999,12 +27534,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Electromagnetic_Control_Rod', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27013,31 +27554,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27132,12 +27679,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Empty_Canister', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27146,31 +27699,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27265,12 +27824,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Encased_Industrial_Beam', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27279,31 +27844,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27398,12 +27969,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Fabric', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27412,31 +27989,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27531,12 +28114,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Flower_Petals', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27545,31 +28134,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27664,12 +28259,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Gas_Filter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27678,31 +28279,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27797,12 +28404,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Green_Power_Slug', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27811,31 +28424,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -27930,12 +28549,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Heat_Sink', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -27944,31 +28569,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28063,12 +28694,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Heavy_Modular_Frame', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28077,31 +28714,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28196,12 +28839,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/High-Speed_Connector', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28210,31 +28859,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28329,12 +28984,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Iodine_Infused_Filter', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28343,31 +29004,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28462,12 +29129,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Iron_Ingot', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28476,31 +29149,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28595,12 +29274,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Iron_Ore', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28609,31 +29294,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28728,12 +29419,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Iron_Plate', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28742,31 +29439,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28861,12 +29564,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Iron_Rod', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -28875,31 +29584,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -28994,12 +29709,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Limestone', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29008,31 +29729,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29127,12 +29854,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Modular_Engine', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29141,31 +29874,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29260,12 +29999,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Modular_Frame', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29274,31 +30019,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29393,12 +30144,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Modular_Frame_Light', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29407,31 +30164,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29526,12 +30289,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Motor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29540,31 +30309,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29659,12 +30434,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Mycelia', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29673,31 +30454,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29792,12 +30579,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Nobelisk', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29806,31 +30599,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -29925,12 +30724,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Nuclear_Fuel_Rod', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -29939,31 +30744,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30058,12 +30869,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Nuclear_Waste', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30072,31 +30889,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30191,12 +31014,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Packaged_Fuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30205,31 +31034,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30324,12 +31159,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Packaged_Heavy_Oil_Residue', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30338,31 +31179,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30457,12 +31304,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Packaged_Liquid_Biofuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30471,31 +31324,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30590,12 +31449,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Packaged_Oil', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30604,31 +31469,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30723,12 +31594,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Packaged_Turbofuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30737,31 +31614,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30856,12 +31739,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Packaged_Water', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -30870,31 +31759,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -30989,12 +31884,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Petroleum_Coke', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31003,31 +31904,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31122,12 +32029,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Plastic', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31136,31 +32049,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31255,12 +32174,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Polymer_Resin', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31269,31 +32194,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31388,12 +32319,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Power_Shard', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31402,31 +32339,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31521,12 +32464,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Purple_Power_Slug', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31535,31 +32484,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31654,12 +32609,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Quartz_Crystal', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31668,31 +32629,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31787,12 +32754,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Quickwire', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31801,31 +32774,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -31920,12 +32899,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Radio_Control_Unit', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -31934,31 +32919,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32053,12 +33044,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Raw_Quartz', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32067,31 +33064,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32186,12 +33189,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Reinforced_Iron_Plate', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32200,31 +33209,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32319,12 +33334,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Rifle_Cartridge', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32333,31 +33354,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32452,12 +33479,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Rotor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32466,31 +33499,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32585,12 +33624,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Rubber', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32599,31 +33644,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32718,12 +33769,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Screw', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32732,31 +33789,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32851,12 +33914,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Silica', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32865,31 +33934,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -32984,12 +34059,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Smart_Plating', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -32998,31 +34079,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33117,12 +34204,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Solid_Biofuel', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33131,31 +34224,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33250,12 +34349,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Spiked_Rebar', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33264,31 +34369,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33383,12 +34494,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Stator', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33397,31 +34514,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33516,12 +34639,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Steel_Beam', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33530,31 +34659,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33649,12 +34784,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Steel_Ingot', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33663,31 +34804,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33782,12 +34929,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Steel_Pipe', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33796,31 +34949,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -33915,12 +35074,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Sulfur', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -33929,31 +35094,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34048,12 +35219,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Supercomputer', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34062,31 +35239,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34181,12 +35364,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Turbo_Motor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34195,31 +35384,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34314,12 +35509,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Uranium', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34328,31 +35529,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34447,12 +35654,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Uranium_Cell', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34461,31 +35674,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34580,12 +35799,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Uranium_Pellet', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34594,31 +35819,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34713,12 +35944,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Versatile_Framework', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34727,31 +35964,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34846,12 +36089,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wire', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34860,31 +36109,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -34979,12 +36234,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Wood', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -34993,31 +36254,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35112,12 +36379,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Yellow_Power_Slug', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35126,31 +36399,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35245,12 +36524,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Compacted_Coal', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35259,31 +36544,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35378,12 +36669,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Electric_Locomotive', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35392,31 +36689,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35511,12 +36814,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Explorer', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35525,31 +36834,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35644,12 +36959,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Freight_Car', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35658,31 +36979,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35777,12 +37104,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Tractor', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35791,31 +37124,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -35910,12 +37249,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Truck', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -35924,31 +37269,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -36043,12 +37394,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Cyber_Wagon', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -36057,31 +37414,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -36176,12 +37539,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Factory_Cart', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -36190,31 +37559,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -36309,12 +37684,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Mercer_Sphere', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -36323,31 +37704,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -36442,12 +37829,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/Somersloop', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -36456,31 +37849,37 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
                 waste:5 // nuclear waste rate per min
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -36575,12 +37974,18 @@ let dataObjects = {
         gamepediaLink:'https://satisfactory.gamepedia.com/M._Ore', // gamepedia link
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:64, // x max per itemslot
+        stackSize:1, // x max per itemslot (-1 if not an item)
         liquid:false,
         resource:false,
         plant:false,
+        animal:false,
         ore:false,
         building:false,
+        statue:false,
+        awesomeShop:false, // from awesomeShop
+        couponCost:-1, // coupon cost (-1 can't be purchased)
+        vehicle:false,
+        consumable:false,
         craftingMaterial:false,
         craftingWorkshop:false,
         buildingMaterial:false,
@@ -36589,30 +37994,36 @@ let dataObjects = {
         alternateItem:false,
         wip:false,
         testInfo:function(){
-            if (isNotEmpty(this.recipes.default.by_product)) return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;
-            else return this.idName + '\n' + this.info;
+            if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+            else {return this.idName + '\n' + this.info;}
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
-                energie:0, // brings x MW while running
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                energie:0, // brings x MW while running
                 consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                energie:2500, // brings x MW while running
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
+            }
+        },
+        building:{
+            generatorEnergie:-1, // brings x MW while running (-1 no generator)
+            inputs:0,
+            outputs:0,
+            power:0, // power usage in MW
+            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            items:{
+                'example_part':0 // num needed of (idName) for building the building
             }
         },
         recipes:{
@@ -36701,4 +38112,8 @@ let dataObjects = {
         }
     }
 }
-console.log(dataObjects['example_part'].testInfo());
+
+if (hasContent(this.recipes)){
+                if (hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+                else {return this.idName + '\n' + this.info;}
+            } else {return this.idName + '\n' + this.info;}
