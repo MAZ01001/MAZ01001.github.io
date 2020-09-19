@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Math Function Drawer</title>
+    <style>
+        body{
+            background-color: #2c2c2c;
+            padding: 0;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="../libraries/p5_min-1.1.9/p5.min.js"></script>
+    <script src="../libraries/p5_min-1.1.9/p5.sound.min.js"></script>
+    <script>
+        let sliderArr = [],
+            hideSlider = true,
+            promVal = [],
+            valsCmd = [],
+            drawCmd = false,
+            scrollingVal = 33,
+            moveX = 0,
+            moveY = 0;
+
+        function setup() {
+            cnv = createCanvas(windowWidth - 1, windowHeight - 4);
+            cnv.mouseWheel(e => scrolling(cnv, true));
+            own = createCheckbox('own function?', false);
+            own.changed(e => {
+                if (own.checked()) {
+                    hideSlider = true;
+                    if (hideSlider) {
+                        hideSliderB.html('show sliders');
+                    } else {
+                        hideSliderB.html('hide sliders');
+                    }
+                    promVal.length = 0;
+                    for (let i = 0; i < sliderArr.length; i++) {
+                        let tmp = NaN;
+                        tmp = prompt('\<a' + i + '> * X^' + i, 0);
+                        if(tmp==null)break;
+                        promVal.push(parseFloat(tmp==""?0:tmp));
+                    }
+                } else { hideSlider = false; }
+            });
+            vSlider = createSlider(1, 100, 10, 0.1).mouseWheel(e => scrolling(vSlider));
+            hSlider = createSlider(1, 100, 10, 0.1).mouseWheel(e => scrolling(hSlider));
+            vSel = createSelect();
+            vSel.option('1-100');
+            vSel.option('100-10k');
+            vSel.option('10k-1M');
+            vSel.option('1M-100M');
+            vSel.changed(e => {
+                switch (vSel.value()) {
+                    case '1-100':
+                        vSlider.elt.min = 1;
+                        vSlider.elt.max = 100;
+                        vSlider.elt.step = 0.1;
+                        break;
+                    case '100-10k':
+                        vSlider.elt.min = 100;
+                        vSlider.elt.max = 10000;
+                        vSlider.elt.step = 1;
+                        break;
+                    case '10k-1M':
+                        vSlider.elt.min = 10000;
+                        vSlider.elt.max = 1000000;
+                        vSlider.elt.step = 1;
+                        break;
+                    case '1M-100M':
+                        vSlider.elt.min = 1000000;
+                        vSlider.elt.max = 100000000;
+                        vSlider.elt.step = 1;
+                        break;
+                
+                    default:
+                        break;
+                }
+            });
+            hSel = createSelect();
+            hSel.option('1-100');
+            hSel.option('100-10k');
+            hSel.option('10k-1M');
+            hSel.option('1M-100M');
+            hSel.changed(e => {
+                switch (hSel.value()) {
+                    case '1-100':
+                        hSlider.elt.min = 1;
+                        hSlider.elt.max = 100;
+                        hSlider.elt.step = 0.1;
+                        break;
+                    case '100-10k':
+                        hSlider.elt.min = 100;
+                        hSlider.elt.max = 10000;
+                        hSlider.elt.step = 1;
+                        break;
+                    case '10k-1M':
+                        hSlider.elt.min = 10000;
+                        hSlider.elt.max = 1000000;
+                        hSlider.elt.step = 1;
+                        break;
+                    case '1M-100M':
+                        hSlider.elt.min = 1000000;
+                        hSlider.elt.max = 100000000;
+                        hSlider.elt.step = 1;
+                        break;
+                
+                    default:
+                        break;
+                }
+            });
+            hideSliderB = createButton('show sliders');
+            hideSliderB.mousePressed(e => {
+                hideSlider = !hideSlider;
+                if (hideSlider) {
+                    hideSliderB.html('show sliders');
+                } else {
+                    hideSliderB.html('hide sliders');
+                }
+            });
+            sliderArr.range = (vSlider.value() + hSlider.value()) / 2;
+            sliderArr.default = [0, 0, 1, 0, 0, 0]; //<!--HK__[a0 → a5]
+            for (let i = 0; i < 6; i++) {
+                sliderArr.push(createSlider(-sliderArr.range, sliderArr.range, sliderArr.default[i], 0.001));
+                sliderArr[i].mouseWheel(e => scrolling(sliderArr[i]));
+            }
+        
+            // frameRate(30);
+        }
+        //<!--HW__setup-end________________________________________________________
+        function draw() {
+            //<!--HK__box to hilight canvas
+            strokeWeight(4);
+            stroke('blue');
+            fill('#202020');
+            rectMode(CORNER);
+            rect(0, 0, width, height);
+            //<!--HK__reset fill, stroke width,stroke color
+            fill('0');
+            strokeWeight(2);
+            stroke('white');
+        
+            //<!--HK__draw graph
+            const numH = hSlider.value(),
+                numV = vSlider.value();
+            drawingfield(numH, numV);
+            noFill();
+            strokeWeight(4);
+            stroke('green');
+            beginShape();
+            for (let i = 0; i <= width; i++) {
+                let formPunkt = formel(map(i, 0, width, -numH, numH));
+                curveVertex(i, map(formPunkt, -numV, numV, height, 0));
+            }
+            endShape();
+            if (own.checked()) {
+                //<!--HK__draw graph2
+                stroke('cyan');
+                beginShape();
+                for (let i = 0; i <= width; i++) {
+                    let formPunkt = ownF(map(i, 0, width, -numH, numH));
+                    curveVertex(i, map(formPunkt, -numV, numV, height, 0));
+                }
+                endShape();
+            }
+            if (drawCmd) { //TODO array aus (max?) graphCmd's with random color~~
+                //<!--HK__draw graph3
+                stroke('magenta');
+                beginShape();
+                for (let i = 0; i <= width; i++) {
+                    let formPunkt = 0;
+                    for (let i2 = 9; i2 >= 0; i2--) {
+                        formPunkt += (valsCmd[i2] * Math.pow(map(i, 0, width, -numH, numH), i2));
+                    }
+                    curveVertex(i, map(formPunkt, -numV, numV, height, 0));
+                }
+                endShape();
+            }
+            //<!--HK__graph names
+            strokeWeight(1);
+            textSize(20);
+            textAlign(LEFT, TOP);
+            fill('green');
+            stroke('green');
+            text(`f(x)`, 20, 30);
+            if (own.checked()) {
+                fill('cyan');
+                stroke('cyan');
+                text(`own(x)`, 20, 50);
+            }
+            if (drawCmd) {
+                fill('magenta');
+                stroke('magenta');
+                text(`cmd(x)`, 20, 70);
+            }
+            textSize(12);
+        
+            //<!--HK__reset sliders/selects
+            own.position(10, 10);
+            hideSliderB.position((width - hideSliderB.width) - 20, (((height / 2) - 200) - hideSliderB.height) - 20);
+            //<!--HK__v
+            vSlider.size(200);
+            vSlider.position((width / 2) - (vSlider.width / 2), 0);
+            vSlider.doubleClicked(function() {
+                vSel.value('1-100');
+                vSlider.elt.min = 1;
+                vSlider.elt.max = 1000;
+                vSlider.value(100);
+            });
+            vSel.position((vSlider.position().x + vSlider.width) + 4, vSlider.position().y);
+            fill('yellow');
+            noStroke();
+            textAlign(RIGHT, CENTER);
+            text('v' + '=' + vSlider.value(), vSlider.position().x - 4, (vSlider.position().y + (vSlider.height / 2)));
+            strokeWeight(1);
+            //<!--HK__h
+            hSlider.size(200);
+            hSlider.position(10, (height / 2) - (hSlider.height / 2));
+            hSlider.doubleClicked(function() {
+                hSel.value('1-1K');
+                hSlider.elt.min = 1;
+                hSlider.elt.max = 1000;
+                hSlider.value(100);
+            });
+            hSel.position(hSlider.position().x + 4, hSlider.position().y - hSlider.height);
+            fill('yellow');
+            noStroke();
+            textAlign(LEFT, CENTER);
+            text('h' + '=' + hSlider.value(), (hSlider.position().x + hSlider.width) + 4, (hSlider.position().y + (hSlider.height / 2)));
+            strokeWeight(1);
+            //<!--HK__anArr
+            if (!hideSlider) { sliderAArrDraw(); } else {
+                sliderArr.forEach(e => { e.hide(); });
+            }
+            //<!--HK__mouse cross with select box + coordinates
+            if (mouseIsPressed) {
+                let xx = roundTo(map(mouseX, 0, width, -hSlider.value(), hSlider.value()), 4),
+                    yy = roundTo(map(mouseY, 0, height, -vSlider.value(), vSlider.value()), 4),
+                    pxx = roundTo(map(moveX, 0, width, -hSlider.value(), hSlider.value()), 4),
+                    pyy = roundTo(map(moveY, 0, height, -vSlider.value(), vSlider.value()), 4);
+                strokeWeight(1);
+                stroke('black');
+                noCursor();
+                noFill();
+                line(mouseX, 0, mouseX, height);
+                line(0, mouseY, width, mouseY);
+                line(moveX, 0, moveX, height);
+                line(0, moveY, width, moveY);
+                cursor(CROSS);
+                fill(255, 255, 0, 20);
+                stroke(255, 255, 0);
+                quad(mouseX, mouseY, moveX, mouseY, moveX, moveY, mouseX, moveY);
+                textAlign(LEFT, BOTTOM);//TODO auto
+                noStroke();
+                fill('yellow');
+                text('px:' + pxx + '\npy:' + pyy + '\nx:' + xx + '\ny:' + yy, mouseX, mouseY);
+            } else {
+                let xx = roundTo(map(mouseX, 0, width, -hSlider.value(), hSlider.value()), 4),
+                    yy = roundTo(map(mouseY, 0, height, -vSlider.value(), vSlider.value()), 4);
+                strokeWeight(1);
+                stroke('black');
+                noCursor();
+                noFill();
+                line(mouseX, 0, mouseX, height);
+                line(0, mouseY, width, mouseY);
+                cursor(CROSS);
+                textAlign(LEFT, BOTTOM);//TODO auto
+                noStroke();
+                fill('yellow');
+                text('x:' + xx + '\ny:' + yy, mouseX, mouseY);
+            }
+        
+            //<!--HW__draw-end_____________________________________________________
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight - 4);
+            return false;
+        }
+
+        function mouseMoved() {
+            moveX = mouseX;
+            moveY = mouseY;
+            return false;
+        }
+
+        function sliderAArrDraw() {
+            for (let i = 0; i < sliderArr.length; i++) {
+                sliderArr[i].show();
+                sliderArr[i].size(width / 1.5);
+                sliderArr[i].position((width - sliderArr[i].width) - 20, ((height / 2) + ((i + i) * sliderArr[i].height)) - (9.5 * sliderArr[i].height));
+                sliderArr[i].doubleClicked(function() { sliderArr[i].value(0); });
+                fill('yellow');
+                noStroke();
+                textAlign(LEFT, CENTER);
+                text('a' + i + '=' + sliderArr[i].value(), sliderArr[i].position().x, ((height / 2) + ((i + i) * sliderArr[i].height)) - (9.5 * sliderArr[i].height));
+                strokeWeight(1);
+            }
+            return false;
+        }
+
+        function drawingfield(zahlH = 10, zahlV = 1000) {
+            stroke('red');
+            noFill();
+            strokeWeight(3);
+            //<!--HK__coordinates
+            line(0, height / 2, width, height / 2);
+            line(width / 2, 0, width / 2, height);
+            //<!--HK__lines %
+            let numbr = -zahlH,
+                schrittH = zahlH / 10,
+                schrittV = zahlV / 10;
+            for (let i = 0; i <= width; i += (width / 20)) {
+                stroke('red');
+                noFill();
+                strokeWeight(3);
+                line(i, (height / 2) - 10, i, (height / 2) + 10);
+                if (numbr !== 0) {
+                    fill('red');
+                    strokeWeight(1);
+                    textAlign(CENTER, CENTER);
+                    text(roundTo(numbr), i, (height / 2) + 15);
+                    numbr += schrittH;
+                } else { numbr += schrittH; }
+            }
+            numbr = zahlV;
+            for (let i = 0; i <= height; i += (height / 20)) {
+                stroke('red');
+                noFill();
+                strokeWeight(3);
+                line((width / 2) - 10, i, (width / 2) + 10, i);
+                if (numbr !== 0) {
+                    fill('red');
+                    strokeWeight(1);
+                    textAlign(LEFT, CENTER);
+                    text(roundTo(numbr), (width / 2) + 15, i);
+                    numbr -= schrittV;
+                } else { numbr -= schrittV; }
+            }
+            stroke(0);
+            strokeWeight(1);
+            return false;
+        }
+
+        function formel(x = NaN) {
+            //<!--HK__f(x) = (a9*(x^9)) + ... + (a3*(x^3)) + (a2*(x^2)) + (a1*(x^1)) + (a0*(x^0))
+            //<!--HK__[0=a0, ... ,9=a9] || [9=a9, ... ,0=a0].reverse()
+            let tmp = 0;
+            for (let i = sliderArr.length-1; i >= 0; i--) {
+                tmp += (sliderArr[i].value() * Math.pow(x, i));
+            }
+            return tmp;
+        }
+
+        function ownF(x = NaN) {
+            //<!--HK__f(x) = (a9*(x^9)) + ... + (a3*(x^3)) + (a2*(x^2)) + (a1*(x^1)) + (a0*(x^0))
+            //<!--HK__[0=a0, ... ,9=a9] || [9=a9, ... ,0=a0].reverse()
+            let tmp2 = 0;
+            for (let i = 0; i < promVal.length; i++) {
+                tmp2 += (promVal[i] * Math.pow(x, i));
+            }
+            return tmp2;
+        }
+
+        function graphCmd(vals = ['a9', 'a8', 'a7', 'a6', 'a5', 'a4', 'a3', 'a2', 'a1', 'a0'], drawGraph = true) {
+            //<!--HK__f(x) = (a9*(x^9)) + ... + (a3*(x^3)) + (a2*(x^2)) + (a1*(x^1)) + (a0*(x^0))
+            //<!--HK__[0=a0, ... ,9=a9] || [9=a9, ... ,0=a0].reverse()
+            let testNan = false;
+            vals.forEach(function(value) {
+                if (isNaN(parseFloat(value))) {
+                    testNan = true;
+                }
+            });
+            if (drawGraph && !testNan) {
+                valsCmd.length = 0;
+                vals.reverse();
+                vals.forEach(function(value) {
+                    valsCmd.push(value);
+                });
+                drawCmd = true;
+            } else {
+                valsCmd.length = 0;
+                drawCmd = false;
+            }
+            return 'done';
+        }
+
+        function roundTo(n, digi = 3) {
+            let neg = false;
+            if (n < 0) {
+                neg = true;
+                n = n * -1;
+            }
+            let multi = Math.pow(10, digi);
+            n = parseFloat((n * multi).toFixed(15));
+            n = (Math.fround(n) / multi).toFixed(digi);
+            if (neg) {
+                n = (n * -1).toFixed(digi);
+            }
+            return n;
+        }
+
+        function scrolling(ee, canvas = false) {
+            // element.mouseWheel(e=>scrolling(e));
+            if (canvas) {
+                //<!--HK__h&v
+                vSlider.value(vSlider.value() + parseFloat(parseFloat(vSlider.elt.step) * (-parseFloat(scrollingVal) / 33.33333206176758)));
+                hSlider.value(hSlider.value() + parseFloat(parseFloat(hSlider.elt.step) * (-parseFloat(scrollingVal) / 33.33333206176758)));
+            }
+            ee.value(ee.value() + parseFloat(parseFloat(ee.elt.step) * (parseFloat(scrollingVal) / 33.33333206176758)));
+            // print(_mouseWheelDeltaY / 33.33333206176758);
+            return false;
+        }
+
+        function mouseWheel(event) {
+            scrollingVal = -event.delta;
+            return false;
+        }
+
+        function mouseReleased() {
+            if ((mouseButton == CENTER)) {
+                print(logValues());
+                copyToClipboard(logValues());
+                alert(logValues());
+            }
+            return false;
+        }
+
+        function logValues() {
+            let tmp3 = '';
+            tmp3 += 'vScale: ' + vSlider.value() + '\nhScale: ' + hSlider.value();
+            tmp3 += '\nf(x) = ';
+            sliderArr.forEach(function(value, index) {
+                if(value.value()>=0) tmp3 += (index==0?'':'+') + value.value() + '*X^' + index;
+                else tmp3 += value.value() + '*X^' + index;
+            });
+            if (own.checked()) {
+                tmp3 += '\nown(x) = ';
+                if(promVal.length>1) promVal.forEach(function(value, index) {
+                    if(value>=0) tmp3 += (index==0?'':'+')+value + '*X^' + index;
+                    else tmp3 += value + '*X^' + index;
+                });
+                else if(promVal.length==1) {
+                    if(promVal[0]>=0) tmp3 += promVal[0] + '*X^0+0*X^1';
+                    else tmp3 += promVal[0] + '*X^0+0*X^1';
+                } else tmp3 += '0*X^0+0*X^1';
+            }
+            if (drawCmd) {
+                tmp3 += '\ncmd(x) = ';
+                valsCmd.forEach(function(value, index) {
+                    if(value>=0) tmp3 += (index==0?'':'+')+value + '*X^' + index;
+                    else tmp3 += value + '*X^' + index;
+                });
+            }
+            return tmp3;
+        }
+        //TODO custom context menu [copy values]<(logValues.tostring{split by'\n'}.to clipboard!!)
+        //TODO                     [paste values]<(textbox popup with {ok} button{same format required})
+        function copyToClipboard(str = '') {
+            const el = document.createElement('textarea'); //<!--HK__Create a <textarea> element
+            el.value = str; //<!--HK__Set its value to the string that you want copied
+            el.setAttribute('readonly', ''); //<!--HK__Make it readonly to be tamper-proof
+            el.style.position = 'absolute';
+            el.style.left = '-9999px'; //<!--HK__Move outside the screen to make it invisible
+            document.body.appendChild(el); //<!--HK__Append the <textarea> element to the HTML document
+            const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false; //<!--HK__Mark as false to know no selection existed before
+            el.select(); //<!--HK__Select the <textarea> content
+            document.execCommand('copy'); //<!--HK__Copy - only works as a result of a user action (e.g. click events)
+            document.body.removeChild(el); //<!--HK__Remove the <textarea> element
+            if (selected) { //<!--HK__If a selection existed before copying
+                document.getSelection().removeAllRanges(); //<!--HK__Unselect everything on the HTML document
+                document.getSelection().addRange(selected); //<!--HK__Restore the original selection
+            }
+            return false;
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>
