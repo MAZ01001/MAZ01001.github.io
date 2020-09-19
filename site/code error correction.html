@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error correction</title>
+    <!--
+        Thanks to:
+        3b1b (theory): https://youtu.be/X8jsijhllIA
+        3b1b (part 2 code): https://youtu.be/b3NxrZOu_CE
+        ben eater (practice): https://youtu.be/h0jloehRKas
+        > interactive web js: https://harryli0088.github.io/hamming-code/
+        > minecraft redstone: https://www.reddit.com/r/3Blue1Brown/comments/iochkl/
+    -->
+    <style>
+        body{
+            background-color: #000;
+            color: #0f0;
+            padding: 0;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: large;
+        }
+        h1{text-align: center;}
+        input#noise{width: 3em;}
+        input#txtIn,input#txtOut{width: 60%;}
+        div#reg div{display: inline-block;}
+        textarea,input,select{
+            background-color: #000;
+            color: #0f0;
+        }
+        div#byteSizeBlock{
+            background-color: #111;
+            padding-left: 1em;
+        }
+        div#useTxtBlock{
+            background-color: #020;
+            padding-left: 1em;
+        }
+        select#method{
+            width: fit-content;
+            font-size: large;
+            vertical-align: middle;
+        }
+        div.bit{
+            text-align: center;
+            width: 100%;
+            background-color: #333;
+        }
+        div.txt{
+            text-align: center;
+            width: 100%;
+            background-color: #030;
+        }
+        div#rerunBlock{
+            padding-bottom: 3px;
+            text-align: center;
+            width: 100%;
+        }
+        input#rerun{
+            border-color: #f90;
+            border-radius: 8px;
+            border-width: 4px;
+        }
+        select#regByte{
+            border-color: #000;
+            border-radius: 8px;
+            border-width: 3px;
+        }
+        div#bitErrNoteBlock{
+            padding-top: 3px;
+            background-color: #600;
+            text-align: center;
+            width: 100%;
+        }
+        div#noiseBlock{
+            position: relative;
+            transform: translateX(-50%);
+            width: max-content;
+            left: 50%;
+        }
+        div#reg{
+            display: inline-block;
+            width: calc(100% - 3em);
+            background-color: #000;
+            font-family: consolas, 'Courier New', Courier, monospace;
+            border: 1px solid #777;
+        }
+        textarea#bitErrNote{
+            width: min(505px, 90%);
+            height: 1.5em;
+            min-height: 1.5em;
+            max-height: 32em;
+            resize: vertical;
+        }
+        div#regBlock{
+            padding-top: 3px;
+            padding-bottom: 3px;
+            text-align: center;
+            width: 100%;
+            background-color: #770;
+        }
+        textarea#bitIn, textarea#bitOut{
+            width: calc(100% - 4em);
+            height: 1.5em;
+            min-height: 1.5em;
+            max-height: 16em;
+            resize: vertical;
+            font-family: consolas, 'Courier New', Courier, monospace;
+            font-size: x-small;
+        }
+    </style>
+    <script>
+        /*
+        ([bit; address_pattern] (check all binary 1's and 'even the total count' by changing self))
+        parrity bits in binary:
+        0   (xxxxxxxx) (check all) [gets ignored by the other checks]
+        1   (xxxxxxx1) (check 1 every 2)
+        2   (xxxxxx1x) (check 2 every 4)
+        4   (xxxxx1xx) (check 4 every 8)
+        8   (xxxx1xxx) (check 8 every 16)
+        16  (xxx1xxxx) (check 16 every 32)
+        32  (xx1xxxxx) (check 32 every 64)
+        64  (x1xxxxxx) (check 64 every 128)
+        128 (1xxxxxxx) (check 128 every 256)
+        256....
+        */
+        let method,useTxt,txtIn,txtOut,noise,bitIn,bitOut,byteSize,bitErrNote,reg,rerun,
+            clog=[{"byte":0,"random":"","og":"","h_encode":"","errFlip":"","h_decode":"","h_extract":""}];
+        function setup(){
+            method = document.getElementById('method');
+            useTxt = document.getElementById('useTxt');
+            txtIn = document.getElementById('txtIn');
+            txtOut = document.getElementById('txtOut');
+            noise = document.getElementById('noise');
+            bitIn = document.getElementById('bitIn');
+            bitOut = document.getElementById('bitOut');
+            byteSize = document.getElementById('byteSize');
+            bitErrNote = document.getElementById('bitErrNote');
+            reg = document.getElementById('reg');
+            regByte =document.getElementById('regByte');
+            rerun = document.getElementById('rerun');
+            useTxt.addEventListener('change',e=>{
+                if (useTxt.checked){
+                    document.getElementById('txtInBlock').hidden=false;
+                    document.getElementById('txtOutBlock').hidden=false;
+                } else {
+                    document.getElementById('txtInBlock').hidden=true;
+                    document.getElementById('txtOutBlock').hidden=true;
+                }
+            });
+            txtIn.addEventListener('input',e=>{
+                bitIn.value=textToBin(txtIn.value);
+                if(byteSize.value>'0'){
+                    let tmp = bitIn.value.split(" ");
+                    for (let i = 0; i < tmp.length; i++) {
+                        tmp[i] = tmp[i].padStart(byteSize.value,'0');
+                        if(tmp[i].length > byteSize.value){
+                            tmp.splice(i,1);
+                            i--;
+                        }
+                    }
+                    bitIn.value = tmp.join(" ");
+                }
+                txtIn.value=binToText(bitIn.value);
+                recode(method.value,bitIn.value,byteSize.value,noise.value);
+            });
+            bitIn.addEventListener('change',e=>{
+                bitIn.value = bitIn.value.replace(/[^01 ]+/gm," ").replace(/(?:\s0+|^0+)/g," ")
+                .replace(/\s\s+/g," ").replace(/^\s?/,"").replace(/\s?$/,"");
+                if(byteSize.value>'0'){
+                    let tmp = bitIn.value.split(" ");
+                    for (let i = 0; i < tmp.length; i++) {
+                        tmp[i] = tmp[i].padStart(byteSize.value,'0');
+                        if(tmp[i].length > byteSize.value){
+                            tmp.splice(i,1);
+                            i--;
+                        }
+                    }
+                    bitIn.value = tmp.join(" ");
+                }
+                txtIn.value=binToText(bitIn.value);
+                recode(method.value,bitIn.value,byteSize.value,noise.value);
+            });
+            byteSize.addEventListener('change',e=>{
+                let tmp = bitIn.value.split(" ");
+                for (let i = 0; i < tmp.length; i++) {
+                    tmp[i] = tmp[i].replace(/(?:\s0+|^0+)/g," ").replace(/^\s?/,"");
+                    if(byteSize.value>'0'){
+                        tmp[i] = tmp[i].padStart(byteSize.value,'0');
+                        if(tmp[i].length > byteSize.value){
+                            tmp.splice(i,1);
+                            i--;
+                        }
+                    }
+                }
+                bitIn.value = tmp.join(" ");
+                txtIn.value=binToText(bitIn.value);
+                recode(method.value,bitIn.value,byteSize.value,noise.value);
+            });
+            noise.addEventListener('change',e=>{
+                let tmp = bitIn.value.split(" ");
+                for (let i = 0; i < tmp.length; i++) {
+                    tmp[i] = tmp[i].replace(/(?:\s0+|^0+)/g," ").replace(/^\s?/,"");
+                    if(byteSize.value>'0'){
+                        tmp[i] = tmp[i].padStart(byteSize.value,'0');
+                        if(tmp[i].length > byteSize.value){
+                            tmp.splice(i,1);
+                            i--;
+                        }
+                    }
+                }
+                bitIn.value = tmp.join(" ");
+                txtIn.value=binToText(bitIn.value);
+                recode(method.value,bitIn.value,byteSize.value,noise.value);
+            });
+            rerun.addEventListener('click',e=>{
+                let tmp = bitIn.value.split(" ");
+                for (let i = 0; i < tmp.length; i++) {
+                    tmp[i] = tmp[i].replace(/(?:\s0+|^0+)/g," ").replace(/^\s?/,"");
+                    if(byteSize.value>'0'){
+                        tmp[i] = tmp[i].padStart(byteSize.value,'0');
+                        if(tmp[i].length > byteSize.value){
+                            tmp.splice(i,1);
+                            i--;
+                        }
+                    }
+                }
+                bitIn.value = tmp.join(" ");
+                txtIn.value=binToText(bitIn.value);
+                recode(method.value,bitIn.value,byteSize.value,noise.value);
+            });
+            regByte.addEventListener('change',e=>{
+                let tmp4={"h_encode":clog[regByte.value].h_encode,"h_decode":clog[regByte.value].h_decode,"errFlip":clog[regByte.value].errFlip},
+                    tmp4ln1 = "",
+                    tmp4ln2 = "";
+                for (let i = 0; i < (tmp4.h_encode).length; i++) {
+                    tmp4ln1 += ` ${tmp4.h_encode[i]}`;
+                    if (tmp4.h_encode[i] == tmp4.h_decode.str[i]){
+                        if (tmp4.h_encode[i]==tmp4.errFlip[i]){tmp4ln2 += ` ${tmp4.h_decode.str[i]}`;}
+                        else {tmp4ln2 += ` <div style="color: #f0f;">${tmp4.h_decode.str[i]}</div>`;}
+                    } else {tmp4ln2 += ` <div style="color: #f00;">${tmp4.h_decode.str[i]}</div>`;}
+                }
+                tmp4ln1 = tmp4ln1.replaceIndex(0,'',1);
+                tmp4ln2 = tmp4ln2.replaceIndex(0,'',1);
+                reg.innerHTML=`${tmp4ln1}<hr>${tmp4ln2}`;
+            });
+        }
+        //recodes the bytes incl. noise
+        function recode(type="",dataBits="",bitPerByte=0,errVal=0.0){
+            switch (type) {
+                case "hamming":
+                    {
+                        // log2(totalsize)=paritysize
+                        let bitStream = dataBits.split(" "),tmp,tmp2,tmp3,tmpErr;
+                        tmpErr="";
+                        clog=[];
+                        for (let i = 0; i < bitStream.length; i++) {
+                            clog[i]={"byte":i,"random":"","og":"","h_encode":"","errFlip":"","h_decode":"","h_extract":""};
+                            tmp3=hamming_encode(bitStream[i]);
+                            clog[i].random=errVal*Math.random()
+                            tmp2=randomBit(tmp3,clog[i].random);
+                            tmp=hamming_decode(tmp2);
+                            tmpErr+="\nByte["+i+"]  \tErr("+Math.round(clog[i].random)+"%)  \t"+tmp.err;
+                            clog[i].og=bitStream[i];
+                            clog[i].h_encode=tmp3;
+                            clog[i].errFlip=tmp2;
+                            clog[i].h_decode=tmp;
+                            bitStream[i] = hamming_extractStr(tmp.str);
+                            clog[i].h_extract=bitStream[i];
+                        }
+                        console.log(clog);
+                        bitErrNote.value = tmpErr.substr(1);
+                        dataBits=bitStream.join(" ");
+                        bitOut.value=dataBits;
+                        txtOut.value=binToText(dataBits);
+                        {
+                            regByte.innerHTML="";
+                            for (let i = 0; i < clog.length; i++) {
+                                if (i==0) regByte.innerHTML+=`\n<option selected="true" value="0">Byte[0]</option>`;
+                                else regByte.innerHTML+=`\n<option value="${i}">Byte[${i}]</option>`;
+                            }
+                            let tmp4={"h_encode":clog[regByte.value].h_encode,"h_decode":clog[regByte.value].h_decode,"errFlip":clog[regByte.value].errFlip},
+                                tmp4ln1 = "",
+                                tmp4ln2 = "";
+                            for (let i = 0; i < (tmp4.h_encode).length; i++) {
+                                tmp4ln1 += ` ${tmp4.h_encode[i]}`;
+                                if (tmp4.h_encode[i] == tmp4.h_decode.str[i]){
+                                    if (tmp4.h_encode[i]==tmp4.errFlip[i]){tmp4ln2 += ` ${tmp4.h_decode.str[i]}`;}
+                                    else {tmp4ln2 += ` <div style="color: #f0f;">${tmp4.h_decode.str[i]}</div>`;}
+                                } else {tmp4ln2 += ` <div style="color: #f00;">${tmp4.h_decode.str[i]}</div>`;}
+                            }
+                            tmp4ln1 = tmp4ln1.replaceIndex(0,'',1);
+                            tmp4ln2 = tmp4ln2.replaceIndex(0,'',1);
+                            reg.innerHTML=`${tmp4ln1}<hr>${tmp4ln2}`;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        // flips bits randomly by % per byte/bit-string
+        function randomBit(byte = "", error = 0) {
+            if(error<=0) return byte;
+            let errNum = Math.round(byte.length*(error/100)),
+                errId = [],
+                tmp,exists;
+            for (let i = 0; i < errNum; i++) {
+                tmp = Math.round(Math.random()*(byte.length-1));
+                exists=false;
+                for(const id of errId){if(id==tmp){exists=true;break;}}
+                if (exists) i--;
+                else errId.push(tmp);
+            }
+            errId.sort((a, b) => a - b);
+            for (const id of errId) {
+                byte=byte.replaceIndex(id,(byte[id]=='0'?'1':'0'),1);
+            }
+            return byte;
+        }
+        //hamming_encode (bit string)
+        function hamming_encode(str = "01101001") {
+            str = str.insertIndex(0, '0');
+            for (let i = 1; i < str.length; i*=2) {
+                str = str.insertIndex(i, '0');
+            }
+            for (let i = 1; i < str.length; i*=2) {
+                let tmp = 0,
+                    c=i;
+                for (let j = i; j < str.length; j += (c*2)) { 
+                    for (let k = 0; k < c; k++) {
+                        if (str[j+k] == '1') tmp++;
+                    }
+                }
+                if (tmp % 2 == 1) { str = str.replaceIndex(i, '1', 1) }
+            }
+            {
+                let tmp = 0;
+                for (let i = 0; i < str.length; i++) {
+                    if (str[i] == '1') tmp++;
+                }
+                if (tmp % 2 == 1) { str = str.replaceIndex(0, '1', 1) }
+            }
+            return str;
+        }
+        //hamming_decode (corrects up to 1 error and returns object with "str" and "err" detected)
+        function hamming_decode(str = "01101011") {
+            /*
+            insert by 0 > 1 > 2 > 4 > 8 > 16 > 32 > 2^i < str.length
+            0^2^2 = 0 (0000 xor 0010 xor 0010 = 0000)
+            */
+            let a = 0,
+                c = 0;
+            for (let i = 0; i < str.length; i++) {
+                if (str[i] === '1') {
+                    a = a ^ i;
+                    c++;
+                }
+            }
+            if (a==0 && c%2==0) {
+                return {"str":str,"err":"0 errors detected","bitAdress":a};
+            } else if (c%2==1) {
+                return {"str":str.replaceIndex(a, str[a] == '0' ? '1' : '0', 1),"err":"1 (or more (odd)) error corrected","bitAdress":a};
+            } else if (a!=0 && c%2==0) {
+                return {"str":str,"err":"2 (or more (even)) errors detected","bitAdress":a};
+            } else {
+                return {"str":str,"err":"undefined","bitAdress":a};
+            }
+        }
+        //hamming_extractStr (removes parity bits and returns original bit string)
+        function hamming_extractStr(str="01101011"){
+            for(let i=str.length;i>0;i--){
+                if(powerOfTwo(i)) str = str.replaceIndex(i, '', 1);
+            }
+            return str.replaceIndex(0, '', 1);
+        }
+        function powerOfTwo(n){
+            return Math.log2(n)%1===0
+        }
+        String.prototype.replaceIndex = function(index,char,length=1){
+            return this.substr(0,index)+char+this.substr(index+length);
+        }
+        String.prototype.insertIndex = function(index,char){
+            return this.substr(0,index)+char+this.substr(index);
+        }
+        // returns bytes seperated by ' '
+        function textToBin(text=""){
+            let tmp="";
+            for(const c of text){
+                tmp += c.charCodeAt(0).toString(2)+" ";
+            }
+            return tmp.replace(/\s?$/,'');
+        }
+        // needs bytes seperated by ' '
+        function binToText(bin=""){
+            if (/^[0 ]*$/.test(bin)) return "";
+            let tmp="";
+            for (const bit of bin.split(" ")){
+                tmp+=String.fromCharCode(parseInt(bit, 2));
+            }
+            return tmp;
+        }
+    </script>
+</head>
+<body onload="setup()">
+    <div id="content">
+        <h1><select id="method">
+            <option selected value="hamming">Hamming</option>
+            <option disabled value="">WIP</option>
+        </select> error correction codes</h1><br>
+        
+        <div id="useTxtBlock">use ASCII text<input type="checkbox" id="useTxt"></div>
+        <div id="byteSizeBlock">byte size <select id="byteSize">
+            <option selected value="0">auto</option>
+            <option value="8">8-bit</option>
+            <option value="16">16-bit</option>
+            <option value="32">32-bit</option>
+        </select></div>
+        <div id="txtInBlock" class="txt" hidden="true">
+            Text input (sender)<br>
+            <input type="text" spellcheck="true" id="txtIn" placeholder="input ascii text"><br>
+            &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;
+        </div>
+        <div id="bitInBlock" class="bit">
+            Binary Input (sender)<br>
+            <textarea id="bitIn" placeholder="binary input"></textarea><br>
+            &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;
+        </div>
+        <hr>
+        <div id="noiseBlock">
+            random flips (per byte) up to<input type="number" id="noise" value="0" step="1" min="0" max="100">%
+        </div>
+        <div id="rerunBlock"><input type="button" id="rerun" value="R U N"></div>
+        <div id="bitErrNoteBlock">
+            <textarea rows="2" readonly="true" id="bitErrNote" placeholder="error note"></textarea>
+        </div>
+        <div id="regBlock">
+            <select id="regByte">
+                <option selected="true" disabled="true" value="">Byte</option>
+            </select>
+            <div id="reg"><div style="color: #555;">binary comparison of X Byte</div></div>
+        </div>
+        <hr>
+        <div id="bitOutBlock" class="bit">
+            &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;<br>
+            Binary Output (receiver)<br>
+            <textarea id="bitOut" readonly="true" placeholder="binary output"></textarea>
+        </div>
+        <div id="txtOutBlock" class="txt" hidden="true">
+            &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;<br>
+            <input type="text" readonly="true" id="txtOut" placeholder="output ascii text"><br>
+            Text output (receiver)
+        </div>
+    </div>
+</body>
+</html>

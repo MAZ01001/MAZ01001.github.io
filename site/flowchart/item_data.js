@@ -16,7 +16,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26,45 +25,54 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:true,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
-        contentShopPack:{
-            /*
-            // packName:'Example Part',
-            */
-            'example_part':0, // item and num in shop
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
                 time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
+                waste:5, // nuclear waste rate per min
+            },
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
-                'example_part':0 // num needed of (idName) for building the building
-            }
+                'example_part':0, // num needed of (idName) for building the building
+            },
         },
         recipes:{
             default:{
@@ -76,18 +84,18 @@ let dataObjects = {
                 by_product:{
                     idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
                     num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
+                    rate:0, // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
                 },
                 items:{
                     'example_part':{ // name of item needed
                         num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                        rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
                     },
                     'example_part':{ // name of item needed
                         num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
+                        rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                    },
+                },
             },
             packing:{
                 machine:'refinery',
@@ -101,13 +109,13 @@ let dataObjects = {
                 fluid:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
                 },
                 canister:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                },
             },
             unpacking:{
                 machine:'refinery',
@@ -126,8 +134,8 @@ let dataObjects = {
                 package:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                },
             },
             alternates:{
                 'example-alternate':{ // name of alternate-recipe-product
@@ -139,47 +147,17 @@ let dataObjects = {
                     by_product:{
                         idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
                         num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
+                        rate:0, // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
                     },
                     items:{
                         'example_part':{ // name of item needed
                             num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
-        /*
-        // generator:{ // all at clockspeed 100%
-        //     energie:0, // electricity produced in MW total
-        //     fuel:{ //~ IN
-        //         item:{
-        //             'example_part':{ // idName of item fuel
-        //                 energie:0, // brings x MW per item
-        //                 num:0, // num produced per cycle (fluid is m^3) for by-product
-        //                 time:0, // burn time in sec
-        //                 consumption:0 // consumtion rate per min [60/this.time]
-        //             }
-        //         },
-        //         liquid:{
-        //             'example_part':{ // idName of liquid fuel
-        //                 energie:0, // brings x MW per m^3
-        //                 num:0, // num produced per cycle (fluid is m^3) for by-product
-        //                 time:0, // burn time in sec
-        //                 consumption:0 // consumtion rate m^3 per min [60/this.time]
-        //             }
-        //         },
-        //         cooling:{
-        //             consumption:45 // water consumtion rate m^3 per min
-        //         }
-        //     },
-        //     by_product:{ //~ OUT
-        //         idName:'nuclear_waste', // idName by-product
-        //         production:5 // waste rate per min
-        //     }
-        // }
-        */
+                            rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                        },
+                    },
+                },
+            },
+        },
     },
     'bacon_agaric':{
         idName:'bacon_agaric', // lowercase name as id (only word char [a-z0-9_])
@@ -191,7 +169,6 @@ let dataObjects = {
         stackSize:50, // x max per itemslot (-1 if not an item)
         resource:true,
         plant:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         consumable:true,
         craftingWorkshop:true,
         testInfo:function(){
@@ -209,7 +186,6 @@ let dataObjects = {
         stackSize:100, // x max per itemslot (-1 if not an item)
         resource:true,
         plant:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         consumable:true,
         craftingWorkshop:true,
         testInfo:function(){
@@ -226,7 +202,6 @@ let dataObjects = {
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:100, // x max per itemslot (-1 if not an item)
         resource:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
@@ -240,7 +215,6 @@ let dataObjects = {
         info:'The parts required to build the basic structure of The HUB.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:1, // x max per itemslot (-1 if not an item)
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         buildingMaterial:true,
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
@@ -257,7 +231,6 @@ let dataObjects = {
         stackSize:50, // x max per itemslot (-1 if not an item)
         resource:true,
         plant:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         consumable:true,
         craftingWorkshop:true,
         testInfo:function(){
@@ -275,13 +248,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:25, // coupon cost (-1 can't be purchased)
+        shopPackName:'Adequate Pioneering', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'adequate_pioneering':1, // item and num in shop
         },
         building:{
             dimensions:[3,2,2], // w,h,d in meters (0.00m float)
@@ -297,13 +267,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:200, // coupon cost (-1 can't be purchased)
+        shopPackName:'Confusing Creature', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'confusing_creature':1, // item and num in shop
         },
         building:{
             dimensions:[2.5,5.5,3], // w,h,d in meters (0.00m float)
@@ -318,14 +285,11 @@ let dataObjects = {
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:1, // x max per itemslot (-1 if not an item)
         awesomeShop:true, // from awesomeShop
-        couponCost:1, // coupon cost (-1 can't be purchased)
         equipment:true,
+        shopPackName:'Cup', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'example_part':0, // item and num in shop
         },
     },
     'ficsit_coupon':{
@@ -337,7 +301,6 @@ let dataObjects = {
         sinkValue:1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:500, // x max per itemslot (-1 if not an item)
         awesomeShop:true, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
@@ -353,13 +316,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:1000, // coupon cost (-1 can't be purchased)
+        shopPackName:'Golden Nut', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'golden_nut':1, // item and num in shop
         },
         building:{
             dimensions:[2.5,3,1], // w,h,d in meters (0.00m float)
@@ -375,13 +335,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:100, // coupon cost (-1 can't be purchased)
+        shopPackName:'Lizard Doggo', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'lizard_doggo_statue':1, // item and num in shop
         },
         building:{
             dimensions:[2,2,4], // w,h,d in meters (0.00m float)
@@ -397,13 +354,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:50, // coupon cost (-1 can't be purchased)
+        shopPackName:'Pretty Good Pioneering', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'pretty_good_pioneering':1, // item and num in shop
         },
         building:{
             dimensions:[2,3,2], // w,h,d in meters (0.00m float)
@@ -419,13 +373,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:150, // coupon cost (-1 can't be purchased)
+        shopPackName:'Satisfactory Pioneering', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'satisfactory_pioneering':1, // item and num in shop
         },
         building:{
             dimensions:[1.5,3.5,1.5], // w,h,d in meters (0.00m float)
@@ -441,13 +392,10 @@ let dataObjects = {
         stackSize:1, // x max per itemslot (-1 if not an item)
         statue:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:50, // coupon cost (-1 can't be purchased)
+        shopPackName:'Silver Hog', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
-        },
-        contentShopPack:{
-            'silver_hog':1, // item and num in shop
         },
         building:{
             dimensions:[1,2,4], // w,h,d in meters (0.00m float)
@@ -462,21 +410,22 @@ let dataObjects = {
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:-1, // x max per itemslot (-1 if not an item)
         building:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
         building:{
-            inputs:2,
-            outputs:1,
+            conveyorInputs:2,
+            pipeInputs:0,
+            conveyorOutputs:1,
+            pipeOutputs:0,
             power:15, // power usage in MW
             dimensions:[10,8,15], // w,h,d in meters (0.00m float)
             items:{
                 'reinforced_iron_plate':8, // num needed of (idName) for building the building
                 'rotor':4,
-                'cable':10
-            }
+                'cable':10,
+            },
         },
     },
     'awesome_shop':{
@@ -489,21 +438,286 @@ let dataObjects = {
         stackSize:-1, // x max per itemslot (-1 if not an item)
         building:true,
         awesomeShop:true, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
         building:{
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[4,5,6], // w,h,d in meters (0.00m float)
             items:{
                 'screw':200, // num needed of (idName) for building the building
                 'iron_plate':10,
-                'cable':30
-            }
+                'cable':30,
+            },
+        },
+        shopPacks:{
+            'Door Walls':{
+                buyType:'single', // [none|single|multi] (can be bought multible times from the awesomeshop)
+                buyCost:2,
+                'center_door_wall__plating':1, // item and num in shop
+                'left_door_wall__plating':1,
+                'right_door_wall__plating':1,
+                'gate_wall':1,
+            },
+            'Silver Hog':{
+                buyType:'multi',
+                buyCost:50,
+                'silver_hog':1,
+            },
+            'Satisfactory Pioneering':{
+                buyType:'multi',
+                buyCost:150,
+                'satisfactory_pioneering':1,
+            },
+            'Pretty Good Pioneering':{
+                buyType:'multi',
+                buyCost:50,
+                'pretty_good_pioneering':1,
+            },
+            'Lizard Doggo':{
+                buyType:'multi',
+                buyCost:100,
+                'lizard_doggo_statue':1,
+            },
+            'Golden Nut':{
+                buyType:'multi',
+                buyCost:1000,
+                'golden_nut':1,
+            },
+            'Cup':{
+                buyType:'multi',
+                buyCost:1,
+                'example_part':0,
+            },
+            'Confusing Creature':{
+                buyType:'multi',
+                buyCost:200,
+                'confusing_creature':1,
+            },
+            'Adequate Pioneering':{
+                buyType:'multi',
+                buyCost:25,
+                'adequate_pioneering':1,
+            },
+            'Metal Door Walls':{
+                buyType:'single',
+                buyCost:4,
+                'center_door_wall__sheet_metal':1,
+                'left_door_wall__sheet_metal':1,
+                'right_door_wall__sheet_metal':1,
+            },
+            'Metal Conveyor Walls':{
+                buyType:'single',
+                buyCost:7,
+                'wall_conveyor_x3':1,
+                'wall_conveyor_x2':1,
+                'wall_conveyor_x1':1,
+            },
+            'Biomass':{
+                buyType:'multi',
+                buyCost:1,
+                'biomass':200,
+            },
+            'Solid Biofuel':{
+                buyType:'multi',
+                buyCost:2,
+                'solid_biofuel':200,
+            },
+            'Fabric':{
+                buyType:'multi',
+                buyCost:3,
+                'fabric':100,
+            },
+            'Packaged Liquid Biofuel':{
+                buyType:'multi',
+                buyCost:3,
+                'packaged_liquid_biofuel':100,
+            },
+            'Cable':{
+                buyType:'multi',
+                buyCost:2,
+                'cable':100,
+            },
+            'Wire':{
+                buyType:'multi',
+                buyCost:1,
+                'wire':500,
+            },
+            'A. I. Limiter':{
+                buyType:'multi',
+                buyCost:3,
+                'ai_limiter':100,
+            },
+            'Quickwire':{
+                buyType:'multi',
+                buyCost:1,
+                'quickwire':500,
+            },
+            'Circuit Board':{
+                buyType:'multi',
+                buyCost:3,
+                'circuit_board':200,
+            },
+            'High-Speed Connector':{
+                buyType:'multi',
+                buyCost:4,
+                'high_speed_connector':100,
+            },
+            'Battery':{
+                buyType:'multi',
+                buyCost:5,
+                'battery':100,
+            },
+            'Concrete':{
+                buyType:'multi',
+                buyCost:1,
+                'concrete':100,
+            },
+            'Black Powder':{
+                buyType:'multi',
+                buyCost:3,
+                'black_powder':100,
+            },
+            'Silica':{
+                buyType:'multi',
+                buyCost:1,
+                'silica':100,
+            },
+            'Iron Plate':{
+                buyType:'multi',
+                buyCost:1,
+                'iron_plate':100,
+            },
+            'Iron Rod':{
+                buyType:'multi',
+                buyCost:1,
+                'iron_rod':100,
+            },
+            'Screw':{
+                buyType:'multi',
+                buyCost:2,
+                'screw':500,
+            },
+            'Copper Sheet':{
+                buyType:'multi',
+                buyCost:1,
+                'copper_sheet':100,
+            },
+            'Modular Frame':{
+                buyType:'multi',
+                buyCost:4,
+                'modular_frame':50,
+            },
+            'Reinforced Iron Plate':{
+                buyType:'multi',
+                buyCost:3,
+                'reinforced_iron_plate':100,
+            },
+            'Steel Beam':{
+                buyType:'multi',
+                buyCost:1,
+                'steel_beam':100,
+            },
+            'Steel Pipe':{
+                buyType:'multi',
+                buyCost:1,
+                'steel_pipe':100,
+            },
+            'Encased Industrial Beam':{
+                buyType:'multi',
+                buyCost:3,
+                'encased_industrial_beam':100,
+            },
+            'Heavy Modular Frame':{
+                buyType:'multi',
+                buyCost:6,
+                'heavy_modular_frame':50,
+            },
+            'Aluminum Alclad Sheet':{
+                buyType:'multi',
+                buyCost:2,
+                'alclad_aluminum_sheet':100,
+            },
+            'Rotor':{
+                buyType:'multi',
+                buyCost:3,
+                'rotor':100,
+            },
+            'Stator':{
+                buyType:'multi',
+                buyCost:3,
+                'stator':100,
+            },
+            'Motor':{
+                buyType:'multi',
+                buyCost:5,
+                'motor':50,
+            },
+            'Heat Sink':{
+                buyType:'multi',
+                buyCost:3,
+                'heat_sink':100,
+            },
+            'Turbo Motor':{
+                buyType:'multi',
+                buyCost:8,
+                'turbo_motor':50,
+            },
+            'Crystal Oscillator':{
+                buyType:'multi',
+                buyCost:4,
+                'crystal_oscillator':100,
+            },
+            'Computer':{
+                buyType:'multi',
+                buyCost:6,
+                'computer':50,
+            },
+            'Radio Control Unit':{
+                buyType:'multi',
+                buyCost:7,
+                'radio_control_unit':50,
+            },
+            'Supercomputer':{
+                buyType:'multi',
+                buyCost:8,
+                'supercomputer':50,
+            },
+            'Empty Canister':{
+                buyType:'multi',
+                buyCost:2,
+                'empty_canister':100,
+            },
+            'Petroleum Coke':{
+                buyType:'multi',
+                buyCost:1,
+                'petroleum_coke':200,
+            },
+            'Plastic':{
+                buyType:'multi',
+                buyCost:1,
+                'plastic':100,
+            },
+            'Rubber':{
+                buyType:'multi',
+                buyCost:1,
+                'rubber':100,
+            },
+            'Packaged Fuel':{
+                buyType:'multi',
+                buyCost:3,
+                'packaged_fuel':100,
+            },
+            'Polymer Resin':{
+                buyType:'multi',
+                buyCost:1,
+                'polymer_resin':200,
+            },
         },
     },
     'awesome_sink':{
@@ -515,21 +729,22 @@ let dataObjects = {
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:-1, // x max per itemslot (-1 if not an item)
         building:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
         building:{
-            inputs:1,
-            outputs:0,
+            conveyorInputs:1,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:30, // power usage in MW
             dimensions:[16,24,13], // w,h,d in meters (0.00m float)
             items:{
                 'reinforced_iron_plate':15, // num needed of (idName) for building the building
                 'cable':30,
-                'concrete':45
-            }
+                'concrete':45,
+            },
         },
     },
     'biomass_burner':{
@@ -541,24 +756,33 @@ let dataObjects = {
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:-1, // x max per itemslot (-1 if not an item)
         building:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
+        generator:{ // all at clockspeed 100%
+            energie:30, // electricity produced in MW total
+            fuel:[ //~ IN
+                'leaves', // idName of fuel
+                'flower_petals','wood','mycelia',
+                'biomass','solid_biofuel','packaged_liquid_biofuel',
+                'alien_carapace','alien_organs','fabric'
+            ],
+        },
         building:{
-            generatorEnergie:30, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             dimensions:[8,7,8], // w,h,d in meters (0.00m float)
             items:{
                 'iron_plate':15, // num needed of (idName) for building the building
                 'iron_rod':15,
-                'wire':25
-            }
+                'wire':25,
+            },
         },
     },
-    'center_door_wall__plating':{//hr__todo#################################################
+    'center_door_wall__plating':{
         idName:'center_door_wall__plating', // lowercase name as id (only word char [a-z0-9_])
         name:'Center Door Wall (Plating)', // main-product
         imgSrc:'.\\icon\\building\\Center_Door_Wall_(Plating).png', // path relative .icon\\**.png (all 120px)
@@ -567,577 +791,107 @@ let dataObjects = {
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:-1, // x max per itemslot (-1 if not an item)
         building:true,
-        couponCost:-1, // coupon cost (-1 can't be purchased)
-        vehicle:false,
-        consumable:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        awesomeShop:true, // from awesomeShop
+        shopPackName:'Door Walls', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
-        contentShopPack:{
-            'center_door_wall__plating':1, // item and num in shop
-            'left_door_wall__plating':1,
-            'right_door_wall__plating':1,
-            'gate_wall':1
-        },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
-            power:0, // power usage in MW
-            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            dimensions:[8,4,1], // w,h,d in meters (0.00m float)
             items:{
-                'example_part':0 // num needed of (idName) for building the building
-            }
+                'iron_plate':3, // num needed of (idName) for building the building
+                'concrete':3,
+            },
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'center_door_wall__sheet_metal':{
         idName:'center_door_wall__sheet_metal', // lowercase name as id (only word char [a-z0-9_])
         name:'Center Door Wall (Sheet Metal)', // main-product
         imgSrc:'.\\icon\\building\\Center_Door_Wall_(Sheet_Metal).png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Center_Door_Wall_(Sheet_Metal)', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Snaps to foundations and other walls. Use these to make buildings with several floors.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:1, // x max per itemslot (-1 if not an item)
-        liquid:false,
-        resource:false,
-        plant:false,
-        animal:false,
-        ore:false,
-        building:false,
-        statue:false,
-        awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
-        vehicle:false,
-        consumable:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
+        awesomeShop:true, // from awesomeShop
+        shopPackName:'Metal Door Walls', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
-            power:0, // power usage in MW
-            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            dimensions:[8,4,1], // w,h,d in meters (0.00m float)
             items:{
-                'example_part':0 // num needed of (idName) for building the building
-            }
+                'iron_plate':3, // num needed of (idName) for building the building
+                'concrete':3,
+            },
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'coal_generator':{
         idName:'coal_generator', // lowercase name as id (only word char [a-z0-9_])
         name:'Coal Generator', // main-product
         imgSrc:'.\\icon\\building\\Coal_Generator.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Coal_Generator', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Burns Coal to boil Water, the produced steam rotates turbines to generate electricity for the power grid.\nHas a Conveyor Belt and Pipe input, so both the Coal and Water supply can be automated.\nResource consumption will automatically be lowered to meet power demands.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
-        stackSize:1, // x max per itemslot (-1 if not an item)
-        liquid:false,
-        resource:false,
-        plant:false,
-        animal:false,
-        ore:false,
-        building:false,
-        statue:false,
-        awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
-        vehicle:false,
-        consumable:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        stackSize:-1, // x max per itemslot (-1 if not an item)
+        building:true,
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+        generator:{ // all at clockspeed 100%
+            energie:75, // electricity produced in MW total
+            fuel:[ //~ IN
+                'coal', // idName of fuel
+                'compacted_coal','petroleum_coke'
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
             },
-            'coal_generator':{ // is fuel for "coal_generator"
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:2,
+            pipeInputs:1,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
-            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            dimensions:[10,36,25], // w,h,d in meters (0.00m float)
             items:{
-                'example_part':0 // num needed of (idName) for building the building
-            }
+                'reinforced_iron_plate':20, // num needed of (idName) for building the building
+                'rotor':10,
+                'cable':30,
+            },
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'constructor':{
         idName:'constructor', // lowercase name as id (only word char [a-z0-9_])
         name:'Constructor', // main-product
         imgSrc:'.\\icon\\building\\Constructor.png', // path relative .icon\\**.png (all 120px)
         gamepediaLink:'https://satisfactory.gamepedia.com/Constructor', // gamepedia link
-        info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
+        info:'Crafts one part into another part.\nCan be automated by feeding parts into it with a conveyor belt connected to the input. The produced parts can be automatically extracted by connecting a conveyor belt to the output.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:1, // x max per itemslot (-1 if not an item)
-        liquid:false,
-        resource:false,
-        plant:false,
-        animal:false,
-        ore:false,
-        building:false,
-        statue:false,
-        awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
-        vehicle:false,
-        consumable:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
+        building:true,
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
-            power:0, // power usage in MW
-            dimensions:[0,0,0], // w,h,d in meters (0.00m float)
+            conveyorInputs:1,
+            pipeInputs:0,
+            conveyorOutputs:1,
+            pipeOutputs:0,
+            power:4, // power usage in MW
+            dimensions:[8,7,10], // w,h,d in meters (0.00m float)
             items:{
-                'example_part':0 // num needed of (idName) for building the building
-            }
+                'reinforced_iron_plate':2, // num needed of (idName) for building the building
+                'cable':8,
+            },
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
-    'conveyor_belt_mk1':{
+    'conveyor_belt_mk1':{//HR__##########################################
         idName:'conveyor_belt_mk1', // lowercase name as id (only word char [a-z0-9_])
         name:'Conveyor Belt Mk.1', // main-product
         imgSrc:'.\\icon\\building\\Conveyor_Belt_Mk.1.png', // path relative .icon\\**.png (all 120px)
@@ -1145,142 +899,22 @@ let dataObjects = {
         info:'this is a text.\tthis is a tab.\nthis is a new line.', // information about the item
         sinkValue:-1, // value in the awesome-sink (-1 for can't be sinked)
         stackSize:1, // x max per itemslot (-1 if not an item)
-        liquid:false,
-        resource:false,
-        plant:false,
-        animal:false,
-        ore:false,
         building:false,
-        statue:false,
-        awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
-        vehicle:false,
-        consumable:false,
-        craftingMaterial:false,
-        craftingWorkshop:false,
-        buildingMaterial:false,
-        spaceElevatorMaterial:false,
-        equipment:false,
-        alternateItem:false,
-        wip:false,
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
-        fuel:{ // all at clockspeed 100%
-            'biomass_burner':{ // is fuel for "biomass_burner"
-                time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'coal_generator':{ // is fuel for "coal_generator"
-                time:0, // burn time in sec
-                cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
-            },
-            'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
-                time:300, // burn time in sec
-                cooling:300, // water consumption per min
-                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-                waste:5 // nuclear waste rate per min
-            }
-        },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
                 'example_part':0 // num needed of (idName) for building the building
             }
         },
-        recipes:{
-            default:{
-                machine:'constructor', // machine idName needed to produce
-                speed:0, // x sec for one cycle
-                num:0, // num produced per cycle (fluid is m^3)
-                rate:0, // x items per min produced [(this.num/this.speed)*60]
-                energie:0, // x MW used to operate
-                by_product:{
-                    idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                    num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                },
-                items:{
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    },
-                    'example_part':{ // name of item needed
-                        num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
-            },
-            packing:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                package:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                fluid:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            unpacking:{
-                machine:'refinery',
-                speed:0, // x sec for one cycle
-                energie:0, // x MW used to operate
-                fluid:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                canister:{ //~ OUT
-                    num:2, // num produced per cycle
-                    idName:'empty_canister', // idName
-                    rate:0, // x items per min produced [(this.num/this.(parentObject).speed)*60]
-                },
-                package:{ //~ IN
-                    num:2, // num needed per cycle
-                    idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
-            },
-            alternates:{
-                'example-alternate':{ // name of alternate-recipe-product
-                    machine:'constructor',
-                    speed:0, // x sec for one cycle
-                    num:0, // num produced per cycle (fluid is m^3)
-                    rate:0, // x items per min produced [(this.num/this.speed)*60]
-                    energie:0, // x MW used to operate
-                    by_product:{
-                        idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
-                        num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
-                    },
-                    items:{
-                        'example_part':{ // name of item needed
-                            num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
     },
     'conveyor_belt_mk2':{
         idName:'conveyor_belt_mk2', // lowercase name as id (only word char [a-z0-9_])
@@ -1298,7 +932,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -1308,9 +941,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -1333,9 +980,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -1443,7 +1091,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -1453,9 +1100,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -1478,9 +1139,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -1588,7 +1250,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -1598,9 +1259,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -1623,9 +1298,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -1733,7 +1409,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -1743,9 +1418,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -1768,9 +1457,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -1878,7 +1568,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -1888,9 +1577,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -1913,9 +1616,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2023,7 +1727,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2033,9 +1736,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2058,9 +1775,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2168,7 +1886,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2178,9 +1895,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2203,9 +1934,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2313,7 +2045,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2323,9 +2054,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2348,9 +2093,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2458,7 +2204,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2468,9 +2213,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2493,9 +2252,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2603,7 +2363,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2613,9 +2372,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2638,9 +2411,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2748,7 +2522,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2758,9 +2531,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2783,9 +2570,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -2893,7 +2681,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -2903,9 +2690,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -2928,9 +2729,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3038,7 +2840,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3048,9 +2849,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3073,9 +2888,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3183,7 +2999,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3193,9 +3008,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3218,9 +3047,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3328,7 +3158,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3338,9 +3167,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3363,9 +3206,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3473,7 +3317,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3483,9 +3326,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3508,9 +3365,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3618,7 +3476,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3628,9 +3485,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3653,9 +3524,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3763,7 +3635,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3773,9 +3644,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3798,9 +3683,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -3908,7 +3794,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -3918,9 +3803,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -3943,9 +3842,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4053,7 +3953,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4063,9 +3962,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4088,9 +4001,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4198,7 +4112,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4208,9 +4121,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4233,9 +4160,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4343,7 +4271,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4353,9 +4280,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4378,9 +4319,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4488,7 +4430,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4498,9 +4439,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4523,9 +4478,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4633,7 +4589,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4643,9 +4598,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4668,9 +4637,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4778,7 +4748,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4788,9 +4757,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4813,9 +4796,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -4923,7 +4907,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -4933,9 +4916,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -4958,9 +4955,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5068,7 +5066,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5078,9 +5075,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5103,9 +5114,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5213,7 +5225,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5223,9 +5234,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5248,9 +5273,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5358,7 +5384,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5368,9 +5393,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5393,9 +5432,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5503,7 +5543,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5513,9 +5552,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5538,9 +5591,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5648,7 +5702,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5658,9 +5711,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5683,9 +5750,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5793,7 +5861,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5803,9 +5870,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5828,9 +5909,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -5938,7 +6020,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -5948,9 +6029,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -5973,9 +6068,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6083,7 +6179,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6093,9 +6188,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6118,9 +6227,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6228,7 +6338,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6238,9 +6347,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6263,9 +6386,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6373,7 +6497,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6383,9 +6506,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6408,9 +6545,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6518,7 +6656,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6528,9 +6665,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6553,9 +6704,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6663,7 +6815,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6673,9 +6824,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6698,9 +6863,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6808,7 +6974,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6818,9 +6983,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6843,9 +7022,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -6953,7 +7133,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -6963,9 +7142,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -6988,9 +7181,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7098,7 +7292,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7108,9 +7301,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -7133,9 +7340,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7243,7 +7451,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7253,9 +7460,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -7278,9 +7499,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7388,7 +7610,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7398,9 +7619,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -7423,9 +7658,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7533,7 +7769,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7543,9 +7778,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -7568,9 +7817,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7678,7 +7928,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7688,9 +7937,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -7713,9 +7976,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7823,7 +8087,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7833,9 +8096,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -7858,9 +8135,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -7968,7 +8246,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -7978,9 +8255,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8003,9 +8294,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8113,7 +8405,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8123,9 +8414,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8148,9 +8453,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8258,7 +8564,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8268,9 +8573,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8293,9 +8612,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8403,7 +8723,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8413,9 +8732,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8438,9 +8771,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8548,7 +8882,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8558,9 +8891,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8583,9 +8930,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8693,7 +9041,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8703,9 +9050,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8728,9 +9089,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8838,7 +9200,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8848,9 +9209,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -8873,9 +9248,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -8983,7 +9359,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -8993,9 +9368,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9018,9 +9407,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9128,7 +9518,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -9138,9 +9527,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9163,9 +9566,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9273,7 +9677,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -9283,9 +9686,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9308,9 +9725,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9418,7 +9836,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -9428,9 +9845,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9453,9 +9884,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9563,7 +9995,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -9573,9 +10004,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9598,9 +10043,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9708,7 +10154,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -9718,9 +10163,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9743,9 +10202,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9853,7 +10313,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -9863,9 +10322,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -9888,9 +10361,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -9998,7 +10472,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10008,9 +10481,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10033,9 +10520,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -10143,7 +10631,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10153,9 +10640,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10178,9 +10679,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -10288,7 +10790,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10298,9 +10799,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10323,9 +10838,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -10433,7 +10949,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10443,9 +10958,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10468,9 +10997,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -10578,7 +11108,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10588,9 +11117,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10613,9 +11156,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -10723,7 +11267,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10733,9 +11276,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10758,9 +11315,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -10868,7 +11426,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -10878,9 +11435,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -10903,9 +11474,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11013,7 +11585,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11023,9 +11594,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11048,9 +11633,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11158,7 +11744,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11168,9 +11753,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11193,9 +11792,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11303,7 +11903,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11313,9 +11912,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11338,9 +11951,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11448,7 +12062,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11458,9 +12071,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11483,9 +12110,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11593,7 +12221,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11603,9 +12230,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11628,9 +12269,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11738,7 +12380,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11748,9 +12389,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11773,9 +12428,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -11883,7 +12539,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -11893,9 +12548,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -11918,9 +12587,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12028,7 +12698,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12038,9 +12707,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12063,9 +12746,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12173,7 +12857,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12183,9 +12866,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12208,9 +12905,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12318,7 +13016,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12328,9 +13025,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12353,9 +13064,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12463,7 +13175,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12473,9 +13184,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12498,9 +13223,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12608,7 +13334,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12618,9 +13343,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12643,9 +13382,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12753,7 +13493,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12763,9 +13502,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12788,9 +13541,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -12898,7 +13652,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -12908,9 +13661,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -12933,9 +13700,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13043,7 +13811,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13053,9 +13820,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13078,9 +13859,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13188,7 +13970,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13198,9 +13979,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13223,9 +14018,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13333,7 +14129,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13343,9 +14138,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13368,9 +14177,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13478,7 +14288,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13488,9 +14297,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13513,9 +14336,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13623,7 +14447,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13633,9 +14456,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13658,9 +14495,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13768,7 +14606,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13778,9 +14615,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13803,9 +14654,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -13913,7 +14765,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -13923,9 +14774,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -13948,9 +14813,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14058,7 +14924,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14068,9 +14933,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14093,9 +14972,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14203,7 +15083,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14213,9 +15092,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14238,9 +15131,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14348,7 +15242,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14358,9 +15251,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14383,9 +15290,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14493,7 +15401,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14503,9 +15410,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14528,9 +15449,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14638,7 +15560,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14648,9 +15569,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14673,9 +15608,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14783,7 +15719,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14793,9 +15728,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14818,9 +15767,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -14928,7 +15878,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -14938,9 +15887,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -14963,9 +15926,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15073,7 +16037,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15083,9 +16046,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15108,9 +16085,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15218,7 +16196,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15228,9 +16205,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15253,9 +16244,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15363,7 +16355,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15373,9 +16364,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15398,9 +16403,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15508,7 +16514,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15518,9 +16523,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+        shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15543,9 +16562,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15653,7 +16673,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15663,9 +16682,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15688,9 +16721,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15798,7 +16832,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15808,9 +16841,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15833,9 +16880,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -15943,7 +16991,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -15953,9 +17000,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -15978,9 +17039,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16088,7 +17150,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16098,9 +17159,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16123,9 +17198,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16233,7 +17309,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16243,9 +17318,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16268,9 +17357,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16378,7 +17468,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16388,9 +17477,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16413,9 +17516,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16523,7 +17627,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16533,9 +17636,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16558,9 +17675,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16668,7 +17786,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16678,9 +17795,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16703,9 +17834,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16813,7 +17945,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16823,9 +17954,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16848,9 +17993,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -16958,7 +18104,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -16968,9 +18113,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -16993,9 +18152,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17103,7 +18263,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17113,9 +18272,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -17138,9 +18311,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17248,7 +18422,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17258,9 +18431,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -17283,9 +18470,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17393,7 +18581,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17403,9 +18590,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -17428,9 +18629,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17538,7 +18740,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17548,9 +18749,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -17573,9 +18788,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17683,7 +18899,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17693,9 +18908,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -17718,9 +18947,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17828,7 +19058,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17838,9 +19067,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -17863,9 +19106,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -17973,7 +19217,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -17983,9 +19226,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18008,9 +19265,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18118,7 +19376,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18128,9 +19385,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18153,9 +19424,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18263,7 +19535,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18273,9 +19544,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18298,9 +19583,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18408,7 +19694,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18418,9 +19703,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18443,9 +19742,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18553,7 +19853,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18563,9 +19862,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18588,9 +19901,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18698,7 +20012,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18708,9 +20021,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18733,9 +20060,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18843,7 +20171,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18853,9 +20180,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -18878,9 +20219,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -18988,7 +20330,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -18998,9 +20339,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19023,9 +20378,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -19133,7 +20489,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -19143,9 +20498,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19168,9 +20537,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -19278,7 +20648,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -19288,9 +20657,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19313,9 +20696,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -19423,7 +20807,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -19433,9 +20816,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19458,9 +20855,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -19568,7 +20966,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -19578,9 +20975,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19603,9 +21014,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -19713,7 +21125,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -19723,9 +21134,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19748,9 +21173,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -19858,7 +21284,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -19868,9 +21293,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -19893,9 +21332,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20003,7 +21443,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20013,9 +21452,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20038,9 +21491,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20148,7 +21602,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20158,9 +21611,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20183,9 +21650,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20293,7 +21761,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20303,9 +21770,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20328,9 +21809,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20438,7 +21920,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20448,9 +21929,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20473,9 +21968,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20583,7 +22079,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20593,9 +22088,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20618,9 +22127,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20728,7 +22238,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20738,9 +22247,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20763,9 +22286,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -20873,7 +22397,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -20883,9 +22406,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -20908,9 +22445,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21018,7 +22556,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21028,9 +22565,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21053,9 +22604,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21163,7 +22715,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21173,9 +22724,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21198,9 +22763,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21308,7 +22874,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21318,9 +22883,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21343,9 +22922,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21453,7 +23033,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21463,9 +23042,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21488,9 +23081,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21598,7 +23192,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21608,9 +23201,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21633,9 +23240,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21743,7 +23351,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21753,9 +23360,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21778,9 +23399,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -21888,7 +23510,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -21898,9 +23519,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -21923,9 +23558,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22033,7 +23669,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22043,9 +23678,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22068,9 +23717,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22178,7 +23828,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22188,9 +23837,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22213,9 +23876,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22323,7 +23987,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22333,9 +23996,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22358,9 +24035,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22468,7 +24146,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22478,9 +24155,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22503,9 +24194,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22613,7 +24305,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22623,9 +24314,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22648,9 +24353,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22758,7 +24464,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22768,9 +24473,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22793,9 +24512,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -22903,7 +24623,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -22913,9 +24632,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -22938,9 +24671,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23048,7 +24782,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23058,9 +24791,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23083,9 +24830,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23193,7 +24941,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23203,9 +24950,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23228,9 +24989,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23338,7 +25100,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23348,9 +25109,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23373,9 +25148,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23483,7 +25259,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23493,9 +25268,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23518,9 +25307,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23628,7 +25418,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23638,9 +25427,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23663,9 +25466,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23773,7 +25577,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23783,9 +25586,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23808,9 +25625,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -23918,7 +25736,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -23928,9 +25745,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -23953,9 +25784,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24063,7 +25895,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24073,9 +25904,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24098,9 +25943,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24208,7 +26054,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24218,9 +26063,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24243,9 +26102,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24353,7 +26213,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24363,9 +26222,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24388,9 +26261,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24498,7 +26372,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24508,9 +26381,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24533,9 +26420,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24643,7 +26531,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24653,9 +26540,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24678,9 +26579,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24788,7 +26690,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24798,9 +26699,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24823,9 +26738,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -24933,7 +26849,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -24943,9 +26858,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -24968,9 +26897,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25078,7 +27008,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25088,9 +27017,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25113,9 +27056,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25223,7 +27167,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25233,9 +27176,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25258,9 +27215,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25368,7 +27326,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25378,9 +27335,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25403,9 +27374,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25513,7 +27485,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25523,9 +27494,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25548,9 +27533,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25658,7 +27644,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25668,9 +27653,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25693,9 +27692,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25803,7 +27803,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25813,9 +27812,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25838,9 +27851,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -25948,7 +27962,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -25958,9 +27971,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -25983,9 +28010,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26093,7 +28121,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26103,9 +28130,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26128,9 +28169,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26238,7 +28280,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26248,9 +28289,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26273,9 +28328,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26383,7 +28439,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26393,9 +28448,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26418,9 +28487,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26528,7 +28598,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26538,9 +28607,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26563,9 +28646,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26673,7 +28757,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26683,9 +28766,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26708,9 +28805,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26818,7 +28916,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26828,9 +28925,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26853,9 +28964,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -26963,7 +29075,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -26973,9 +29084,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -26998,9 +29123,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27108,7 +29234,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27118,9 +29243,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -27143,9 +29282,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27253,7 +29393,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27263,9 +29402,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -27288,9 +29441,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27398,7 +29552,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27408,9 +29561,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -27433,9 +29600,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27543,7 +29711,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27553,9 +29720,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -27578,9 +29759,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27688,7 +29870,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27698,9 +29879,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -27723,9 +29918,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27833,7 +30029,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27843,9 +30038,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -27868,9 +30077,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -27978,7 +30188,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -27988,9 +30197,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28013,9 +30236,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28123,7 +30347,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -28133,9 +30356,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28158,9 +30395,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28268,7 +30506,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -28278,9 +30515,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28303,9 +30554,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28413,7 +30665,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -28423,9 +30674,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28448,9 +30713,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28558,7 +30824,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -28568,9 +30833,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28593,9 +30872,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28703,7 +30983,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -28713,9 +30992,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28738,9 +31031,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28848,7 +31142,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -28858,9 +31151,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -28883,9 +31190,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -28993,7 +31301,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29003,9 +31310,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29028,9 +31349,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -29138,7 +31460,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29148,9 +31469,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29173,9 +31508,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -29283,7 +31619,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29293,9 +31628,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29318,9 +31667,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -29428,7 +31778,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29438,9 +31787,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29463,9 +31826,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -29573,7 +31937,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29583,9 +31946,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29608,9 +31985,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -29718,7 +32096,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29728,9 +32105,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29753,9 +32144,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -29863,7 +32255,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -29873,9 +32264,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -29898,9 +32303,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30008,7 +32414,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30018,9 +32423,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30043,9 +32462,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30153,7 +32573,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30163,9 +32582,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30188,9 +32621,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30298,7 +32732,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30308,9 +32741,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30333,9 +32780,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30443,7 +32891,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30453,9 +32900,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30478,9 +32939,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30588,7 +33050,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30598,9 +33059,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30623,9 +33098,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30733,7 +33209,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30743,9 +33218,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30768,9 +33257,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -30878,7 +33368,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -30888,9 +33377,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -30913,9 +33416,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31023,7 +33527,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31033,9 +33536,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31058,9 +33575,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31168,7 +33686,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31178,9 +33695,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31203,9 +33734,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31313,7 +33845,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31323,9 +33854,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31348,9 +33893,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31458,7 +34004,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31468,9 +34013,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31493,9 +34052,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31603,7 +34163,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31613,9 +34172,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31638,9 +34211,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31748,7 +34322,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31758,9 +34331,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31783,9 +34370,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -31893,7 +34481,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -31903,9 +34490,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -31928,9 +34529,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32038,7 +34640,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32048,9 +34649,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32073,9 +34688,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32183,7 +34799,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32193,9 +34808,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32218,9 +34847,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32328,7 +34958,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32338,9 +34967,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32363,9 +35006,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32473,7 +35117,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32483,9 +35126,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32508,9 +35165,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32618,7 +35276,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32628,9 +35285,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32653,9 +35324,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32763,7 +35435,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32773,9 +35444,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32798,9 +35483,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -32908,7 +35594,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -32918,9 +35603,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -32943,9 +35642,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33053,7 +35753,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33063,9 +35762,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33088,9 +35801,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33198,7 +35912,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33208,9 +35921,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33233,9 +35960,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33343,7 +36071,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33353,9 +36080,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33378,9 +36119,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33488,7 +36230,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33498,9 +36239,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33523,9 +36278,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33633,7 +36389,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33643,9 +36398,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33668,9 +36437,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33778,7 +36548,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33788,9 +36557,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33813,9 +36596,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -33923,7 +36707,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -33933,9 +36716,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -33958,9 +36755,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34068,7 +36866,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34078,9 +36875,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34103,9 +36914,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34213,7 +37025,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34223,9 +37034,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34248,9 +37073,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34358,7 +37184,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34368,9 +37193,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34393,9 +37232,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34503,7 +37343,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34513,9 +37352,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34538,9 +37391,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34648,7 +37502,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34658,9 +37511,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34683,9 +37550,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34793,7 +37661,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34803,9 +37670,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34828,9 +37709,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -34938,7 +37820,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -34948,9 +37829,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -34973,9 +37868,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35083,7 +37979,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35093,9 +37988,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35118,9 +38027,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35228,7 +38138,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35238,9 +38147,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35263,9 +38186,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35373,7 +38297,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35383,9 +38306,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35408,9 +38345,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35518,7 +38456,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35528,9 +38465,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35553,9 +38504,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35663,7 +38615,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35673,9 +38624,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35698,9 +38663,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35808,7 +38774,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35818,9 +38783,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35843,9 +38822,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -35953,7 +38933,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -35963,9 +38942,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -35988,9 +38981,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36098,7 +39092,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36108,9 +39101,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -36133,9 +39140,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36243,7 +39251,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36253,9 +39260,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -36278,9 +39299,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36388,7 +39410,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36398,9 +39419,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -36423,9 +39458,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36533,7 +39569,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36543,9 +39578,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -36568,9 +39617,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36678,7 +39728,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36688,9 +39737,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -36713,9 +39776,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36823,7 +39887,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36833,9 +39896,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -36858,9 +39935,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -36968,7 +40046,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -36978,9 +40055,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37003,9 +40094,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37113,7 +40205,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37123,9 +40214,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37148,9 +40253,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37258,7 +40364,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37268,9 +40373,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37293,9 +40412,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37403,7 +40523,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37413,9 +40532,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37438,9 +40571,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37548,7 +40682,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37558,9 +40691,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37583,9 +40730,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37693,7 +40841,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37703,9 +40850,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37728,9 +40889,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37838,7 +41000,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37848,9 +41009,23 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
+        },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
         },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
@@ -37873,9 +41048,10 @@ let dataObjects = {
             }
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
@@ -37892,18 +41068,18 @@ let dataObjects = {
                 by_product:{
                     idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
                     num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
+                    rate:0, // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
                 },
                 items:{
                     'example_part':{ // name of item needed
                         num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                        rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
                     },
                     'example_part':{ // name of item needed
                         num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
+                        rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                    },
+                },
             },
             packing:{
                 machine:'refinery',
@@ -37917,13 +41093,13 @@ let dataObjects = {
                 fluid:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
                 },
                 canister:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                },
             },
             unpacking:{
                 machine:'refinery',
@@ -37942,8 +41118,8 @@ let dataObjects = {
                 package:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                },
             },
             alternates:{
                 'example-alternate':{ // name of alternate-recipe-product
@@ -37955,17 +41131,17 @@ let dataObjects = {
                     by_product:{
                         idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
                         num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
+                        rate:0, // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
                     },
                     items:{
                         'example_part':{ // name of item needed
                             num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
+                            rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                        },
+                    },
+                },
+            },
+        },
     },
     'sam_ore':{
         idName:'sam_ore', // lowercase name as id (only word char [a-z0-9_])
@@ -37983,7 +41159,6 @@ let dataObjects = {
         building:false,
         statue:false,
         awesomeShop:false, // from awesomeShop
-        couponCost:-1, // coupon cost (-1 can't be purchased)
         vehicle:false,
         consumable:false,
         craftingMaterial:false,
@@ -37993,38 +41168,53 @@ let dataObjects = {
         equipment:false,
         alternateItem:false,
         wip:false,
+            shopPackName:'', // if exist package from awesome shop
         testInfo:function(){
             if (hasContent(this.recipes) && hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
             else {return this.idName + '\n' + this.info;}
         },
+        generator:{ // all at clockspeed 100%
+            energie:0, // electricity produced in MW total
+            fuel:[ //~ IN
+                'example_part' // idName of fuel
+            ],
+            cooling:{
+                consumption:45, // water consumtion rate m^3 per min
+            },
+            by_product:{ //~ OUT
+                idName:'nuclear_waste', // idName by-product
+                production:5, // waste rate per min
+            },
+        },
         fuel:{ // all at clockspeed 100%
             'biomass_burner':{ // is fuel for "biomass_burner"
                 time:0, // burn time in sec
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'coal_generator':{ // is fuel for "coal_generator"
                 time:0, // burn time in sec
                 cooling:45, // water consumption per min
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'fuel_generator':{ // is fuel for "fuel_generator"
-                consumption:0 // consumtion rate per min (fluid in m^3) [60/this.time]
+                consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
             },
             'nuclear_power_plant':{ // is fuel for "nuclear_power_plant"
                 time:300, // burn time in sec
                 cooling:300, // water consumption per min
                 consumption:0, // consumtion rate per min (fluid in m^3) [60/this.time]
-            }
+            },
         },
         building:{
-            generatorEnergie:-1, // brings x MW while running (-1 no generator)
-            inputs:0,
-            outputs:0,
+            conveyorInputs:0,
+            pipeInputs:0,
+            conveyorOutputs:0,
+            pipeOutputs:0,
             power:0, // power usage in MW
             dimensions:[0,0,0], // w,h,d in meters (0.00m float)
             items:{
-                'example_part':0 // num needed of (idName) for building the building
-            }
+                'example_part':0, // num needed of (idName) for building the building
+            },
         },
         recipes:{
             default:{
@@ -38036,18 +41226,18 @@ let dataObjects = {
                 by_product:{
                     idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
                     num:0, // num produced per cycle (fluid is m^3) for by-product
-                    rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
+                    rate:0, // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
                 },
                 items:{
                     'example_part':{ // name of item needed
                         num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                        rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
                     },
                     'example_part':{ // name of item needed
                         num:0, // num needed
-                        rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                    }
-                }
+                        rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                    },
+                },
             },
             packing:{
                 machine:'refinery',
@@ -38061,13 +41251,13 @@ let dataObjects = {
                 fluid:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
                 },
                 canister:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'empty_canister', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                },
             },
             unpacking:{
                 machine:'refinery',
@@ -38086,8 +41276,8 @@ let dataObjects = {
                 package:{ //~ IN
                     num:2, // num needed per cycle
                     idName:'', // name of item needed
-                    rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                }
+                    rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                },
             },
             alternates:{
                 'example-alternate':{ // name of alternate-recipe-product
@@ -38099,21 +41289,21 @@ let dataObjects = {
                     by_product:{
                         idName:'example_part', // lowercase name as id for the by-product (only word char [a-z0-9_])
                         num:0, // num produced per cycle (fluid is m^3) for by-product
-                        rate:0 // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
+                        rate:0, // x items per min produced [(this.by_num/this.(parentObject).speed)*60]
                     },
                     items:{
                         'example_part':{ // name of item needed
                             num:0, // num needed
-                            rate:0 // x items per min consumed [(this.num/this.(parentObject).speed)*60]
-                        }
-                    }
-                }
-            }
-        }
-    }
+                            rate:0, // x items per min consumed [(this.num/this.(parentObject).speed)*60]
+                        },
+                    },
+                },
+            },
+        },
+    },
 }
 
 if (hasContent(this.recipes)){
-                if (hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
-                else {return this.idName + '\n' + this.info;}
-            } else {return this.idName + '\n' + this.info;}
+    if (hasContent(this.recipes.default.by_product)) {return this.idName + ':\n' + this.info + '\n-------------\n' + this.recipes.default.by_product.idName + ':\n' + dataObjects[this.recipes.default.by_product.idName].info;}
+    else {return this.idName + '\n' + this.info;}
+} else {return this.idName + '\n' + this.info;}
