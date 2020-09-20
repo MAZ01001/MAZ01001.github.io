@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <title>Main Page</title>
     <style>
-        body {background-color: #2b2b2b;color: #0f0f;}
-        @keyframes banner {
-            100% {background-position: -56px 0;}
-        }
+        body {background-color: #000;color: #0f0f;}
+        @keyframes banner {100% {background-position: -56px 0;}}
         @keyframes shadowcolor {
             0% {
                 filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#f00')";
@@ -46,7 +44,7 @@
             }
         }
         body>div>div{
-            background-color: #2b2b2b;
+            background-color: #000;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -64,8 +62,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 50px;
-            height: 285px;
-            width: 540px;
+            height: 333px;
+            width: 500px;
             box-shadow: 4px 4px 10px 0px black;
             background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 39px);
             background-size: calc(100% + 58px) 100%;
@@ -80,54 +78,69 @@
             transform: translate(-50%, -50%);
             height: max(100vh,1000px);
             pointer-events: none;
-            --shadow: 20px;
+            --shadow: 0.4em;
             filter: url(#drop-shadow);
             animation: shadowcolor 5s linear -1s infinite normal backwards running;
         }
-        h2>a[href],h3>a[href] {color: #0f0;}
-        social>a[href] {color: #08f;}
-        h2{
+        h2>a:link,h3>a:link {
+            color: #0f0;
+            text-decoration: none;
+            text-shadow: 0.013em 0.013em #000,
+                -0.013em 0.013em #000,
+                -0.013em -0.013em #000,
+                0.013em -0.01em #000,
+                0em 0.013em #000,
+                0em -0.013em #000,
+                0.013em 0em #000,
+                -0.013em 0em #000,
+                5px 3px 10px #080;
+            --shadow: 10px;
+            filter: url(#drop-shadow);
+            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
+            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+        }
+        h2>a:visited,h3>a:visited {color: #0a0;}/* can't edit more https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector */
+        h2>a:hover,h3>a:hover,h2>a:active,h3>a:active {
+            text-shadow: 0.013em 0.013em #000,
+                -0.013em 0.013em #000,
+                -0.013em -0.013em #000,
+                0.013em -0.01em #000,
+                0em 0.013em #000,
+                0em -0.013em #000,
+                0.013em 0em #000,
+                -0.013em 0em #000,
+                5px 3px 10px #0f0;
+            --shadow: 10px;
+            filter: url(#drop-shadow);
+            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#0f0')";
+            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #0f0);
+            filter: drop-shadow(0px 0px var(--shadow,10px) #0f0);
+        }
+        div#social>a:link {
+            color: #0af;
+            text-decoration: none;
+        }
+        div#social>a:visited {color: #03f;}
+        div#social>a:hover,div#social>a:active {
+            color: #0af;
+            text-shadow: 0px 0px 15px #00f, 0px 0px 15px #00f, 0px 0px 15px #00f;
+        }
+        h2,h3{
             display: inline;
             font-size: 3em;
             margin-block-start: 0.4em;
             margin-block-end: 0.1em;
             font-family: 'Times New Roman', Times, serif;
-            text-shadow: 0.013em 0.013em #000,
-                -0.013em 0.013em #000,
-                -0.013em -0.013em #000,
-                0.013em -0.01em #000,
-                0em 0.013em #000,
-                0em -0.013em #000,
-                0.013em 0em #000,
-                -0.013em 0em #000,
-                5px 3px 10px #0a0;
-            --shadow: 10px;
-            filter: url(#drop-shadow);
-            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
-            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
-            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
         }
-        h3{
+        h3{font-size: 2em !important;}
+        div#social{
             display: inline;
-            font-size: 2em;
-            margin-block-start: 0.4em;
-            margin-block-end: 0.1em;
-            font-family: 'Times New Roman', Times, serif;
-            text-shadow: 0.013em 0.013em #000,
-                -0.013em 0.013em #000,
-                -0.013em -0.013em #000,
-                0.013em -0.01em #000,
-                0em 0.013em #000,
-                0em -0.013em #000,
-                0.013em 0em #000,
-                -0.013em 0em #000,
-                5px 3px 10px #0a0;
-            --shadow: 10px;
-            filter: url(#drop-shadow);
-            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
-            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
-            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            padding: 5px 15px 8px;
+            border: 1px solid #0a0;
+            border-radius:80px;
         }
+        div#social>span{color: #0a0;}
         ::-webkit-scrollbar {width: 10px;height: 10px;}
         ::-webkit-scrollbar-thumb {background: #008000;border-radius: 10px;}
         ::-webkit-scrollbar-thumb:hover {background: #0F0F;}
@@ -140,14 +153,14 @@
     <img src=".\img\logo.svg">
     <div>
         <div>
-            <h3><a href=".\site\flowchart\Flow Chart U3.html" target="_self" rel="noopener noreferrer" title="Unofficial U3 Flow Chart for Satisfactory">Unofficial U3 Flow Chart for Satisfactory</a></h3><br>
+            <h3><a href=".\site\flowchart\Flow Chart U3.html" target="_self" rel="noopener noreferrer" title="Unofficial Satisfactory U3 Flow Chart">Unofficial Satisfactory U3 Flow Chart</a></h3><br>
             <h2><a href=".\site\canvas ball.html" target="_self" rel="noopener noreferrer" title="Ball Screensaver">Ball Screensaver</a></h2><br>
             <h2><a href=".\site\dice.html" target="_self" rel="noopener noreferrer" title="Small Dice">Small Dice</a></h2><br>
             <h2><a href=".\site\pascal's triangle.html" target="_self" rel="noopener noreferrer" title="Pascal's Triangle">Pascal's Triangle</a></h2><br>
             <h2><a href=".\site\math function drawer.html" target="_self" rel="noopener noreferrer" title="Math Function Drawer">Math Function Drawer</a></h2><br>
             <h2><a href=".\site\code error correction.html" target="_self" rel="noopener noreferrer" title="Error Correction Codes">Error Correction Codes</a></h2><br>
-            <br><br>
-            <social>
+            <br>
+            <div id="social">
                 <a href="https://www.youtube.com/channel/UCQHeetVlsN7Poqnovh5_eKA" target="_blank" rel="noopener noreferrer" title="MAZ">youtube</a>
                 <span>&verbar;</span>
                 <a href="https://www.instagram.com/maz01001/" target="_blank" rel="noopener noreferrer" title="@maz01001">instagram</a>
@@ -155,7 +168,7 @@
                 <a href="https://soundcloud.com/maz-angst/likes" target="_blank" rel="noopener noreferrer" title="MAZ Likes">soundcloud</a>
                 <span>&verbar;</span>
                 <a href="https://www.reddit.com/user/MAZ00101" target="_blank" rel="noopener noreferrer" title="u/MAZ00101">reddit</a>
-            </social>
+            </div>
         </div>
     </div>
 </body>
