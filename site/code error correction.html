@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-16">
     <title>Error correction</title>
     <!--
         Thanks to:
@@ -21,8 +20,8 @@
             font-size: large;
         }
         h1{text-align: center;}
-        input#noise{width: 3em;}
         input#txtIn,input#txtOut{width: 60%;}
+        input#noise{width: 3em;}
         div#reg div{display: inline-block;}
         textarea,input,select{
             background-color: #000;
@@ -149,7 +148,7 @@
                 }
             });
             txtIn.addEventListener('input',e=>{
-                bitIn.value=textToBin(txtIn.value);
+                bitIn.value=txtIn.value.split('').map(ee=>{return unicodeToBinary(ee)}).join(' ');
                 if(byteSize.value>'0'){
                     let tmp = bitIn.value.split(" ");
                     for (let i = 0; i < tmp.length; i++) {
@@ -160,8 +159,8 @@
                         }
                     }
                     bitIn.value = tmp.join(" ");
+                    txtIn.value=bitIn.value.split(' ').map(ee=>{let tmpp=[];for(let ii=0;ii<e.length;ii++){tmpp.push(parseInt(ee[ii],2))}return binaryToUnicode(tmpp)}).join('');
                 }
-                txtIn.value=binToText(bitIn.value);
                 recode(method.value,bitIn.value,byteSize.value,noise.value);
             });
             bitIn.addEventListener('change',e=>{
@@ -178,7 +177,7 @@
                     }
                     bitIn.value = tmp.join(" ");
                 }
-                txtIn.value=binToText(bitIn.value);
+                txtIn.value=bitIn.value.split(' ').map(e=>{let tmp=[];for(let i=0;i<e.length;i++){tmp.push(parseInt(e[i],2))}return binaryToUnicode(tmp)}).join('');
                 recode(method.value,bitIn.value,byteSize.value,noise.value);
             });
             byteSize.addEventListener('change',e=>{
@@ -194,7 +193,7 @@
                     }
                 }
                 bitIn.value = tmp.join(" ");
-                txtIn.value=binToText(bitIn.value);
+                txtIn.value=bitIn.value.split(' ').map(e=>{let tmp=[];for(let i=0;i<e.length;i++){tmp.push(parseInt(e[i],2))}return binaryToUnicode(tmp)}).join('');
                 recode(method.value,bitIn.value,byteSize.value,noise.value);
             });
             noise.addEventListener('change',e=>{
@@ -210,7 +209,7 @@
                     }
                 }
                 bitIn.value = tmp.join(" ");
-                txtIn.value=binToText(bitIn.value);
+                txtIn.value=bitIn.value.split(' ').map(e=>{let tmp=[];for(let i=0;i<e.length;i++){tmp.push(parseInt(e[i],2))}return binaryToUnicode(tmp)}).join('');
                 recode(method.value,bitIn.value,byteSize.value,noise.value);
             });
             rerun.addEventListener('click',e=>{
@@ -226,7 +225,7 @@
                     }
                 }
                 bitIn.value = tmp.join(" ");
-                txtIn.value=binToText(bitIn.value);
+                txtIn.value=bitIn.value.split(' ').map(e=>{let tmp=[];for(let i=0;i<e.length;i++){tmp.push(parseInt(e[i],2))}return binaryToUnicode(tmp)}).join('');
                 recode(method.value,bitIn.value,byteSize.value,noise.value);
             });
             regByte.addEventListener('change',e=>{
@@ -250,7 +249,13 @@
             switch (type) {
                 case "hamming":
                     {
-                        // log2(totalsize)=paritysize
+                        /*{
+                            let testString = "rfukdbgu🤣🤦‍♂️😒🌚👌😂🤔😉₯﷼૱௹⨌௹﷼⨻";
+                            let bitString=testString.split('').map(ee=>{return unicodeToBinary(ee)}).join(' ');
+                            let backToText=bitString.split(' ').map(ee=>{let tmpp=[];for(let ii=0;ii<e.length;ii++){tmpp.push(parseInt(ee[ii],2))}return binaryToUnicode(tmpp)}).join('');
+                            console.log(`${testString}\n${bitString}\n${backToText}`);
+                        }*/
+                        //log2(totalsize)=paritysize
                         let bitStream = dataBits.split(" "),tmp,tmp2,tmp3,tmpErr;
                         tmpErr="";
                         clog=[];
@@ -268,11 +273,12 @@
                             bitStream[i] = hamming_extractStr(tmp.str);
                             clog[i].h_extract=bitStream[i];
                         }
-                        console.log(clog);
+                        //log all details in the console
+                        console.log(Date.now(),clog);
                         bitErrNote.value = tmpErr.substr(1);
                         dataBits=bitStream.join(" ");
                         bitOut.value=dataBits;
-                        txtOut.value=binToText(dataBits);
+                        txtOut.value=dataBits.split(' ').map(e=>{let tmp=[];for(let i=0;i<e.length;i++){tmp.push(parseInt(e[i],2))}return binaryToUnicode(tmp)}).join('');
                         {
                             regByte.innerHTML="";
                             for (let i = 0; i < clog.length; i++) {
@@ -320,9 +326,9 @@
         }
         //hamming_encode (bit string)
         function hamming_encode(str = "01101001") {
-            str = str.insertIndex(0, '0');
+            str = str.replaceIndex(0,'0',0);
             for (let i = 1; i < str.length; i*=2) {
-                str = str.insertIndex(i, '0');
+                str = str.replaceIndex(i,'0',0);
             }
             for (let i = 1; i < str.length; i*=2) {
                 let tmp = 0,
@@ -370,35 +376,30 @@
         //hamming_extractStr (removes parity bits and returns original bit string)
         function hamming_extractStr(str="01101011"){
             for(let i=str.length;i>0;i--){
-                if(powerOfTwo(i)) str = str.replaceIndex(i, '', 1);
+                //powerOfTwo?
+                if(Math.log2(i)%1===0) str = str.replaceIndex(i, '', 1);
             }
             return str.replaceIndex(0, '', 1);
         }
-        function powerOfTwo(n){
-            return Math.log2(n)%1===0
+        //converts text to binary string
+        function unicodeToBinary(char) {
+            return char.split('').map(function(codepoint) {
+                return codepoint.charCodeAt(0).toString(2);
+            }).join('');
         }
+        //converts binary string to text
+        function binaryToUnicode(binaryList,UTF_BITS=32) {
+            var codepointsAsNumbers = [];
+            while( binaryList.length>0 ){
+                var codepointBits = binaryList.slice(0,UTF_BITS);
+                binaryList = binaryList.slice(UTF_BITS);
+                codepointsAsNumbers.push( parseInt(codepointBits.join(''),2) );
+            }
+            return String.fromCharCode.apply(this,codepointsAsNumbers);
+        }
+        //for adding characters at a specific index to a string, replacing a set amount of characters
         String.prototype.replaceIndex = function(index,char,length=1){
             return this.substr(0,index)+char+this.substr(index+length);
-        }
-        String.prototype.insertIndex = function(index,char){
-            return this.substr(0,index)+char+this.substr(index);
-        }
-        // returns bytes seperated by ' '
-        function textToBin(text=""){
-            let tmp="";
-            for(const c of text){
-                tmp += c.charCodeAt(0).toString(2)+" ";
-            }
-            return tmp.replace(/\s?$/,'');
-        }
-        // needs bytes seperated by ' '
-        function binToText(bin=""){
-            if (/^[0 ]*$/.test(bin)) return "";
-            let tmp="";
-            for (const bit of bin.split(" ")){
-                tmp+=String.fromCharCode(parseInt(bit, 2));
-            }
-            return tmp;
         }
     </script>
 </head>
@@ -408,7 +409,6 @@
             <option selected value="hamming">Hamming</option>
             <option disabled value="">WIP</option>
         </select> error correction codes</h1><br>
-        
         <div id="useTxtBlock">use ASCII text<input type="checkbox" id="useTxt"></div>
         <div id="byteSizeBlock">byte size <select id="byteSize">
             <option selected value="0">auto</option>
@@ -428,7 +428,7 @@
         </div>
         <hr>
         <div id="noiseBlock">
-            random flips (per byte) up to<input type="number" id="noise" value="0" step="1" min="0" max="100">%
+            random flips (per bytes) up to<input type="number" id="noise" value="0" step="1" min="0" max="100">%
         </div>
         <div id="rerunBlock"><input type="button" id="rerun" value="R U N"></div>
         <div id="bitErrNoteBlock">
@@ -438,7 +438,7 @@
             <select id="regByte">
                 <option selected="true" disabled="true" value="">Byte</option>
             </select>
-            <div id="reg"><div style="color: #555;">binary comparison of X Byte</div></div>
+            <div id="reg"><div style="color: #555;">shows selected encoded byte and highlights errors</div></div>
         </div>
         <hr>
         <div id="bitOutBlock" class="bit">
@@ -448,7 +448,7 @@
         </div>
         <div id="txtOutBlock" class="txt" hidden="true">
             &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;<br>
-            <input type="text" readonly="true" id="txtOut" placeholder="output ascii text"><br>
+            <input type="text" id="txtOut" placeholder="output ascii text"><br>
             Text output (receiver)
         </div>
     </div>
