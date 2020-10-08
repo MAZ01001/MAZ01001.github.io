@@ -11,7 +11,6 @@
         }
     </style>
     <script src="../libraries/p5_min-1.1.9/p5.min.js"></script>
-    <script src="../libraries/p5_min-1.1.9/p5.sound.min.js"></script>
     <script>
         let sliderArr = [],
             hideSlider = true,
@@ -118,7 +117,7 @@
                     hideSliderB.html('hide sliders');
                 }
             });
-            sliderArr.range = (vSlider.value() + hSlider.value()) / 2;
+            sliderArr.range = 10;
             sliderArr.default = [0, 0, 1, 0, 0, 0]; //<!--HK__[a0 → a5]
             for (let i = 0; i < 6; i++) {
                 sliderArr.push(createSlider(-sliderArr.range, sliderArr.range, sliderArr.default[i], 0.001));
@@ -139,7 +138,8 @@
             fill('0');
             strokeWeight(2);
             stroke('white');
-        
+            //TODO OOP!
+            //TODO OOP!
             //<!--HK__draw graph
             const numH = hSlider.value(),
                 numV = vSlider.value();
@@ -163,7 +163,7 @@
                 }
                 endShape();
             }
-            if (drawCmd) { //TODO array aus (max?) graphCmd's with random color~~
+            if (drawCmd) { //TODO Object-array of (max?) graphCmd's with random color~~
                 //<!--HK__draw graph3
                 stroke('magenta');
                 beginShape();
@@ -341,7 +341,8 @@
             strokeWeight(1);
             return false;
         }
-
+        //TODO OOP!
+        //TODO OOP!
         function formel(x = NaN) {
             //<!--HK__f(x) = (a9*(x^9)) + ... + (a3*(x^3)) + (a2*(x^2)) + (a1*(x^1)) + (a0*(x^0))
             //<!--HK__[0=a0, ... ,9=a9] || [9=a9, ... ,0=a0].reverse()
@@ -369,6 +370,7 @@
             vals.forEach(function(value) {
                 if (isNaN(parseFloat(value))) {
                     testNan = true;
+                    break;
                 }
             });
             if (drawGraph && !testNan) {

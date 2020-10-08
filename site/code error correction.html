@@ -412,6 +412,7 @@
         <div id="useTxtBlock">use ASCII text<input type="checkbox" id="useTxt"></div>
         <div id="byteSizeBlock">byte size <select id="byteSize">
             <option selected value="0">auto</option>
+            <!-- could be any number > 0 -->
             <option value="8">8-bit</option>
             <option value="16">16-bit</option>
             <option value="32">32-bit</option>
@@ -434,6 +435,7 @@
         <div id="bitErrNoteBlock">
             <textarea rows="2" readonly="true" id="bitErrNote" placeholder="error note"></textarea>
         </div>
+        <!-- maybe add custom bit errors (in far future) -->
         <div id="regBlock">
             <select id="regByte">
                 <option selected="true" disabled="true" value="">Byte</option>
@@ -448,7 +450,7 @@
         </div>
         <div id="txtOutBlock" class="txt" hidden="true">
             &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;<br>
-            <input type="text" id="txtOut" placeholder="output ascii text"><br>
+            <input type="text" id="txtOut" readonly="true" placeholder="output ascii text"><br>
             Text output (receiver)
         </div>
     </div>
