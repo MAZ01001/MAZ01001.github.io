@@ -1,0 +1,1 @@
+RedirectMatch ^https\:\/\/maz01001\.github\.io\/(?:libraries|img|site\/flowchart\/icon)/.* https://maz01001.github.io/index.html

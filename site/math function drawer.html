@@ -367,12 +367,12 @@
             //<!--HK__f(x) = (a9*(x^9)) + ... + (a3*(x^3)) + (a2*(x^2)) + (a1*(x^1)) + (a0*(x^0))
             //<!--HK__[0=a0, ... ,9=a9] || [9=a9, ... ,0=a0].reverse()
             let testNan = false;
-            vals.forEach(function(value) {
+            for(value of vals){
                 if (isNaN(parseFloat(value))) {
                     testNan = true;
                     break;
                 }
-            });
+            }
             if (drawGraph && !testNan) {
                 valsCmd.length = 0;
                 vals.reverse();
