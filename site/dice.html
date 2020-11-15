@@ -5,165 +5,94 @@
     <title>wuerfel</title>
     <style>
         body {
-            background: #303030;
+            font-size: xx-large;
+            font-family: 'Times New Roman', Times, serif;
+            background: #333;
         }
+        input{font: inherit;}
         table {
-            border: 1px solid #ffffff;
+            border: 0;
+            border-radius: 40px;
+            color: #000;
+            background-color: #000;
             border-collapse: collapse;
             position: fixed;
-            margin-left: -150px;
-            margin-top: -182px;
+            transform: translate(-50%,-50%);
             top: 50%;
             left: 50%;
         }
         td {
-            color: #ffffff;
-            background-color: #000000;
             table-layout: fixed;
             text-align: center;
             width: 100px;
             height: 100px;
         }
         div {
-            border-radius: 50px;
-            border: 50px solid #0f00;
+            border-radius: 30px;
+            margin: auto;
+            border: 0;
+            width: 60px;
+            height: 60px;
         }
         #b {
-            border: 1px solid #000000;
+            border: 0;
+            border-radius: 20px;
             background-color: #32cd32;
+            width: 80px;
+            height: 50px;
             position: fixed;
-            width: 25px;
-            height: 25px;
-            margin-left: -12.5px;
-            margin-top: 157px;
-            top: 50%;
+            transform: translate(-50%,-50%);
+            top: calc(50% + 190px);
             left: 50%;
         }
-        #min {
-            border: 1px solid #000000;
+        #min,#max{
+            border: 0;
             position: fixed;
-            width: 40px;
-            height: 25px;
-            margin-left: -45px;
-            margin-top: 127px;
-            top: 50%;
-            left: 50%;
+            background-color: #000;
+            color: #0f0;
+            border-radius: 20px;
+            text-align: center;
+            width: 80px;
+            height: 50px;
+            transform: translate(-50%,-50%);
+            top: calc(50% - 190px);
         }
-        #max {
-            border: 1px solid #000000;
-            position: fixed;
-            width: 40px;
-            height: 25px;
-            margin-left: 5px;
-            margin-top: 127px;
-            top: 50%;
-            left: 50%;
-        }
+        #min {left: calc(50% - 50px);}
+        #max {left: calc(50% + 50px);}
     </style>
     <script lang="javascript">
-        var swcb = true,
-            logz = "";
-
+        let swcb = 1,
+            logz = "",
+            min,max;
+        function start(){
+            min=document.getElementById('min');
+            max=document.getElementById('max');
+        }
         function wuerfel(z) {
-
-            document.getElementById('d1').style.border = "50px solid #0f00";
-            document.getElementById('d2').style.border = "50px solid #0f00";
-            document.getElementById('d3').style.border = "50px solid #0f00";
-            document.getElementById('d4').style.border = "50px solid #0f00";
-            document.getElementById('d5').style.border = "50px solid #0f00";
-            document.getElementById('d6').style.border = "50px solid #0f00";
-            document.getElementById('d7').style.border = "50px solid #0f00";
-            document.getElementById('d8').style.border = "50px solid #0f00";
-            document.getElementById('d9').style.border = "50px solid #0f00";
-
+            for(el of Array.from(document.body.querySelectorAll('td>div'))){el.style.backgroundColor='#0f00';}
             switch (z) {
-                case 1:
-                    //5
-                    document.getElementById('d5').style.border = "50px solid #0f0f";
-                    break;
-                case 2:
-                    //37
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    break;
-                case 3:
-                    //357
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d5').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    break;
-                case 4:
-                    //1379
-                    document.getElementById('d1').style.border = "50px solid #0f0f";
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    document.getElementById('d9').style.border = "50px solid #0f0f";
-                    break;
-                case 5:
-                    //13579
-                    document.getElementById('d1').style.border = "50px solid #0f0f";
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d5').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    document.getElementById('d9').style.border = "50px solid #0f0f";
-                    break;
-                case 6:
-                    //134679
-                    document.getElementById('d1').style.border = "50px solid #0f0f";
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d4').style.border = "50px solid #0f0f";
-                    document.getElementById('d6').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    document.getElementById('d9').style.border = "50px solid #0f0f";
-                    break;
-                case 7:
-                    //1345679
-                    document.getElementById('d1').style.border = "50px solid #0f0f";
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d4').style.border = "50px solid #0f0f";
-                    document.getElementById('d5').style.border = "50px solid #0f0f";
-                    document.getElementById('d6').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    document.getElementById('d9').style.border = "50px solid #0f0f";
-                    break;
-                case 8:
-                    //12346789
-                    document.getElementById('d1').style.border = "50px solid #0f0f";
-                    document.getElementById('d2').style.border = "50px solid #0f0f";
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d4').style.border = "50px solid #0f0f";
-                    document.getElementById('d6').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    document.getElementById('d8').style.border = "50px solid #0f0f";
-                    document.getElementById('d9').style.border = "50px solid #0f0f";
-                    break;
-                case 9:
-                    //123456789
-                    document.getElementById('d1').style.border = "50px solid #0f0f";
-                    document.getElementById('d2').style.border = "50px solid #0f0f";
-                    document.getElementById('d3').style.border = "50px solid #0f0f";
-                    document.getElementById('d4').style.border = "50px solid #0f0f";
-                    document.getElementById('d5').style.border = "50px solid #0f0f";
-                    document.getElementById('d6').style.border = "50px solid #0f0f";
-                    document.getElementById('d7').style.border = "50px solid #0f0f";
-                    document.getElementById('d8').style.border = "50px solid #0f0f";
-                    document.getElementById('d9').style.border = "50px solid #0f0f";
-                    break;
-
-                default:
-                    break;
+                case 1:for(el of Array.from(document.body.querySelectorAll('td>div.f1'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 2:for(el of Array.from(document.body.querySelectorAll('td>div.f2'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 3:for(el of Array.from(document.body.querySelectorAll('td>div.f3'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 4:for(el of Array.from(document.body.querySelectorAll('td>div.f4'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 5:for(el of Array.from(document.body.querySelectorAll('td>div.f5'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 6:for(el of Array.from(document.body.querySelectorAll('td>div.f6'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 7:for(el of Array.from(document.body.querySelectorAll('td>div.f7'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 8:for(el of Array.from(document.body.querySelectorAll('td>div.f8'))){el.style.backgroundColor='#0f0f';}return true;break;
+                case 9:for(el of Array.from(document.body.querySelectorAll('td>div.f9'))){el.style.backgroundColor='#0f0f';}return true;break;
+                default:return false;break;
             }
         }
-
         function swcolor() {
-            if (swcb) {
-                document.getElementById('b').style = "background-color: #00ff00;";
-            } else {
-                document.getElementById('b').style = "background-color: #32cd32;";
-            }
-            swcb = !swcb;
+            const b=document.getElementById('b');
+            swcb=(swcb>3?1:swcb);
+            switch (swcb) {
+                case 1:b.style.backgroundColor="#00FF00";break;
+                case 2:b.style.backgroundColor="#2a78ff";break;
+                case 3:b.style.backgroundColor="#FF7E19";break;
+                default:break;
+            }swcb++;
         }
-
         function wuerfeln(min, max) {
             if (min <= max) {
                 min = Math.round(min);
@@ -178,7 +107,6 @@
             document.getElementById('b').value = r;
             logz += r;
         }
-
         function charCount(str, l) {
             var lc = 0;
             for (let p = 0; p < str.length; p++) {
@@ -188,7 +116,6 @@
             }
             return lc;
         }
-
         function stats(loggg) {
             let X = [],
                 Y = loggg.length;
@@ -206,7 +133,6 @@
                 logg: X
             };
         }
-
         function displayStats(arr) {
             let X = "",
                 Y = "",
@@ -231,23 +157,23 @@
     </script>
 </head>
 
-<body onload="alert('click on dice for stats');wuerfeln(document.getElementById('min').value,document.getElementById('max').value);">
+<body onload="start();wuerfeln(document.getElementById('min').value,document.getElementById('max').value);">
     <!--https://upload.wikimedia.org/wikipedia/commons/0/0e/Location_dot_green.svg online-pic-->
     <table onclick="alert(displayStats(stats(logz)))">
         <tr>
-            <td><div data-num="1" id="d1"></div></td>
-            <td><div data-num="2" id="d2"></div></td>
-            <td><div data-num="3" id="d3"></div></td>
+            <td><div id="d1" class="f4 f5 f6 f7 f8 f9"></div></td>
+            <td><div id="d2" class="f8 f9"></div></td>
+            <td><div id="d3" class="f2 f3 f4 f5 f6 f7 f8 f9"></div></td>
         </tr>
         <tr>
-            <td><div data-num="4" id="d4"></div></td>
-            <td><div data-num="5" id="d5"></div></td>
-            <td><div data-num="6" id="d6"></div></td>
+            <td><div id="d4" class="f6 f7 f8 f9"></div></td>
+            <td><div id="d5" class="f1 f3 f5 f7 f9"></div></td>
+            <td><div id="d6" class="f6 f7 f8 f9"></div></td>
         </tr>
         <tr>
-            <td><div data-num="7" id="d7"></div></td>
-            <td><div data-num="8" id="d8"></div></td>
-            <td><div data-num="9" id="d9"></div></td>
+            <td><div id="d7" class="f2 f3 f4 f5 f6 f7 f8 f9"></div></td>
+            <td><div id="d8" class="f8 f9"></div></td>
+            <td><div id="d9" class="f4 f5 f6 f7 f8 f9"></div></td>
         </tr>
     </table><br>
     <input id="min" max="9" min="0" placeholder="min" type="number" value="1"> <input id="max" max="9" min="0" placeholder="max" type="number" value="6"><br>
