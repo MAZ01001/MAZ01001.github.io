@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
++    _   _  _____ _      _     _____    _____ _   _  ___________ _____
++   | | | ||  ___| |    | |   |  _  |  |_   _| | | ||  ___| ___ \  ___|
++   | |_| || |__ | |    | |   | | | |    | | | |_| || |__ | |_/ / |__
++   |  _  ||  __|| |    | |   | | | |    | | |  _  ||  __||    /|  __|
++   | | | || |___| |____| |___\ \_/ /    | | | | | || |___| |\ \| |___
++   \_| |_/\____/\_____/\_____/\___/     \_/ \_| |_/\____/\_| \_\____/
+-->
+<head>
+    <meta charset="UTF-16">
+    <title>Enigma</title>
+    <style>
+        /* 
+              _         _ _
+             | |       | (_)
+          ___| |_ _   _| |_ _ __   __ _
+         / __| __| | | | | | '_ \ / _` |
+         \__ \ |_| |_| | | | | | | (_| |
+         |___/\__|\__, |_|_|_| |_|\__, |
+                   __/ |           __/ |
+                  |___/           |___/
+        */
+        body{
+            background-color: #000;
+            color: #0F0F;
+            padding: 0;
+            margin: 0;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: large;
+        }
+        div#box{
+            background-color: #333;
+            overflow: overlay;
+            border-radius: 20px;
+            text-align: center;
+            max-width: calc(100% - 60px);
+            max-height: calc(100% - 60px);
+            padding: 30px;
+            position: fixed;
+            transform: translate(-50%,-50%);
+            top: 50%;
+            left: 50%;
+        }
+        h1#title{font-size: 4em;margin: 0;}
+        h1#title>a{color: #0F0F;}
+        h1#title>a:hover,h1#title>a:focus{color: #0AFF;}
+        div#enigma_info{
+            color: #0A0F;
+            display: inline-block;
+            font-size: large;
+            font-style: italic;
+            cursor: pointer;
+        }
+        div#enigma_info:hover{color: #0F0F;}
+        input#enigma_counter{
+            background-color: #000F;
+            color: #0A0F;
+            font-family: monospace;
+            font-size: xx-large;
+            font-weight: bold;
+            cursor: pointer;
+            width: 4.1em;
+            height: 1.1em;
+            border: 2px inset #777F;
+        }
+        input#enigma_counter:hover{background-color: #333F;color: #0F0F;}
+        div#switch{
+            display: flex;
+            flex-direction: row;
+            flex-flow: nowrap;
+            justify-content: space-between;
+            align-items: center;
+            width: 222px;
+            margin: 5px auto auto;
+            user-select: none;
+        }
+        div#switch>txt#txt_decode{order: 1;transition: .4s;color: #000F;padding:0 8px}
+        div#switch>label{order: 2;}
+        div#switch>txt#txt_encode{order: 3;transition: .4s;color: #0F0F;padding:0 8px}
+        div#switch txt{
+            cursor: default;
+            border: 1px solid black;
+            border-radius: 10px;
+            background-color: #222F;
+            color: #0a0F;
+            font-size: large;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {opacity:0;width:0;height:0;}
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #0A0F;
+            transition: .4s;
+            border-radius: 34px;
+            border: 3px solid black;
+        }
+        .slider:before {
+            position: absolute;
+            content: "←";
+            font-family: consolas;
+            font-size: 1.1em;
+            height: 26px;
+            width: 26px;
+            left: 1px;
+            bottom: 1px;
+            background-color: #000F;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        /* label.switch>input:checked + .slider {background-color: #0A0F;} */
+        label.switch>input:focus + .slider {box-shadow: 0 0 0 1px #F90F;}
+        label.switch>input:checked + .slider:before {
+            content: "→";
+            font-family: consolas;
+            font-size: 1.1em;
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+        div#conversion{
+            width: max-content;
+            height: max-content;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+        }
+        div#input{
+            order: 1;
+            text-align: start;
+        }
+        div#input_counter{
+            font-family: monospace;
+            color: #0F0F;
+            cursor: default;
+        }
+        textarea#input_text{
+            background-color: #222F;
+            color: #0F0F;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        input#enigma_convert_button{
+            margin: 0 4px;
+            order: 2;
+            z-index: 10;
+            display: block;
+            font-size: 1em;
+            background-color: #222F;
+            border-color: #444F;
+            color: #0A0F;
+            border-radius: 0.8em;
+            width: 2em;
+            height: 2em;
+        }
+        input#enigma_convert_button:hover{background-color: #333F;color: #0F0F;}
+        input#enigma_convert_button:focus{border-color: #F90F;}
+        div#output{
+            order: 3;
+            text-align: start;
+        }
+        div#output_counter{
+            font-family: monospace;
+            color: #0F0F;
+            cursor: default;
+        }
+        textarea#output_text{
+            background-color: #222F;
+            color: #0F0F;
+            font-family: monospace;
+        }
+        textarea{
+            white-space: pre-wrap;
+            overflow: overlay;
+            height: 200px;
+            width: 300px;
+            min-height: 80px;
+            min-width: 240px;
+            max-height: 300px;
+            max-width: 450px;
+        }
+        textarea:hover{box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);}
+        textarea:focus{outline: #F90F solid 1px;}
+        *:not(textarea){outline: none;}
+        div#blurer{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(6px);
+            background-color: transparent;
+            z-index: 20;
+        }
+        div#edit_decode_machine,
+        div#edit_encode_machine{
+            background-color: #333;
+            overflow: overlay;
+            border-radius: 20px;
+            text-align: center;
+            padding: 15px;
+            max-width: calc(100% - 30px);
+            max-height: calc(100% - 30px);
+            width: max-content;
+            height: max-content;
+            position: fixed;
+            transform: translate(-50%,-50%);
+            top: 50%;
+            left: 50%;
+            box-shadow: inset 0 0 6px 4px #000F;
+        }
+        textarea#edit_encode_input_chars{
+            line-break: anywhere;
+            height: 80px;
+            width: 240px;
+            background-color: #000F;
+            font-family: monospace;
+            color: #0F0F;
+            border-radius: 10px;
+        }
+        input#edit_encode_weels_num,input#edit_encode_plugs_num{
+            z-index: 25;
+            background-color: #000F;
+            color: #0F0F;
+            font-family: monospace;
+            font-size: xx-large;
+            font-weight: bold;
+            cursor: pointer;
+            width: 4.1em;
+            height: 1.1em;
+            border: 2px inset #777F;
+        }
+        input#edit_encode_weels_num:valid,input#edit_encode_plugs_num:valid{border-color: #0f0;}
+        input#edit_encode_weels_num:invalid,input#edit_encode_plugs_num:invalid{border-color: #f00;}
+        input#edit_encode_weels_num:placeholder-shown,input#edit_encode_plugs_num:placeholder-shown{border-color: currentColor;border-style: dashed;}
+        input[type=button]#edit_decode_copy_button,
+        input[type=button]#edit_encode_create_button,
+        input[type=button]#edit_encode_abort{
+            background-color: #000;
+            color: #0F0F;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: larger;
+            border-radius: 10px;
+        }
+        div#loader{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            background-image: radial-gradient(transparent,transparent,black,black);
+        }
+        div#loader>div{
+            font-size: 2em;
+            font-family: serif;
+            position: absolute;
+            transform: translate(-50%,-50%);
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            text-align: center;
+        }
+        ::-webkit-scrollbar {width: 0.7em;height: 0.7em;}
+        ::-webkit-scrollbar-thumb:window-inactive{border-color: #040F !important;}
+        ::-webkit-scrollbar-thumb:vertical {
+            background-color: #0000;
+            border-right: 2px solid #080F;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:vertical:hover {
+            background-color: #0F0F;
+            border: none;
+            border-top-left-radius: 1em;
+            border-bottom-left-radius: 1em;
+        }
+        ::-webkit-scrollbar-thumb:horizontal {
+            background-color: #0000;
+            border-bottom: 2px solid #080F;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:horizontal:hover {
+            background-color: #0F0F;
+            border: none;
+            border-top-left-radius: 1em;
+            border-top-right-radius: 1em;
+        }
+        ::-webkit-scrollbar-track {display: none;background-color: #0000;}
+        ::-webkit-scrollbar-track-piece {display: none;background-color: #0000;}
+        ::-webkit-scrollbar-corner {display: none;background-color: #0000;}
+    </style>
+    <script type="text/javascript" src="./code.js"></script>
+    <script>
+        //   __                  _   _
+        //  / _|                | | (_)
+        // | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+        // |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+        // | | | |_| | | | | (__| |_| | (_) | | | \__ \
+        // |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+        /**
+         * __takes an element__ _(at any index)_ __from an array and returns it__
+         * @param {any[]} array an array
+         * @param {number} index the index of the element to extract
+         * @returns {any} element of array
+         */
+        function take_from_array(array,index){
+            if(index<0){index=0;}
+            if(index>=array.length){index=array.length-1;}
+            const tmp=array[index];
+            for(let i=index;i<array.length;i++){
+                if(i+1==array.length){array.pop();}
+                else{array[i]=array[i+1];}
+            }
+            return tmp;
+        }
+        /**
+         * __maps a number from a field to another in the same ratio to the ends__
+         * @param {number} value the value from current reach
+         * @param {number} low1 currend reach-start
+         * @param {number} high1 current reach-end
+         * @param {number} low2 new reach-start
+         * @param {number} high2 new reach-end
+         * @returns {number} the value from new reach
+         * @source [P5.js → map()](https://p5js.org/reference/#/p5/map)
+         */
+        function map_num(value, low1, high1, low2, high2){return (low2 + (((high2 - low2) * (value - low1)) / (high1 - low1)));}
+        /**
+         * __special function for creating a "gear"__
+         * @param {string[]} allCharsArr ascii chars
+         * @returns {{}|{string:string;}} a weel as object
+         */
+        function create_weel(allCharsArr){
+            if(allCharsArr.length==0){return {};}
+            let arr=[],newWeel={};
+            allCharsArr.forEach(function(value,index,array){arr[index]=value.toString();});
+            for(let i=0;arr.length>0;i++){newWeel[allCharsArr[i].toString()]=take_from_array(arr,Math.round(map_num(Math.random(),0,1,0,arr.length-1)));}
+            return newWeel;
+        }
+        /**
+         * __special function for creating a "plugboard"__
+         * @param {string[]} allCharsArr ascii chars
+         * @param {number} plugs maximum plugs used _default=`10`_
+         * @param {boolean} gost_entries allow for `'A':'A'` _default=`false`_
+         * @returns {{}|{string:string;}} a plugboard as object
+         */
+        function create_plugboard(allCharsArr,plugs=10,gost_entries=false){
+            if(plugs>Math.floor(allCharsArr.length/2)){plugs=Math.floor(allCharsArr.length/2);}
+            let tmp={};
+            for (let i = 0; i < plugs; i++) {
+                let ascii1 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))],
+                    ascii2 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))];
+                while(tmp[ascii1]!=undefined){
+                    ascii1 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))];
+                }
+                while(tmp[ascii2]!=undefined){
+                    if(ascii1==ascii2 && !gost_entries){
+                        while(ascii1==ascii2){
+                            ascii2 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))]
+                        }
+                    }else{ascii2 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))]}
+                }
+                tmp[ascii1]=ascii2;
+                tmp[ascii2]=ascii1;
+            }
+            return tmp;
+        }
+        /**
+         * __creates an enigma system and returns it__
+         * @param {string[]} ascii_char_arr the chars `['a','b',...]` to create the enigma-system
+         * @param {number} weels_num number of "weels" _between `0` and `100`_
+         * @param {number} plug_num number of "plugs" _between `0` and `x=96`_
+         * @returns {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma system
+         */
+        function create_enigma(ascii_char_arr,weels_num=8,plug_num=4){
+            if(plug_num<0){plug_num=0;}
+            if(plug_num>Math.floor(ascii_char_arr.length/2)){plug_num=Math.floor(ascii_char_arr.length/2);}
+            if(plug_num>500){plug_num=500;}
+            if(weels_num<1){weels_num=1;}
+            if(weels_num>500){weels_num=500;}
+            let weels = [],
+                plugboard = create_plugboard(ascii_char_arr,plug_num);
+            /*
+                HK__rewrite for site: (inside enigma-object)
+                let test="asdf";
+                (function(lol=test){return lol+' xd';}).call() //=> "asdf xd"
+            */
+            for (let i = 0; i < weels_num; i++) {
+                weels[i]={weel:{},save:{},turnCounter:0,length:0};
+                weels[i].weel=create_weel(ascii_char_arr);
+                for (const key in weels[i].weel) {weels[i].save[key.toString()] = weels[i].weel[key.toString()].toString();}
+                weels[i].length=ascii_char_arr.length;
+            }
+            return {'weels':weels,'plugboard':plugboard,'chars':ascii_char_arr};
+        }
+        /**
+         * __moves the first value to the last key of a data-array__
+         * @param {{}|{string:string;}} weel an enigma weel as object
+         * @info edits object - no return
+         * @example
+         * let a = {
+         *      'a':'0',
+         *      'b':'1',
+         *      'c':'2'
+         * };
+         * turn(a);
+         * a; // {
+         * //      'a':'1',
+         * //      'b':'2',
+         * //      'c':'0'
+         * // }
+         */
+        function turn_object_values(weel){
+            let keys=[],values=[];
+            for (const key in weel) {keys.push(key.toString());values.push(weel[key.toString()].toString());}
+            for (let i = 0; i < keys.length; i++) {
+                if(i+1==keys.length){weel[keys[i].toString()]=values[0].toString();}
+                else{weel[keys[i].toString()]=values[i+1].toString();}
+            }
+        }
+        /**
+         * __moves the last value to the first key of a data-array__
+         * @param {{}|{string:string;}} weel an enigma weel as object
+         * @info edits object - no return
+         * @example
+         * let a = {
+         *      'a':'0',
+         *      'b':'1',
+         *      'c':'2'
+         * };
+         * turn(a);
+         * a; // {
+         * //      'a':'2',
+         * //      'b':'0',
+         * //      'c':'1'
+         * // }
+         */
+        function turn_object_values_rev(weel){
+            let keys=[],values=[];
+            for (const key in weel) {keys.push(key.toString());values.push(weel[key.toString()].toString());}
+            for (let i = keys.length-1; i >= 0; i--) {
+                if(i==0){weel[keys[i].toString()]=values[keys.length-1].toString();}
+                else{weel[keys[i].toString()]=values[i-1].toString();}
+            }
+        }
+        /**
+         * __gets the current turn number of the weels__
+         * @param {{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[]} weels_arr array of enigma-weels
+         * @returns {number|boolean} the current turn number or `false` on error
+         */
+        function get_counter(weels_arr){
+            if(weels_arr==undefined){return false;}
+            let sumlength=1,n=0;
+            weels_arr.forEach(function(value,index,array){sumlength*=(value.length>0?value.length:1);});
+            for(let i=weels_arr.length-1;i>=0;i--) {
+                sumlength/=weels_arr[i].length;
+                n+=(sumlength*weels_arr[i].turnCounter);
+            }
+            return n;
+        }
+        /**
+         * __increment the weel num by x much with carry__
+         * @param {{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[]} weels_arr array of enigma-weels
+         * @param {number} turns number to increment the weels _default `1`_
+         */
+        function turning(weels_arr,turns=1){
+            // weels_arr-- >> 0
+            //     floor(num/length↑index)=turn(w/carry)
+            //     num=num%length↑index
+            // if num==0 DONE
+            for(let i=weels_arr.length-1;i>=0&&turns>0;i--){
+                for(let j=Math.floor(turns/Math.pow(weels_arr[i].length,i));j>0;j--){
+                    for (let n = i; n < weels_arr.length; n++) {
+                        turn_object_values(weels_arr[n].weel);
+                        weels_arr[n].turnCounter++;
+                        if(weels_arr[n].turnCounter<weels_arr[n].length){break;}
+                        weels_arr[n].turnCounter=0;
+                    }
+                }
+                turns=turns%Math.pow(weels_arr[i].length,i);
+            }
+        }
+        /**
+         * __decrement the weel num by x much with carry__
+         * @param {{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[]} weels_arr array of enigma-weels
+         * @param {number} turns number to decrement the weels _default `1`_
+         */
+        function turning_rev(weels_arr,turns=1){
+            // weels_arr-- >> 0
+            //     floor(num/length↑index)=turn(w/carry)
+            //     num=num%length↑index
+            // if num==0 DONE
+            for(let i=weels_arr.length-1;i>=0&&turns>0;i--){
+                for(let j=Math.floor(turns/Math.pow(weels_arr[i].length,i));j>0;j--){
+                    for (let n = i; n < weels_arr.length; n++) {
+                        turn_object_values_rev(weels_arr[n].weel);
+                        weels_arr[n].turnCounter--;
+                        if(weels_arr[n].turnCounter>=0){break;}
+                        weels_arr[n].turnCounter=weels_arr[n].length-1;
+                    }
+                }
+                turns=turns%Math.pow(weels_arr[i].length,i);
+            }
+        }
+        /**
+         * __sets the turn number of the weels__
+         * @param {{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[]} weels_arr an enigma-weels array
+         * @param {number} num the turn number _default=`0`_
+         */
+        function set_turn_num(weels_arr,num=0){
+            if(weels_arr==undefined){return;}
+            const old_num = get_counter(weels_arr);
+            if(num>old_num){turning(weels_arr,num-old_num);}
+            else if(num<old_num){turning_rev(weels_arr,old_num-num);}
+        }
+        /**
+         * __special cipher encoder__ _(gets val from a weel on the enigma)_
+         * @param {{}|{string:string;}} weel an enigma weel as object
+         * @param {string} val a character
+         * @returns {(string|undefined)} returns a `string` character or `undefined` on error
+         */
+        function get_weel_val(weel,val){return weel[val.toString()];}
+        /**
+         * __returns key from value on obnject__
+         * @param {{}|{string:string;}} weel an enigma weel as object
+         * @param {string} val a character
+         * @returns {(string|undefined)} key or `undefined` on error
+         * @source https://stackoverflow.com/a/28191966/13282166
+         */
+        function get_weel_val_rev(weel,val){return Object.keys(weel).find(key => weel[key.toString()]===val.toString());}
+        /**
+         * __gets val from plugboard on the enigma__
+         * @param {{}|{string:string;}} plugboard an enigma plugboard as object
+         * @param {string} val a character
+         * @returns {(string|undefined)} returns a `string` character or `undefined` on error
+         */
+        function get_plugboard_val(plugboard,val){return plugboard[val.toString()];}
+        /**
+         * __returns key from value on obnject__
+         * @param {{}|{string:string;}} plugboard an enigma plugboard as object
+         * @param {string} val a character
+         * @returns {(string|undefined)} key or `undefined` on error
+         * @source https://stackoverflow.com/a/28191966/13282166
+         */
+        function get_plugboard_val_rev(plugboard,val){return Object.keys(plugboard).find(key => plugboard[key.toString()]===val.toString());}
+        /**
+         * __encrypt a character with the enigma machine__
+         * @param {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma_sys enigma system
+         * @param {string} key character
+         * @returns {(string|boolean)} encrypted character or `false` on error
+         */
+        function get_enigma_key(enigma_sys,key){
+            if(enigma_sys.chars.includes(key)===false){return false;}
+            //plugboard → weels 0-x [turning++]
+            if(get_plugboard_val(enigma_sys.plugboard,key)!=undefined){key=get_plugboard_val(enigma_sys.plugboard,key).toString();}
+            for(let i=0;i<enigma_sys.weels.length;i++){
+                if(get_weel_val(enigma_sys.weels[i].weel,key)===undefined){return false;}
+                key=get_weel_val(enigma_sys.weels[i].weel,key).toString();
+            }
+            return key;
+        }
+        /**
+         * __encrypt a character with the enigma machine but reverse__
+         * @param {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma_sys enigma system
+         * @param {string} key character
+         * @returns {(string|boolean)} encrypted character or `false` on error
+         */
+        function get_enigma_key_rev(enigma_sys,key){
+            if(enigma_sys.chars.includes(key)===false){return false;}
+            //weels x-0 → plugboard [turning++]
+            for(let i=enigma_sys.weels.length-1;i>=0;i--){
+                if(get_weel_val_rev(enigma_sys.weels[i].weel,key)===undefined){return false;}
+                key=get_weel_val_rev(enigma_sys.weels[i].weel,key).toString();
+            }
+            if(get_plugboard_val_rev(enigma_sys.plugboard,key)!=undefined){key=get_plugboard_val_rev(enigma_sys.plugboard,key).toString();}
+            return key;
+        }
+        /**
+         * __encodes a string__ _(that the enigma supports)_ __and returns it__
+         * @param {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma enigma-system
+         * @param {string} txt raw text
+         * @returns {string} encoded text
+         */
+        function enigma_encode_txt(enigma,txt){
+            let encodedTxt="";
+            for (let i = 0; i < txt.length; i++) {
+                encodedTxt += get_enigma_key(enigma,txt[i].toString());
+                turning(enigma.weels,1);
+            }
+            return encodedTxt;
+        }
+        /**
+         * __decodes a string__ _(that the enigma encoded)_ __and returns it__
+         * @param {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma enigma-system
+         * @param {string} txt encoded text
+         * @returns {string} raw text
+         * @info _(enigma-counter must be set (with "`set_turn_num(enigma.weels,*);`") to the same number as before the text was encoded)_
+         */
+        function enigma_decode_txt(enigma,txt){
+            let decodedTxt="";
+            for (let i = 0; i < txt.length; i++) {
+                decodedTxt += get_enigma_key_rev(enigma,txt[i].toString());
+                turning(enigma.weels,1);
+            }
+            return decodedTxt;
+        }
+        /**
+         * __encoding function for html__
+         * @param {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma enigma-system
+         * @param {HTMLTextAreaElement} input_el input textarea
+         * @param {HTMLTextAreaElement} output_el output textarea
+         * @param {HTMLInputElement} num_el counter input[number]
+         * @returns {boolean} `true` and `false` on error
+         */
+        function enigma_encode_txt_html(enigma,input_el,output_el,num_el){
+            let text_arr = Array.from(input_el.value.toString());
+            for (let i = 0; i < text_arr.length; i++) {
+                if(get_enigma_key(enigma,text_arr[i].toString())===false){return false;}
+                output_el.value += get_enigma_key(enigma,text_arr[i].toString()).toString();
+                turning(enigma.weels,1);
+                num_el.value = get_counter(enigma.weels).toString();
+            }
+            return true;
+        }
+        /**
+         * __decoing function for html__
+         * @param {{'weels':{'weel':{}|{string:string;};'save':{}|{string:string;};'turnCounter':number;'length': number;}[];'plugboard':{}|{string:string;};'chars':string[]}} enigma enigma-system
+         * @param {HTMLTextAreaElement} input_el input textarea
+         * @param {HTMLTextAreaElement} output_el output textarea
+         * @param {HTMLInputElement} num_el counter input[number]
+         * @returns {boolean} `true` and `false` on error
+         * @info _(enigma-counter must be set (with "`set_turn_num(enigma.weels,*);`") to the same number as before the text was encoded)_
+         */
+        function enigma_decode_txt_html(enigma,input_el,output_el,num_el){
+            let text_arr = Array.from(input_el.value.toString());
+            for (let i = 0; i < text_arr.length; i++) {
+                if(get_enigma_key_rev(enigma,text_arr[i].toString())===false){return false;}
+                output_el.value += get_enigma_key_rev(enigma,text_arr[i].toString()).toString();
+                turning(enigma.weels,1);
+                num_el.value = get_counter(enigma.weels).toString();
+            }
+            return true;
+        }
+        /**
+         * __escapes a string for match as RegExp inside `[``]` with `u` flag__
+         * @param {string} str raw unicode string
+         * @returns {string} escaped string
+         */
+        function escape_unicode_regexp(str){
+            return str.replace('\\','\\\\')
+                .replace('{','\\{')
+                .replace('}','\\}')
+                .replace('[','\\[')
+                .replace(']','\\]')
+                .replace('-','\\u{2d}')
+                .replace('.','\\.')
+                .replace('\n','\\n')
+                .replace('\t','\\t')
+            ;
+        }
+        /**
+         * __download text as file__
+         * @param {string} data text to download _(`utf16le`)_
+         * @param {string?} filename default filename _(default `*.txt`)_
+         * @example download('hallo\ntest','test.txt');
+         */
+        function download(data,filename='*.txt'){
+            let blob = new Blob([data], {type: 'text/plain;charset=utf16le;'});
+            if(window.navigator.msSaveOrOpenBlob){window.navigator.msSaveBlob(blob,filename);}
+            else{
+                let elem = window.document.createElement('a'),
+                    url = window.URL.createObjectURL(blob);
+                elem.href = url;
+                elem.download = filename;
+                elem.rel = 'noopener noreferrer';
+                elem.target = '_blank';
+                elem.title = 'save txt file to pc';
+                elem.innerHTML='save txt to file';
+                elem.style.display = 'none !important';
+                window.document.body.appendChild(elem);
+                elem.click();
+                window.document.body.removeChild(elem);
+                setTimeout(function(){window.URL.revokeObjectURL(url);},2000);
+            }
+        }
+        /**
+         * __encode a unicode string to base64__
+         * @param {string} str unicode string
+         * @returns {string} encoded string
+         */
+        function encode_unicode_2b64(str){return btoa(btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,function(match,p1){return String.fromCharCode(+('0x'+p1));})));}
+        /**
+         * __decode an encoded string with the `encode_unicode_2b64` function__
+         * @param {string} str encoded string
+         * @returns {string} decoded string
+         */
+        function decode_unicode_2b64(str){return decodeURIComponent(atob(atob(str)).split('').map(c=>{return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join(''));}
+        function event_convert_encode(){
+            if (input_text.value.length<=0){return;}
+            loader.style.display='';
+            output_counter.innerText='('+enigma_counter.value+')';
+            const prev_out = output_text.value;
+            output_text.value="";
+            const num_now = get_counter(enigma_system.encode_enigma.weels);
+            if(!enigma_encode_txt_html(enigma_system.encode_enigma,input_text,output_text,enigma_counter)){
+                set_turn_num(enigma_system.encode_enigma.weels,num_now);
+                output_counter.innerText='('+num_now+')';
+                output_text=prev_out;
+                alert('[ERROR]encoding');
+                console.log('[ERROR]encoding');
+                loader.style.display='none';
+                return false;
+            }else{
+                input_text.value='';
+                input_text.dispatchEvent(new Event('input',{bubbles:false}));
+                output_text.select();
+                console.log('encoded ['+num_now+'->'+get_counter(enigma_system.encode_enigma.weels)+']');
+                loader.style.display='none';
+                return true;
+            }
+        }
+        function event_convert_decode(){
+            if (input_text.value.length<=0){return;}
+            loader.style.display='';
+            output_counter.innerText='('+enigma_counter.value+')';
+            const prev_out = output_text.value;
+            output_text.value="";
+            const num_now = get_counter(enigma_system.decode_enigma.weels);
+            if(!enigma_decode_txt_html(enigma_system.decode_enigma,input_text,output_text,enigma_counter)){
+                set_turn_num(enigma_system.decode_enigma.weels,num_now);
+                output_counter.innerText='('+num_now+')';
+                output_text=prev_out;
+                alert('[ERROR]decoding');
+                console.log('[ERROR]decoding');
+                loader.style.display='none';
+                return false;
+            }else{
+                input_text.value='';
+                input_text.dispatchEvent(new Event('input',{bubbles:false}));
+                output_text.select();
+                console.log('decoded ['+num_now+'->'+get_counter(enigma_system.decode_enigma.weels)+']');
+                loader.style.display='none';
+                return true;
+            }
+        }
+        //                  _       _     _
+        //                 (_)     | |   | |
+        // __   ____ _ _ __ _  __ _| |__ | | ___  ___
+        // \ \ / / _` | '__| |/ _` | '_ \| |/ _ \/ __|
+        //  \ V / (_| | |  | | (_| | |_) | |  __/\__ \
+        //   \_/ \__,_|_|  |_|\__,_|_.__/|_|\___||___/
+        let enigma_chars = ['\n',' ','!','"','#','$','%','&','\'','(',')','*','+','-','.','/','0','1','2','3','4','5','6',
+            '7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R',
+            'S','T','U','V','W','X','Y','Z','[','\\',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n',
+            'o','p','q','r','s','t','u','v','w','x','y','z','{','|','}','~','€'
+        ];//default chars for the enigma (0x20 to 0x7E plus 0x0A and 0x20AC)
+        let enigma_info,enigma_counter,input_text,output_text,
+            blurer,
+            edit_decode_machine,
+            edit_decode_section_copy_encoding,
+            edit_decode_copy_button,
+            edit_decode_section_load_file,
+            edit_decode_load_file,
+            edit_decode_section_abort,
+            edit_decode_abort,
+            edit_encode_machine,
+            edit_encode_section_save_file,
+            edit_encode_save_file,
+            edit_encode_section_create_new,
+            edit_encode_input_chars,
+            edit_encode_weels_num,
+            edit_encode_plugs_num,
+            edit_encode_create_button,
+            edit_encode_section_load_file,
+            edit_encode_load_file,
+            edit_encode_section_abort,
+            edit_encode_abort,
+            visible_switch,
+            loader,
+            enigma_system = {
+                //__necessary tmp vals__
+                encode_enigma:create_enigma(['0','1'],1,0),
+                encode_last_in:'',
+                encode_last_out:'',
+                encode_last_out_num:0,
+                encode_regexp:RegExp(),
+                decode_enigma:create_enigma(['0','1'],1,0),
+                decode_last_in:'',
+                decode_last_out:'',
+                decode_last_out_num:0,
+                decode_regexp:RegExp(),
+            };
+        function start(){
+            //____add elements____
+            enigma_info = document.getElementById('enigma_info');
+            enigma_counter = document.getElementById('enigma_counter');
+            switch_area = document.getElementById('switch');
+            txt_encode = document.getElementById('txt_encode');
+            switch_label = document.getElementById('switch').querySelector('label.switch');
+            toggle_en_decode = document.getElementById('toggle_en_decode');
+            switch_slider = document.getElementById('switch').querySelector('span.slider');
+            txt_decode = document.getElementById('txt_decode');
+            input_counter = document.getElementById('input_counter');
+            input_text = document.getElementById('input_text');
+            output_counter = document.getElementById('output_counter');
+            output_text = document.getElementById('output_text');
+            blurer = document.getElementById('blurer');
+            edit_decode_machine = document.getElementById('edit_decode_machine');
+            edit_decode_section_copy_encoding = document.getElementById('edit_decode_machine').querySelector('div[name=copy_encoding]');
+            edit_decode_copy_button = document.getElementById('edit_decode_copy_button');
+            edit_decode_section_load_file = document.getElementById('edit_decode_machine').querySelector('div[name=load_file]');
+            edit_decode_load_file = document.getElementById('edit_decode_load_file');
+            edit_decode_section_abort = document.getElementById('edit_decode_machine').querySelector('div[name=abort]');
+            edit_decode_abort = document.getElementById('edit_decode_abort');
+            edit_encode_machine = document.getElementById('edit_encode_machine');
+            edit_encode_section_save_file = document.getElementById('edit_encode_machine').querySelector('div[name=save_file]');
+            edit_encode_save_file = document.getElementById('edit_encode_save_file');
+            edit_encode_section_create_new = document.getElementById('edit_encode_machine').querySelector('div[name=create_new]');
+            edit_encode_input_chars = document.getElementById('edit_encode_input_chars');
+            edit_encode_weels_num = document.getElementById('edit_encode_weels_num');
+            edit_encode_plugs_num = document.getElementById('edit_encode_plugs_num');
+            edit_encode_create_button = document.getElementById('edit_encode_create_button');
+            edit_encode_section_load_file = document.getElementById('edit_encode_machine').querySelector('div[name=load_file]');
+            edit_encode_load_file = document.getElementById('edit_encode_load_file');
+            edit_encode_section_abort = document.getElementById('edit_encode_machine').querySelector('div[name=abort]');
+            edit_encode_abort = document.getElementById('edit_encode_abort');
+            loader = document.getElementById('loader');
+            //____some menuing____
+            loader.style.display='';
+            enigma_counter.value='0';
+            blurer.style.display='';
+            edit_decode_machine.style.display='none';
+            edit_encode_machine.style.display='';
+            edit_encode_section_create_new.style.display='';
+            edit_encode_section_load_file.style.display='';
+            edit_encode_section_save_file.style.display='none';
+            edit_encode_section_abort.style.display='none';
+            edit_encode_input_chars.value=enigma_chars.join('');
+            edit_encode_weels_num.value=8;
+            edit_encode_plugs_num.value=4;
+            edit_encode_input_chars.dispatchEvent(new Event('change',{bubbles:false}));
+            edit_encode_weels_num.dispatchEvent(new Event('input',{bubbles:false}));
+            edit_encode_plugs_num.dispatchEvent(new Event('input',{bubbles:false}));
+            //                       _     _ _     _
+            //                      | |   | (_)   | |
+            //   _____   _____ _ __ | |_  | |_ ___| |_ ___ _ __   ___ _ __ ___
+            //  / _ \ \ / / _ \ '_ \| __| | | / __| __/ _ \ '_ \ / _ \ '__/ __|
+            // |  __/\ V /  __/ | | | |_  | | \__ \ ||  __/ | | |  __/ |  \__ \
+            //  \___| \_/ \___|_| |_|\__| |_|_|___/\__\___|_| |_|\___|_|  |___/
+            toggle_en_decode.addEventListener('change',event=>{
+                blurer.style.display='';
+                edit_decode_machine.style.display='';
+                edit_decode_section_copy_encoding.style.display='';
+                edit_decode_section_load_file.style.display='';
+                edit_decode_section_abort.style.display='none';
+            },{once:true});
+            edit_decode_abort.addEventListener('click',event=>{edit_decode_machine.style.display='none';blurer.style.display='none';});
+            edit_encode_abort.addEventListener('click',event=>{edit_encode_machine.style.display='none';blurer.style.display='none';});
+            input_text.addEventListener('input',event=>{
+                if(toggle_en_decode.checked){input_text.value=input_text.value.replace(enigma_system.encode_regexp,'');}
+                else{input_text.value=input_text.value.replace(enigma_system.decode_regexp,'');}
+                input_counter.innerText='('+input_text.value.length+')';
+            });
+            output_text.addEventListener('click',event=>{output_text.select();});
+            output_text.addEventListener('dblclick',event=>{
+                if(output_text.value.length>0){
+                    output_text.select();
+                    document.execCommand('copy');
+                    output_text.blur();
+                    console.log(`copied ${toggle_en_decode.checked?'en':'de'}coding output`);
+                }
+            });
+            enigma_convert_button.addEventListener('click',event_convert_encode);
+            toggle_en_decode.addEventListener('change',event=>{
+                loader.style.display='';
+                if(toggle_en_decode.checked){
+                    txt_decode.style.color="#000F";txt_encode.style.color="#0F0F";
+                    enigma_system.decode_last_out=output_text.value;
+                    enigma_system.decode_last_out_num=parseInt(output_counter.innerText.replace(/[\(\)]/g,''));
+                    enigma_system.decode_last_in=input_text.value;
+                    enigma_counter.value=get_counter(enigma_system.encode_enigma.weels).toString();
+                    input_text.value=enigma_system.encode_last_in;
+                    output_text.value=enigma_system.encode_last_out;
+                    output_counter.innerText='('+enigma_system.encode_last_out_num+')';
+                    input_text.dispatchEvent(new Event('input',{bubbles:false}));
+                    enigma_convert_button.removeEventListener('click',event_convert_decode);
+                    enigma_convert_button.addEventListener('click',event_convert_encode);
+                    enigma_info.innerText='('+enigma_system.encode_enigma.weels.length+'weels and '+Object.keys(enigma_system.encode_enigma.plugboard).length/2+'plugs)';
+                }else{
+                    txt_decode.style.color="#0F0F";txt_encode.style.color="#000F";
+                    enigma_system.encode_last_out=output_text.value;
+                    enigma_system.encode_last_out_num=parseInt(output_counter.innerText.replace(/[\(\)]/g,''));
+                    enigma_system.encode_last_in=input_text.value;
+                    enigma_counter.value=get_counter(enigma_system.decode_enigma.weels).toString();
+                    input_text.value=enigma_system.decode_last_in;
+                    output_text.value=enigma_system.decode_last_out;
+                    output_counter.innerText='('+enigma_system.decode_last_out_num+')';
+                    input_text.dispatchEvent(new Event('input',{bubbles:false}));
+                    enigma_convert_button.removeEventListener('click',event_convert_encode);
+                    enigma_convert_button.addEventListener('click',event_convert_decode);
+                    enigma_info.innerText='('+enigma_system.decode_enigma.weels.length+'weels and '+Object.keys(enigma_system.decode_enigma.plugboard).length/2+'plugs)';
+                }
+                console.log(`switched to ${toggle_en_decode.checked?'en':'de'}coding`);
+                loader.style.display='none';
+            });
+            switch_area.addEventListener('click',event=>{
+                if(event.target==toggle_en_decode||event.target==switch_label||event.target==switch_slider){return;}
+                toggle_en_decode.checked=!toggle_en_decode.checked;
+                toggle_en_decode.dispatchEvent(new Event('change',{bubbles:false}));
+                toggle_en_decode.focus();
+            });
+            enigma_info.addEventListener('click',event=>{
+                if(window.getSelection().toString().length==0){
+                    if(toggle_en_decode.checked){
+                        blurer.style.display='';
+                        edit_encode_machine.style.display='';
+                        edit_encode_section_create_new.style.display='';
+                        edit_encode_section_load_file.style.display='';
+                        edit_encode_section_save_file.style.display='';
+                        edit_encode_section_abort.style.display='';
+                        edit_encode_input_chars.value=enigma_system.encode_enigma.chars.join('');
+                        edit_encode_weels_num.value=enigma_system.encode_enigma.weels.length;
+                        edit_encode_plugs_num.value=Object.keys(enigma_system.encode_enigma.plugboard).length/2;
+                        edit_encode_input_chars.dispatchEvent(new Event('change',{bubbles:false}));
+                        edit_encode_weels_num.dispatchEvent(new Event('input',{bubbles:false}));
+                        edit_encode_plugs_num.dispatchEvent(new Event('input',{bubbles:false}));
+                    }else{
+                        blurer.style.display='';
+                        edit_decode_machine.style.display='';
+                        edit_decode_section_copy_encoding.style.display='';
+                        edit_decode_section_load_file.style.display='';
+                        edit_decode_section_abort.style.display='';
+                    }
+                }
+            });
+            enigma_counter.addEventListener('click',event=>{
+                if(window.getSelection().toString().length==0){
+                    loader.style.display='';
+                    if(toggle_en_decode.checked){
+                        const old_num=get_counter(enigma_system.encode_enigma.weels);
+                        let new_num=prompt('please set \'turn\' number\nfor encode-enigma\n(only positive integers)',old_num||'0');
+                        if(new_num!==null){
+                            while(new_num==""||isNaN(new_num)||+new_num<0||!isFinite(+new_num)){
+                                alert('!only positive integers!');
+                                new_num=prompt('please set \'turn\' number\nfor encode-enigma\n(!only positive integers!)',old_num||'0');
+                            }
+                            if(+new_num!==old_num){
+                                set_turn_num(enigma_system.encode_enigma.weels,+new_num);
+                                console.log(`set_turn[${old_num}->${+new_num}]`);
+                                enigma_counter.value=new_num;
+                            }
+                        }
+                    }else{
+                        const old_num=get_counter(enigma_system.decode_enigma.weels);
+                        let new_num=prompt('please set \'turn\' number\nfor decode-enigma\n(only positive integers)',old_num||'0');
+                        if(new_num!==null){
+                            while(new_num==""||isNaN(new_num)||+new_num<0||!isFinite(+new_num)){
+                                alert('!only positive integers!');
+                                new_num=prompt('please set \'turn\' number\nfor decode-enigma\n(!only positive integers!)',old_num||'0');
+                            }
+                            if(+new_num!==old_num){
+                                set_turn_num(enigma_system.decode_enigma.weels,+new_num);
+                                console.log(`set_turn[${old_num}->${+new_num}]`);
+                                enigma_counter.value=new_num;
+                            }
+                        }
+                    }
+                    loader.style.display='none';
+                }
+            });
+            edit_decode_copy_button.addEventListener('click',event=>{
+                loader.style.display='';
+                edit_decode_machine.style.display='none';
+                blurer.style.display='none';
+                enigma_system.decode_enigma = JSON.parse(JSON.stringify(enigma_system.encode_enigma));
+                enigma_info.innerText='('+enigma_system.decode_enigma.weels.length+'weels and '+Object.keys(enigma_system.decode_enigma.plugboard).length/2+'plugs)';
+                enigma_counter.value=get_counter(enigma_system.decode_enigma.weels).toString();
+                enigma_system.decode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.decode_enigma.chars.join(''))}]`,'gum');
+                console.log('decoding-enigma mirrored from encoding');
+                loader.style.display='none';
+            });
+            edit_decode_load_file.addEventListener('change',event=>{
+                loader.style.display='';
+                const deode_file_reader = new FileReader();
+                deode_file_reader.addEventListener('loadend',event=>{
+                    enigma_system.decode_enigma=JSON.parse(decode_unicode_2b64(deode_file_reader.result));
+                    enigma_info.innerText='('+enigma_system.decode_enigma.weels.length+'weels and '+Object.keys(enigma_system.decode_enigma.plugboard).length/2+'plugs)';
+                    enigma_counter.value=get_counter(enigma_system.decode_enigma.weels).toString();
+                    edit_decode_machine.style.display='none';
+                    blurer.style.display='none';
+                    enigma_system.decode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.decode_enigma.chars.join(''))}]`,'gum');
+                    console.log('decoding-enigma loaded');
+                    loader.style.display='none';
+                });
+                if(/\.enigma$/.test(edit_decode_load_file.files[0].name)){deode_file_reader.readAsText(edit_decode_load_file.files[0],'UTF-8');}
+                else{alert("!select an enigma-machine file!");}
+            });
+            edit_encode_input_chars.addEventListener('change',event=>{edit_encode_input_chars.value=Array.from(new Set(Array.from(edit_encode_input_chars.value))).join('')});
+            edit_encode_weels_num.addEventListener('input',event=>{
+                if(edit_encode_weels_num.value.length<=0){return;}
+                if(+edit_encode_weels_num.value===NaN){edit_encode_weels_num.value='';return;}
+                if(Math.abs(Math.round(+edit_encode_weels_num.value))<1){edit_encode_weels_num.value='1';}
+                else if(Math.abs(Math.round(+edit_encode_weels_num.value))>500){edit_encode_weels_num.value='500';}
+                else {edit_encode_weels_num.value = Math.abs(Math.round(+edit_encode_weels_num.value)).toString();}
+                if(/^([1-9][0-9]?|[1-4][0-9][0-9]|500)$/.test(edit_encode_weels_num.value)&&edit_encode_weels_num.validity.valid){edit_encode_weels_num.setCustomValidity('');}
+                else{edit_encode_weels_num.setCustomValidity('!only integers from 1 to 500 included!');}
+                edit_encode_weels_num.reportValidity();
+            });
+            edit_encode_plugs_num.addEventListener('input',event=>{
+                if(edit_encode_plugs_num.value.length<=0){return;}
+                if(+edit_encode_plugs_num.value===NaN){edit_encode_plugs_num.value='';return;}
+                if(Math.abs(Math.round(+edit_encode_plugs_num.value))<0){edit_encode_plugs_num.value='0';}
+                else if(Math.abs(Math.round(+edit_encode_plugs_num.value))>Math.floor(edit_encode_input_chars.value.length/2)){edit_encode_plugs_num.value=Math.floor(edit_encode_input_chars.value.length/2).toString();}
+                else if(Math.abs(Math.round(+edit_encode_plugs_num.value))>500){edit_encode_plugs_num.value='500';}
+                else {edit_encode_plugs_num.value = Math.abs(Math.round(+edit_encode_plugs_num.value)).toString();}
+                if(/^(0|[1-9][0-9]?|[1-4][0-9][0-9]|500)$/.test(edit_encode_plugs_num.value)&&+edit_encode_plugs_num.value<=Math.floor(edit_encode_input_chars.value.length/2)&&edit_encode_weels_num.validity.valid){edit_encode_plugs_num.setCustomValidity('');}
+                else{edit_encode_plugs_num.setCustomValidity('!only integers from 0 to 500 included!max half the number of characters the enigma supports!');}
+                edit_encode_plugs_num.reportValidity();
+            });
+            edit_encode_weels_num.addEventListener('blur',event=>{if(edit_encode_weels_num.value.length<=0||+edit_encode_weels_num.value===NaN){edit_encode_weels_num.value='';return;}});
+            edit_encode_plugs_num.addEventListener('blur',event=>{if(edit_encode_plugs_num.value.length<=0||+edit_encode_plugs_num.value===NaN){edit_encode_plugs_num.value='';return;}});
+            edit_encode_create_button.addEventListener('click',event=>{
+                if(edit_encode_weels_num.value.length>0&&edit_encode_plugs_num.value.length>0&&edit_encode_input_chars.value.length>0){
+                    loader.style.display='';
+                    edit_encode_machine.style.display='none';
+                    blurer.style.display='none';
+                    enigma_system.encode_enigma=create_enigma(Array.from(new Set(Array.from(edit_encode_input_chars.value))),+edit_encode_weels_num.value,+edit_encode_plugs_num.value);
+                    enigma_info.innerText='('+enigma_system.encode_enigma.weels.length+'weels and '+Object.keys(enigma_system.encode_enigma.plugboard).length/2+'plugs)';
+                    enigma_system.encode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.encode_enigma.chars.join(''))}]`,'gum');
+                    console.log('encoding-enigma created');
+                    loader.style.display='none';
+                }
+            });
+            edit_encode_load_file.addEventListener('change',event=>{
+                loader.style.display='';
+                const encode_file_reader = new FileReader();
+                encode_file_reader.addEventListener('loadend',event=>{
+                    enigma_system.encode_enigma=JSON.parse(decode_unicode_2b64(encode_file_reader.result));
+                    enigma_info.innerText='('+enigma_system.encode_enigma.weels.length+'weels and '+Object.keys(enigma_system.encode_enigma.plugboard).length/2+'plugs)';
+                    enigma_counter.value=get_counter(enigma_system.encode_enigma.weels).toString();
+                    edit_encode_machine.style.display='none';
+                    blurer.style.display='none';
+                    enigma_system.encode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.encode_enigma.chars.join(''))}]`,'gum');
+                    console.log('encoding-enigma loaded');
+                    loader.style.display='none';
+                });
+                if(/\.enigma$/.test(edit_encode_load_file.files[0].name)){encode_file_reader.readAsText(edit_encode_load_file.files[0],'UTF-8');}
+                else{alert("!select an enigma-machine file!");}
+            });
+            edit_encode_save_file.addEventListener('click',event=>{
+                loader.style.display='';
+                edit_encode_machine.style.display='none';
+                blurer.style.display='none';
+                download(encode_unicode_2b64(JSON.stringify(enigma_system.encode_enigma)),new Date().toJSON().substr(0,23).replaceAll('-','_').replace('T','-').replaceAll(':','_').replace(/\.[0-9]{3}/,'')+'-encode.enigma');
+                console.log('encoding-enigma saved');
+                alert('keep it somewhere save!')
+                loader.style.display='none';
+            });
+            alert('hello there\n\nnote: this site is only client-side so take notes and save,\nbecause just a refresh and everything is gone!')
+            loader.style.display='none';
+        }
+    </script>
+</head>
+<body onload="start();">
+    <div id="box">
+        <h1 id="title"><a href="https://en.wikipedia.org/wiki/Enigma_machine" target="_blank" rel="noopener noreferrer" title="Enigma [wiki]">Enigma</a></h1>
+        <br><br>
+        <div id="enigma_info">(1weels and 0plugs)</div>
+        <br>
+        <input id="enigma_counter" type="number" min="0" step="1" readonly="true" title="turn counter of the enigma machine">
+        <br>
+        <div id="switch">
+            <txt id="txt_decode">Decode</txt>
+            <label class="switch"><input type="checkbox" checked="true" id="toggle_en_decode"><span class="slider"></span></label>
+            <txt id="txt_encode">Encode</txt>
+        </div>
+        <br>
+        <div id="conversion">
+            <div id="input">
+                <div id="input_counter">(0)</div>
+                <textarea id="input_text" maxlength="1000" style="white-space: pre-wrap;" spellcheck="true" placeholder="text (can be unicode)" title="text (can be unicode)"></textarea>
+            </div>
+            <input type="button" id="enigma_convert_button" value="▶">
+            <div id="output">
+                <div id="output_counter">(0)</div>
+                <textarea id="output_text" maxlength="1000" style="white-space: pre-wrap;" readonly="true" placeholder="output text" title="click to copy"></textarea>
+            </div>
+        </div>
+    </div>
+    <div id="blurer">
+        <div id="edit_decode_machine">
+            <div name="copy_encoding" style="all: unset;">
+                <input type="button" id="edit_decode_copy_button" value="copy encoding" title="use the same as encoding">
+                <hr size="2px" style="border-color:#0F0F;">
+            </div>
+            <div name="load_file" style="all: unset;">
+                <hr size="2px" style="border-color:#0F0F;">
+                <label for="edit_decode_load_file">Select save file:</label>
+                <input type="file" id="edit_decode_load_file" accept=".enigma">
+            </div>
+            <div name="abort" style="all: unset;">
+                <hr size="2px" style="border-color:#0F0F;">
+                <input type="button" value="abort" id="edit_decode_abort">
+            </div>
+        </div>
+        <div id="edit_encode_machine">
+            <div name="save_file">
+                <label for="edit_encode_save_file">Save current to file:</label>
+                <input type="button" value="save" id="edit_encode_save_file">
+                <hr size="2px" style="border-color:#0F0F;">
+            </div>
+            <div name="create_new" style="all: unset;">
+                <textarea id="edit_encode_input_chars" spellcheck="false" placeholder="new caracters - no seperator - can be unicode" title="input any characters you whant the machine to support (no seperator - can be unicode)"></textarea>
+                <br><br>
+                <input type="number" id="edit_encode_weels_num" min="0" step="1" max="100" placeholder="Weels" title="the number of weels the machine should have (used only in one direction)">
+                <input type="number" id="edit_encode_plugs_num" min="0" step="1" max="100" placeholder="Plugs" title="the number of plugs the machine should have">
+                <br><br>
+                <input type="button" id="edit_encode_create_button" value="done">
+            </div>
+            <div name="load_file" style="all: unset;">
+                <hr size="2px" style="border-color:#0F0F;">
+                <label for="edit_encode_load_file">Select save file:</label>
+                <input type="file" id="edit_encode_load_file" accept=".enigma">
+            </div>
+            <div name="abort" style="all: unset;">
+                <hr size="2px" style="border-color:#0F0F;">
+                <input type="button" value="abort" id="edit_encode_abort">
+            </div>
+        </div>
+    </div>
+    <div id="loader">
+        <div>
+            <svg width="100%" height="100%" viewBox="0 0 350 100">
+                <title>please wait...</title>
+                <rect x="0" y="0" width="100%" height="100%" style="fill: transparent;"/>
+                <g style="overflow:hidden;text-anchor: middle;">
+                    <defs>
+                        <mask id="textMask"><text style="fill: white;" x="175" y="55">please wait...</text></mask>
+                        <filter id="innerShadow" x="-15%" y="-15%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur"/>
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur2"/>
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur3"/>
+                            <feMerge result="blur">
+                                <feMergeNode in="blur" mode="normal"/>
+                                <feMergeNode in="blu2" mode="normal"/>
+                                <feMergeNode in="blur3" mode="normal"/>
+                            </feMerge>
+                            <feOffset in="blur" dx="0.7" dy="0.7"/>
+                        </filter>
+                    </defs>
+                    <g mask="url(#textMask)">
+                        <rect x="0" y="0" width="350" height="75" style="fill: black;"/>
+                        <text style="fill: #0f0f;filter: url(#innerShadow);" x="175" y="55">please wait...</text>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
+</body>
+</html>
