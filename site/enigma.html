@@ -997,6 +997,10 @@
                 enigma_counter.value=get_counter(enigma_system.decode_enigma.weels).toString();
                 enigma_system.decode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.decode_enigma.chars.join(''))}]`,'gum');
                 console.log('decoding-enigma mirrored from encoding');
+                input_text.value='';
+                output_text.value='';
+                output_counter.innerText='(0)';
+                enigma_counter.value='0';
                 loader.style.display='none';
             });
             edit_decode_load_file.addEventListener('change',event=>{
@@ -1010,6 +1014,10 @@
                     blurer.style.display='none';
                     enigma_system.decode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.decode_enigma.chars.join(''))}]`,'gum');
                     console.log('decoding-enigma loaded');
+                    input_text.value='';
+                    output_text.value='';
+                    output_counter.innerText='(0)';
+                    enigma_counter.value='0';
                     loader.style.display='none';
                 });
                 if(/\.enigma$/.test(edit_decode_load_file.files[0].name)){deode_file_reader.readAsText(edit_decode_load_file.files[0],'UTF-8');}
@@ -1049,6 +1057,10 @@
                     enigma_info.innerText='('+enigma_system.encode_enigma.weels.length+'weels and '+Object.keys(enigma_system.encode_enigma.plugboard).length/2+'plugs)';
                     enigma_system.encode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.encode_enigma.chars.join(''))}]`,'gum');
                     console.log('encoding-enigma created');
+                    input_text.value='';
+                    output_text.value='';
+                    output_counter.innerText='(0)';
+                    enigma_counter.value='0';
                     loader.style.display='none';
                 }
             });
@@ -1063,6 +1075,10 @@
                     blurer.style.display='none';
                     enigma_system.encode_regexp=new RegExp(`[^${escape_unicode_regexp(enigma_system.encode_enigma.chars.join(''))}]`,'gum');
                     console.log('encoding-enigma loaded');
+                    input_text.value='';
+                    output_text.value='';
+                    output_counter.innerText='(0)';
+                    enigma_counter.value='0';
                     loader.style.display='none';
                 });
                 if(/\.enigma$/.test(edit_encode_load_file.files[0].name)){encode_file_reader.readAsText(edit_encode_load_file.files[0],'UTF-8');}
