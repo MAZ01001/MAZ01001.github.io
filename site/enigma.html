@@ -314,7 +314,6 @@
         ::-webkit-scrollbar-track-piece {display: none;background-color: #0000;}
         ::-webkit-scrollbar-corner {display: none;background-color: #0000;}
     </style>
-    <script type="text/javascript" src="./code.js"></script>
     <script>
         //   __                  _   _
         //  / _|                | | (_)
@@ -570,12 +569,13 @@
          */
         function get_enigma_key(enigma_sys,key){
             if(enigma_sys.chars.includes(key)===false){return false;}
-            //plugboard → weels 0-x [turning++]
+            //plugboard → weels 0-x → plugboard [turning++]
             if(get_plugboard_val(enigma_sys.plugboard,key)!=undefined){key=get_plugboard_val(enigma_sys.plugboard,key).toString();}
             for(let i=0;i<enigma_sys.weels.length;i++){
                 if(get_weel_val(enigma_sys.weels[i].weel,key)===undefined){return false;}
                 key=get_weel_val(enigma_sys.weels[i].weel,key).toString();
             }
+            if(get_plugboard_val(enigma_sys.plugboard,key)!=undefined){key=get_plugboard_val(enigma_sys.plugboard,key).toString();}
             return key;
         }
         /**
@@ -586,7 +586,8 @@
          */
         function get_enigma_key_rev(enigma_sys,key){
             if(enigma_sys.chars.includes(key)===false){return false;}
-            //weels x-0 → plugboard [turning++]
+            //plugboard → weels x-0 → plugboard [turning++]
+            if(get_plugboard_val_rev(enigma_sys.plugboard,key)!=undefined){key=get_plugboard_val_rev(enigma_sys.plugboard,key).toString();}
             for(let i=enigma_sys.weels.length-1;i>=0;i--){
                 if(get_weel_val_rev(enigma_sys.weels[i].weel,key)===undefined){return false;}
                 key=get_weel_val_rev(enigma_sys.weels[i].weel,key).toString();
