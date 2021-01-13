@@ -240,9 +240,19 @@
             font-size: xx-large;
             font-weight: bold;
             cursor: pointer;
-            width: 4.1em;
+            width: 3.1em;
             height: 1.1em;
             border: 2px inset #777F;
+            border-radius: 15px;
+            text-align: center;
+        }
+        label[for=edit_encode_weels_num],label[for=edit_encode_plugs_num],
+        div#edit_encode_machine>div[name=create_new]>div{font-size: 1.3em;}
+        div#edit_encode_machine>div[name=create_new] br{
+            display: block;
+            margin-top: 10px;
+            line-height: 10px;
+            content: "";
         }
         input#edit_encode_weels_num:valid,input#edit_encode_plugs_num:valid{border-color: #0f0;}
         input#edit_encode_weels_num:invalid,input#edit_encode_plugs_num:invalid{border-color: #f00;}
@@ -355,10 +365,9 @@
          * __special function for creating a "plugboard"__
          * @param {string[]} allCharsArr ascii chars
          * @param {number} plugs maximum plugs used _default=`10`_
-         * @param {boolean} gost_entries allow for `'A':'A'` _default=`false`_
          * @returns {{}|{string:string;}} a plugboard as object
          */
-        function create_plugboard(allCharsArr,plugs=10,gost_entries=false){
+        function create_plugboard(allCharsArr,plugs=10){
             if(plugs>Math.floor(allCharsArr.length/2)){plugs=Math.floor(allCharsArr.length/2);}
             let tmp={};
             for (let i = 0; i < plugs; i++) {
@@ -367,12 +376,8 @@
                 while(tmp[ascii1]!=undefined){
                     ascii1 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))];
                 }
-                while(tmp[ascii2]!=undefined){
-                    if(ascii1==ascii2 && !gost_entries){
-                        while(ascii1==ascii2){
-                            ascii2 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))]
-                        }
-                    }else{ascii2 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))]}
+                while(ascii1==ascii2||tmp[ascii2]!=undefined){
+                    ascii2 = allCharsArr[Math.round(map_num(Math.random(),0,1,0,allCharsArr.length-1))];
                 }
                 tmp[ascii1]=ascii2;
                 tmp[ascii2]=ascii1;
@@ -388,10 +393,11 @@
          */
         function create_enigma(ascii_char_arr,weels_num=8,plug_num=4){
             if(plug_num<0){plug_num=0;}
-            if(plug_num>Math.floor(ascii_char_arr.length/2)){plug_num=Math.floor(ascii_char_arr.length/2);}
             if(plug_num>500){plug_num=500;}
+            if(plug_num>Math.floor(ascii_char_arr.length/2)){plug_num=Math.floor(ascii_char_arr.length/2);}
             if(weels_num<1){weels_num=1;}
             if(weels_num>500){weels_num=500;}
+            while(!isFinite(Math.pow(ascii_char_arr.length,weels_num))){weels_num--;}
             let weels = [],
                 plugboard = create_plugboard(ascii_char_arr,plug_num);
             /*
@@ -464,8 +470,7 @@
          */
         function get_counter(weels_arr){
             if(weels_arr==undefined){return false;}
-            let sumlength=1,n=0;
-            weels_arr.forEach(function(value,index,array){sumlength*=(value.length>0?value.length:1);});
+            let sumlength=Math.pow(weels_arr[0].length,weels_arr.length),n=0;
             for(let i=weels_arr.length-1;i>=0;i--) {
                 sumlength/=weels_arr[i].length;
                 n+=(sumlength*weels_arr[i].turnCounter);
@@ -1013,18 +1018,19 @@
             edit_encode_weels_num.addEventListener('input',event=>{
                 if(edit_encode_weels_num.value.length<=0){return;}
                 if(+edit_encode_weels_num.value===NaN){edit_encode_weels_num.value='';return;}
+                while(!isFinite(Math.pow(edit_encode_input_chars.value.length,edit_encode_weels_num.value))){edit_encode_weels_num.value=edit_encode_weels_num.value-1;}
                 if(Math.abs(Math.round(+edit_encode_weels_num.value))<1){edit_encode_weels_num.value='1';}
                 else if(Math.abs(Math.round(+edit_encode_weels_num.value))>500){edit_encode_weels_num.value='500';}
                 else {edit_encode_weels_num.value = Math.abs(Math.round(+edit_encode_weels_num.value)).toString();}
                 if(/^([1-9][0-9]?|[1-4][0-9][0-9]|500)$/.test(edit_encode_weels_num.value)&&edit_encode_weels_num.validity.valid){edit_encode_weels_num.setCustomValidity('');}
-                else{edit_encode_weels_num.setCustomValidity('!only integers from 1 to 500 included!');}
+                else{edit_encode_weels_num.setCustomValidity('!only integers from 1 to 500 included!auto max of what js can still calculate!');}
                 edit_encode_weels_num.reportValidity();
             });
             edit_encode_plugs_num.addEventListener('input',event=>{
                 if(edit_encode_plugs_num.value.length<=0){return;}
                 if(+edit_encode_plugs_num.value===NaN){edit_encode_plugs_num.value='';return;}
+                if(Math.abs(Math.round(+edit_encode_plugs_num.value))>Math.floor(edit_encode_input_chars.value.length/2)){edit_encode_plugs_num.value=Math.floor(edit_encode_input_chars.value.length/2).toString();}
                 if(Math.abs(Math.round(+edit_encode_plugs_num.value))<0){edit_encode_plugs_num.value='0';}
-                else if(Math.abs(Math.round(+edit_encode_plugs_num.value))>Math.floor(edit_encode_input_chars.value.length/2)){edit_encode_plugs_num.value=Math.floor(edit_encode_input_chars.value.length/2).toString();}
                 else if(Math.abs(Math.round(+edit_encode_plugs_num.value))>500){edit_encode_plugs_num.value='500';}
                 else {edit_encode_plugs_num.value = Math.abs(Math.round(+edit_encode_plugs_num.value)).toString();}
                 if(/^(0|[1-9][0-9]?|[1-4][0-9][0-9]|500)$/.test(edit_encode_plugs_num.value)&&+edit_encode_plugs_num.value<=Math.floor(edit_encode_input_chars.value.length/2)&&edit_encode_weels_num.validity.valid){edit_encode_plugs_num.setCustomValidity('');}
@@ -1104,7 +1110,7 @@
     <div id="blurer">
         <div id="edit_decode_machine">
             <div name="copy_encoding" style="all: unset;">
-                <input type="button" id="edit_decode_copy_button" value="copy encoding" title="use the same as encoding">
+                <input type="button" id="edit_decode_copy_button" value="mirror encoding" title="copy the encoding-enigma">
                 <hr size="2px" style="border-color:#0F0F;">
             </div>
             <div name="load_file" style="all: unset;">
@@ -1114,7 +1120,7 @@
             </div>
             <div name="abort" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
-                <input type="button" value="abort" id="edit_decode_abort">
+                <input type="button" value="abort" id="edit_decode_abort" title="go back without changes">
             </div>
         </div>
         <div id="edit_encode_machine">
@@ -1124,12 +1130,16 @@
                 <hr size="2px" style="border-color:#0F0F;">
             </div>
             <div name="create_new" style="all: unset;">
+                <div>Characters:</div>
                 <textarea id="edit_encode_input_chars" spellcheck="false" placeholder="new caracters - no seperator - can be unicode" title="input any characters you whant the machine to support (no seperator - can be unicode)"></textarea>
                 <br><br>
-                <input type="number" id="edit_encode_weels_num" min="0" step="1" max="100" placeholder="Weels" title="the number of weels the machine should have (used only in one direction)">
-                <input type="number" id="edit_encode_plugs_num" min="0" step="1" max="100" placeholder="Plugs" title="the number of plugs the machine should have">
+                <label for="edit_encode_weels_num">Weels:</label>
+                <input type="number" id="edit_encode_weels_num" min="0" step="1" max="500" placeholder="Weels" title="the number of weels the machine should have (used only in one direction) [1~500]">
                 <br><br>
-                <input type="button" id="edit_encode_create_button" value="done">
+                <label for="edit_encode_plugs_num">Plugs:</label>
+                <input type="number" id="edit_encode_plugs_num" min="0" step="1" max="500" placeholder="Plugs" title="the number of plugs the machine should have [0~500]">
+                <br><br>
+                <input type="button" id="edit_encode_create_button" value="done" title="create new enigma with values above">
             </div>
             <div name="load_file" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
@@ -1138,7 +1148,7 @@
             </div>
             <div name="abort" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
-                <input type="button" value="abort" id="edit_encode_abort">
+                <input type="button" value="abort" id="edit_encode_abort" title="go back without changes">
             </div>
         </div>
     </div>
