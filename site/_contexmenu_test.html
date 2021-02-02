@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body{background-color: #aaa;}
+        div#box{
+            border-radius: 4em;
+            text-align: center;
+            background-color: #777;
+            width: 90vw;
+            height: 90vh;
+            position: fixed;
+            transform: translate(-50%,-50%);
+            top: 50%;
+            left: 50%;
+        }
+        div#rmenu {
+            opacity: 0;
+            position: fixed;
+            top: -2em;
+            left: -2em;
+            transform: translate(-100%,-100%);
+            overflow: overlay;
+            max-width: max-content;
+            max-height: 100vh;
+            transition: opacity 500ms ease-in 500ms, top 0s linear 1s, left 0s linear 1s, transform 0s linear 1s;
+            border: 10px solid black;
+            background: #000F;
+            color: #0F0F;
+            height: fit-content;
+            width: fit-content;
+        }
+        div#rmenu.visible {
+            opacity: 1;
+            transition: opacity 0s linear 0s, top 0s linear 0s, left 0s linear 0s, transform 0s linear 0s;
+        }
+    </style>
+</head>
+<body>
+    <div id="box" class="addContext">
+        <h1>test RM-click</h1>
+    </div>
+    <div id="rmenu">
+        <!-- custom contextmenu here -->
+        <div style="display:inline-block;background-color:#333;">
+            <h1>test test test test test test</h1>
+            <br><br><br><br><br><h2>big</h2>
+        </div>
+        <script>
+            // contextAll => elements who should have the menu
+            const rmenu=document.getElementById('rmenu'),
+                contextAll=document.body.querySelectorAll('.addContext');
+            contextAll.forEach(function(value,key,parent){value.addEventListener('contextmenu',event=>{
+                if(event.path.includes(rmenu)){return;}
+                event.preventDefault();
+                rmenu.dataset.top=event.pageY+'px';
+                rmenu.dataset.left=event.pageX+'px';
+                if(rmenu.getBoundingClientRect().height>(window.innerHeight-event.pageY)){
+                    if(rmenu.getBoundingClientRect().height>window.innerHeight){
+                        if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(-100%,-'+event.pageY+'px)';}
+                        else{rmenu.dataset.transform='translate(0,-'+event.pageY+'px)';}
+                    }else{
+                        if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(-100%,-'+(rmenu.getBoundingClientRect().height-(window.innerHeight-event.pageY))+'px)';}
+                        else{rmenu.dataset.transform='translate(0,-'+(rmenu.getBoundingClientRect().height-(window.innerHeight-event.pageY))+'px)';}
+                    }
+                }else{
+                    if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(-100%,0)';}
+                    else{rmenu.dataset.transform='translate(0,0)';}
+                }
+                rmenu.style.top=rmenu.dataset.top;
+                rmenu.style.left=rmenu.dataset.left;
+                rmenu.style.transform=rmenu.dataset.transform;
+                rmenu.classList.add('visible');
+            });});
+            rmenu.addEventListener('mouseleave',event=>{
+                rmenu.classList.remove('visible');
+                rmenu.style.top='';
+                rmenu.style.left='';
+                rmenu.style.transform='';
+            });
+            rmenu.addEventListener('mouseover',event=>{
+                rmenu.classList.add('visible');
+                rmenu.style.top=rmenu.dataset.top;
+                rmenu.style.left=rmenu.dataset.left;
+                rmenu.style.transform=rmenu.dataset.transform;
+            });
+        </script>
+    </div>
+</body>
+</html>
