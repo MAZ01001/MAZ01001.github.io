@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vektor-Field</title>
+    <style>
+        body{
+            background-color: #222;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../libraries/p5_min-1.1.9/p5.min.js"></script>
+    <script>
+        class _Vector{
+            values={
+                dir:{ // direction
+                    min:0.01,max:1, // length in % [0-1]
+                    x:0,y:0, // pos of vec-arrow in canvas [0+]
+                    m:20, // length in pixel [0+]
+                    am:0, // used for angle (in rad)
+                    xt:false, // used for angle (right==false)
+                    ang:0, // current angle (in deg)
+                },
+                pos:{x:0,y:0,}, // pos in canvas
+                col:{ // color
+                    min:0,max:1, // color clipping in % [0-1]
+                    cmin:240,cmax:0, // color hue [0-360]
+                    rgb:[0,0,0], //current rgb-color
+                },
+                lm:0, // distance from origin to mouse (in canvas)
+                lv:0, // length of vec in px (% * px-max)
+            };
+            /**
+             * __calc values and color__
+             */
+            calc_move(_mX=mouseX,_mY=mouseY){
+                const _max_dis=sqrt(
+                    pow(
+                        ((width-this.values.pos.x)>this.values.pos.x)?
+                        (width-this.values.pos.x):this.values.pos.x
+                    ,2)+pow(
+                        ((height-this.values.pos.y)>this.values.pos.y)?
+                        (height-this.values.pos.y):this.values.pos.y
+                    ,2)
+                );
+                const _g = _mY - this.values.pos.y,
+                    _a = _mX - this.values.pos.x;
+                this.values.dir.am = atan(_g/_a);
+                this.values.lm = sqrt(_g*_g+_a*_a);
+                const _length=map(this.values.lm,0,_max_dis,this.values.dir.min,this.values.dir.max);
+                const _cos=cos(this.values.dir.am)*this.values.dir.m*_length,
+                    _sin=sin(this.values.dir.am)*this.values.dir.m*_length;
+                this.values.dir.xt=_a<0;
+                if(this.values.dir.xt){
+                    this.values.dir.x=this.values.pos.x-(_cos);
+                    this.values.dir.y=this.values.pos.y-(_sin);
+                }else{
+                    this.values.dir.x=this.values.pos.x+_cos;
+                    this.values.dir.y=this.values.pos.y+_sin;
+                }
+                this.values.lv = sqrt(
+                    ((this.values.dir.x-this.values.pos.x)*
+                    (this.values.dir.x-this.values.pos.x))+
+                    ((this.values.dir.y-this.values.pos.y)*
+                    (this.values.dir.y-this.values.pos.y))
+                );
+                this.calc_color();
+                this.calc_ang();
+            }
+            /**
+             * __calc color__
+             */
+            calc_color(){
+                this.values.col.rgb=hue_rgb(map(this.values.lv,
+                this.values.col.min*this.values.dir.m,
+                this.values.col.max*this.values.dir.m,
+                this.values.col.cmin,
+                this.values.col.cmax
+                ));
+            }
+            /**
+             * __calc real angle in deg__
+             */
+            calc_ang(){
+                //  rad2deg > *(180/PI)
+                //  deg2rad > *(PI/180)
+                if(this.values.dir.xt){this.values.dir.ang=((-this.values.dir.am)*(180/PI))+180;}
+                else{
+                    if(this.values.dir.am<0){this.values.dir.ang=(-this.values.dir.am)*(180/PI);}
+                    else if(this.values.dir.am>0){this.values.dir.ang=((-this.values.dir.am)*(180/PI))+360;}
+                    else{this.values.dir.ang=0;}
+                }
+            }
+            /**
+             * __set vector pos in canvas__
+             * @param {number} _x - Xpos in canvas - _default `0`_
+             * @param {number} _y - Ypos in canvas - _default `0`_
+             */
+            set_pos(_x=0,_y=0){
+                this.values.pos.x=_x;
+                this.values.pos.y=_y;
+                this.calc_move();
+            }
+            /**
+             * __print vec as p5-object on canvas__
+             */
+            print(){
+                strokeWeight(3);
+                stroke(this.values.col.rgb);
+                fill(0);
+                line(this.values.pos.x, this.values.pos.y, this.values.dir.x, this.values.dir.y);
+                push();
+                translate(this.values.dir.x,this.values.dir.y);
+                rotate(this.values.dir.am);
+                triangle(
+                    this.values.dir.xt?10:-10,-5,
+                    0,0,
+                    this.values.dir.xt?10:-10,5
+                );
+                pop();
+            }
+            /**
+             * __create new vector__
+             * @param {number} _x - Xpos in canvas `[0+]` - _default `0`_
+             * @param {number} _y - Ypos in canvas `[0+]` - _default `0`_
+             * @param {number} _m - max length in pixel `[1-500]` - _default `20`_
+             * @param {number} _min - min length in % `[0-1]` - _default `0.01`_
+             * @param {number} _max - max length in % `[0-1]` - _default `1`_
+             * @param {number} _cmin - color-clip start in % `[0-1]` - _default `0`_
+             * @param {number} _cmax - color-clip end in % `[0-1]` - _default `1`_
+             * @param {number} _ccmin - color-hue start in deg `[0-360]` - _default `240`_
+             * @param {number} _ccmax - color-hue end in deg `[0-360]` - _default `0`_
+             */
+            constructor(_x=0,_y=0,_m=20,_min=0.01,_max=1,_cmin=0,_cmax=1,_ccmin=240,_ccmax=0){
+                this.set_pos(_x,_y);
+                this.values.dir.m=_m;
+                this.values.dir.min=_min;
+                this.values.dir.max=_max;
+                this.values.col.min=_cmin;
+                this.values.col.max=_cmax;
+                this.values.col.cmin=_ccmin;
+                this.values.col.cmax=_ccmax;
+            }
+        };
+        let last_fps=0,lastMX = 0,lastMY = 0,varr = [];
+        const lastMDif=0,_FPS=30;
+        function setup() {
+            createCanvas(windowWidth, windowHeight - 0);
+            lastMX=mouseX;
+            lastMY=mouseY;
+            /* Create field: */
+            for (let _x = 20; _x < width; _x+=50) {
+                for (let _y = 20; _y < height; _y+=50) {
+                    varr.push(new _Vector(_x,_y,20,0.1,2.5));
+                }
+            }
+            frameRate(_FPS);
+        }
+        function draw() {
+            {/* background */
+                strokeWeight(3);
+                stroke('blue');
+                fill('#202020');
+                rectMode(CORNER);
+                rect(0, 0, width, height);
+            }
+            if((lastMX-lastMDif)>mouseX||mouseX>(lastMX+lastMDif)||(lastMY-lastMDif)>mouseY||mouseY>(lastMY+lastMDif)){
+                lastMX=mouseX;lastMY=mouseY;
+                /* Your function here */
+                for(const vec of varr){vec.calc_move(mouseX,mouseY);}
+            }
+            for(const vec of varr){vec.print();}
+            {/* cursor and fps */
+                strokeWeight(1);
+                stroke('black');
+                noCursor();
+                noFill();
+                line(mouseX, 0, mouseX, height);
+                line(0, mouseY, width, mouseY);
+                textAlign(LEFT, BOTTOM);
+                noStroke();
+                textSize(12);
+                fill('yellow');
+                text(
+                    `x: ${parseInt(mouseX)}\ny: ${parseInt(mouseY)}`,
+                    ((mouseX+50)>width)?mouseX-50:mouseX+4,
+                    ((mouseY-50)<0)?mouseY+32:mouseY-4
+                );
+                textAlign(LEFT, TOP);
+                textSize(14);
+                strokeWeight(4);
+                stroke('black');
+                fill('lime');
+                text(`FPS ${round((last_fps+frameRate())/2)}/${_FPS}`,4,4);
+                last_fps=frameRate();
+            }
+        }
+        function mouseWheel(event) {
+            /*
+                vec.values.col:
+                step 0.02       step 1
+                shift > min     +alt > cmin
+                ctrl > max      +alt > cmax
+            */
+            const _min=1,_max=500,_cmin=0,_cmax=1,_ccmin=0,_ccmax=360,_cstep=0.02,_ccstep=1;
+            if(event.shiftKey&&!event.ctrlKey&&event.altKey){
+                for (const vektor of varr) {
+                    if(event.delta>0){vektor.values.col.cmin-=_ccstep;}
+                    else if(event.delta<0){vektor.values.col.cmin+=_ccstep;}
+                    if(vektor.values.col.cmin >_ccmax){vektor.values.col.cmin =_ccmax;}
+                    else if(vektor.values.col.cmin <_ccmin){vektor.values.col.cmin =_ccmin;}
+                    vektor.calc_color(mouseX,mouseY);
+                }
+                console.log("%ccol-cmin: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.cmin);
+            }else if(!event.shiftKey&&event.ctrlKey&&event.altKey){
+                for (const vektor of varr) {
+                    if(event.delta>0){vektor.values.col.cmax-=_ccstep;}
+                    else if(event.delta<0){vektor.values.col.cmax+=_ccstep;}
+                    if(vektor.values.col.cmax >_ccmax){vektor.values.col.cmax =_ccmax;}
+                    else if(vektor.values.col.cmax <_ccmin){vektor.values.col.cmax =_ccmin;}
+                    vektor.calc_color(mouseX,mouseY);
+                }
+                console.log("%ccol-cmax: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.cmax);
+            }else if(event.shiftKey&&!event.ctrlKey&&!event.altKey){
+                for (const vektor of varr) {
+                    if(event.delta>0){vektor.values.col.min-=_cstep;}
+                    else if(event.delta<0){vektor.values.col.min+=_cstep;}
+                    if(vektor.values.col.min >_cmax){vektor.values.col.min =_cmax;}
+                    else if(vektor.values.col.min <_cmin){vektor.values.col.min =_cmin;}
+                    vektor.calc_color(mouseX,mouseY);
+                }
+                console.log("%ccol-min: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.min);
+            }else if(!event.shiftKey&&event.ctrlKey&&!event.altKey){
+                for (const vektor of varr) {
+                    if(event.delta>0){vektor.values.col.max-=_cstep;}
+                    else if(event.delta<0){vektor.values.col.max+=_cstep;}
+                    if(vektor.values.col.max >_cmax){vektor.values.col.max =_cmax;}
+                    else if(vektor.values.col.max <_cmin){vektor.values.col.max =_cmin;}
+                    vektor.calc_color(mouseX,mouseY);
+                }
+                console.log("%ccol-max: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.max);
+            }else{
+                for (const vektor of varr) {
+                    if(event.delta>0){vektor.values.dir.m--;}
+                    else if(event.delta<0){vektor.values.dir.m++;}
+                    if(vektor.values.dir.m>_max){vektor.values.dir.m=_max;}
+                    else if(vektor.values.dir.m<_min){vektor.values.dir.m=_min;}
+                    vektor.calc_move(mouseX,mouseY);
+                }
+                console.log("%cdir-m: %d","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.dir.m);
+            }
+            return false;
+        }
+        /**
+         * __calc rgb from hue
+         * @param {number} h - hue in deg `[0-360]`
+         * @returns {[3]} - rgb as array `[R,G,B]`
+         */
+        function hue_rgb(h=240){
+            // hsl: [h,1,0.5]
+            const hueToRgb=function hueToRgb(t1, t2, hue) {
+                if (hue < 0) hue += 6;
+                if (hue >= 6) hue -= 6;
+                if (hue < 1) return (t2 - t1) * hue + t1;
+                else if(hue < 3) return t2;
+                else if(hue < 4) return (t2 - t1) * (4 - hue) + t1;
+                else return t1;
+            }
+            let t1, t2, r, g, b;
+            h = h / 60;
+            t2=1;
+            t1=1-t2;
+            r = hueToRgb(t1, t2, h + 2) * 255;
+            g = hueToRgb(t1, t2, h) * 255;
+            b = hueToRgb(t1, t2, h - 2) * 255;
+            return [r,g,b];
+        }
+        function windowResized(){resizeCanvas(windowWidth, windowHeight);return false;}
+    </script>
+</head>
+<body></body>
+</html>
