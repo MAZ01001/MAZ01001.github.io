@@ -720,6 +720,7 @@ let dataObjects = {
             },
         },
     },
+    // TODO
     'awesome_sink':{
         idName:'awesome_sink', // lowercase name as id (only word char [a-z0-9_])
         name:'AWESOME Sink', // main-product

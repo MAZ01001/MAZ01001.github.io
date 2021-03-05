@@ -11,29 +11,91 @@
             overflow: hidden;
         }
     </style>
-    <script src="../libraries/p5_min-1.1.9/p5.min.js"></script>
+    <script src="../libraries/p5_min-1.2.0/p5.min.js"></script>
     <script>
         class _Vector{
             values={
-                dir:{ // direction
-                    min:0.01,max:1, // length in % [0-1]
-                    x:0,y:0, // pos of vec-arrow in canvas [0+]
-                    m:20, // length in pixel [0+]
-                    am:0, // used for angle (in rad)
-                    xt:false, // used for angle (right==false)
-                    ang:0, // current angle (in deg)
+                /** @type {{}} - direction - group */
+                dir:{
+                    /** @type {number} - min-length in % `[0-1]` */
+                    min:0.01,
+                    /** @type {number} - max-length in % `[0-1]` */
+                    max:1,
+                    /** @type {number} - x-pos of vec-arrow in canvas `[0+]` */
+                    x:0,
+                    /** @type {number} - y-pos of vec-arrow in canvas `[0+]` */
+                    y:0,
+                    /** @type {number} - length in pixel `[0+]` */
+                    m:20,
+                    /** @type {number} - length in % (min-max) */
+                    pl:0,
+                    /** @type {number} - used for size length^fac `[0+]` */
+                    fac:1,
+                    /** @type {number} - used for angle (in rad) */
+                    am:0,
+                    /** @type {boolean} - used for angle (right==false) */
+                    xt:false,
+                    /** @type {number} - current angle (in deg) */
+                    ang:0,
                 },
-                pos:{x:0,y:0,}, // pos in canvas
-                col:{ // color
-                    min:0,max:1, // color clipping in % [0-1]
-                    cmin:240,cmax:0, // color hue [0-360]
-                    rgb:[0,0,0], //current rgb-color
+                /** @type {{}} - triangle/arrow-head - group */
+                tri:{
+                    //TODO more val here ~
+                    /** @type {number} - width in px `[0+]` */
+                    width:10,
+                    /** @type {number} - height in px `[0+]` */
+                    height:10,
+                    /** @type {[number]|string} - fill "css-color"/["r","g","b"] each `[0-255]` */
+                    fill:[0,0,0]||"black",
                 },
-                lm:0, // distance from origin to mouse (in canvas)
-                lv:0, // length of vec in px (% * px-max)
+                /** @type {{}} - pos - group */
+                pos:{
+                    /** @type {number} - x-pos in canvas in px `[0+]` */
+                    x:0,
+                    /** @type {number} - x-pos in canvas in px `[0+]` */
+                    y:0,
+                },
+                /** @type {{}} - color - group */
+                col:{
+                    /** @type {number} - min-color-clipping in % `[0-1]` */
+                    min:0,
+                    /** @type {number} - max-color-clipping in % `[0-1]` */
+                    max:1,
+                    /** @type {number} - min-color hue `[0-360]` */
+                    cmin:240,
+                    /** @type {number} - max-color hue `[0-360]` */
+                    cmax:0,
+                    /** @type {number[]} - current rgb-color `[r,g,b]` */
+                    rgb:[0,0,0],
+                },
+                /** @type {{}} - extras - group */
+                x:{
+                    /** @type {boolean} - render triangle _default `true`_ */
+                    triangle:true,
+                    /** @type {boolean} - render line _default `true`_ */
+                    line:true,
+                    /** @type {boolean} - triangle instead of a line _default `false`_ */
+                    tri_line:false,
+                    /**
+                     * @type {boolean} - render the triangle relatively small _default `false`_ 
+                     * @requires - **(tri_line==false)**
+                     */
+                    small_tri:false,
+                    /**
+                     * @type {boolean} - render the triangle relatively big _default `false`_
+                     * @requires - **(trie_line==false && small_tri==false)**
+                     */
+                    big_tri:false,
+                },
+                /** @type {number} - distance from origin to mouse _(in canvas)_ */
+                lm:0,
+                /** @type {number} - length of vec in px _(% * px-max)_ */
+                lv:0,
             };
             /**
              * __calc values and color__
+             * @param {number} _mX - Xpos in canvas to point the vector at - _default `mouseX`_
+             * @param {number} _mY - Ypos in canvas to point the vector at - _default `mouseY`_
              */
             calc_move(_mX=mouseX,_mY=mouseY){
                 const _max_dis=sqrt(
@@ -49,9 +111,9 @@
                     _a = _mX - this.values.pos.x;
                 this.values.dir.am = atan(_g/_a);
                 this.values.lm = sqrt(_g*_g+_a*_a);
-                const _length=map(this.values.lm,0,_max_dis,this.values.dir.min,this.values.dir.max);
-                const _cos=cos(this.values.dir.am)*this.values.dir.m*_length,
-                    _sin=sin(this.values.dir.am)*this.values.dir.m*_length;
+                this.values.dir.pl=map(this.values.lm,0,_max_dis,this.values.dir.min,this.values.dir.max);
+                const _cos=cos(this.values.dir.am)*pow(this.values.dir.m*this.values.dir.pl,this.values.dir.fac),
+                    _sin=sin(this.values.dir.am)*pow(this.values.dir.m*this.values.dir.pl,this.values.dir.fac);
                 this.values.dir.xt=_a<0;
                 if(this.values.dir.xt){
                     this.values.dir.x=this.values.pos.x-(_cos);
@@ -73,11 +135,11 @@
              * __calc color__
              */
             calc_color(){
-                this.values.col.rgb=hue_rgb(map(this.values.lv,
-                this.values.col.min*this.values.dir.m,
-                this.values.col.max*this.values.dir.m,
-                this.values.col.cmin,
-                this.values.col.cmax
+                this.values.col.rgb=hue_rgb(map(this.values.lv/2,
+                    this.values.col.min*this.values.dir.m,
+                    this.values.col.max*this.values.dir.m,
+                    this.values.col.cmin,
+                    this.values.col.cmax
                 ));
             }
             /**
@@ -110,32 +172,40 @@
                 strokeWeight(3);
                 stroke(this.values.col.rgb);
                 fill(0);
-                line(this.values.pos.x, this.values.pos.y, this.values.dir.x, this.values.dir.y);
-                push();
-                translate(this.values.dir.x,this.values.dir.y);
-                rotate(this.values.dir.am);
-                triangle(
-                    this.values.dir.xt?10:-10,-5,
-                    0,0,
-                    this.values.dir.xt?10:-10,5
-                );
-                pop();
+                if(!this.values.x.line&&!this.values.x.triangle){ellipse(this.values.pos.x, this.values.pos.y,1);}
+                if(this.values.x.line&&!this.values.x.big_tri&&!this.values.x.tri_line){line(this.values.pos.x, this.values.pos.y, this.values.dir.x, this.values.dir.y);}
+                if(this.values.x.triangle){
+                    push();
+                    translate(this.values.dir.x,this.values.dir.y);
+                    rotate(this.values.dir.am);
+                    const tr_h=this.values.x.tri_line?this.values.lv:(this.values.x.small_tri?1:(this.values.dir.m*(this.values.x.big_tri?1:0.1))*this.values.dir.pl*this.values.tri.height),
+                        tr_w=this.values.x.tri_line?(this.values.lv*0.5):(this.values.x.small_tri?1:(this.values.dir.m*(this.values.x.big_tri?1:0.1))*this.values.dir.pl*(this.values.tri.width*0.5));
+                    triangle(
+                        this.values.dir.xt?tr_h:-tr_h,-tr_w,
+                        0,0,
+                        this.values.dir.xt?tr_h:-tr_h,tr_w
+                    );
+                    pop();
+                }
             }
             /**
              * __create new vector__
              * @param {number} _x - Xpos in canvas `[0+]` - _default `0`_
              * @param {number} _y - Ypos in canvas `[0+]` - _default `0`_
              * @param {number} _m - max length in pixel `[1-500]` - _default `20`_
-             * @param {number} _min - min length in % `[0-1]` - _default `0.01`_
+             * @param {number} _fac - used for size length^fac `[>0]` - _default `1.333`_
+             * @param {number} _min - min length in % `[0-1]` - _default `0`_
              * @param {number} _max - max length in % `[0-1]` - _default `1`_
              * @param {number} _cmin - color-clip start in % `[0-1]` - _default `0`_
              * @param {number} _cmax - color-clip end in % `[0-1]` - _default `1`_
              * @param {number} _ccmin - color-hue start in deg `[0-360]` - _default `240`_
              * @param {number} _ccmax - color-hue end in deg `[0-360]` - _default `0`_
              */
-            constructor(_x=0,_y=0,_m=20,_min=0.01,_max=1,_cmin=0,_cmax=1,_ccmin=240,_ccmax=0){
+            constructor(_x=0,_y=0,_m=20,_fac=1.333,_min=0,_max=1,_cmin=0,_cmax=1,_ccmin=240,_ccmax=0){
+                //TODO add new vars in constructor
                 this.set_pos(_x,_y);
                 this.values.dir.m=_m;
+                this.values.dir.fac=_fac;
                 this.values.dir.min=_min;
                 this.values.dir.max=_max;
                 this.values.col.min=_cmin;
@@ -145,7 +215,11 @@
             }
         };
         let last_fps=0,lastMX = 0,lastMY = 0,varr = [];
-        const lastMDif=0,_FPS=30;
+        const _FPS=30;
+        let mouse_f=function(_mx,_my){/* Your mouse-function here */
+            for(const vec of varr){vec.calc_move(_mx,_my);}
+        };
+        let once_f=null;/* Your on-time-calc-function here */
         function setup() {
             createCanvas(windowWidth, windowHeight - 0);
             lastMX=mouseX;
@@ -153,12 +227,23 @@
             /* Create field: */
             for (let _x = 20; _x < width; _x+=50) {
                 for (let _y = 20; _y < height; _y+=50) {
-                    varr.push(new _Vector(_x,_y,20,0.1,2.5));
+                    varr.push(new _Vector(_x,_y));
                 }
             }
+            console.log("%cmake functions with\n%c  %s \n  %s \n%calso try: \n%c  %s \n  %s ",
+                "background-color:#000;color:#0f0;font-size:1.5em;font-family:serif;",
+                "background-color:#000;color:#0f0;font-family:monospace;",
+                "mouse_f=function(_mx,_my){/*varr[]*/};",
+                "once_f=function(){/*varr[]*/};once_f();",
+                "background-color:#000;color:#0f0;font-size:1.5em;font-family:serif;",
+                "background-color:#000;color:#0f0;font-family:monospace;",
+                "varr.forEach(e=>e.values.x.big_tri=true);",
+                "varr.forEach(e=>e.values.x.tri_line=true);"
+            );
             frameRate(_FPS);
         }
         function draw() {
+            // TODO pause toggle "P" "return;"
             {/* background */
                 strokeWeight(3);
                 stroke('blue');
@@ -166,13 +251,12 @@
                 rectMode(CORNER);
                 rect(0, 0, width, height);
             }
-            if((lastMX-lastMDif)>mouseX||mouseX>(lastMX+lastMDif)||(lastMY-lastMDif)>mouseY||mouseY>(lastMY+lastMDif)){
+            if((mouseX!=lastMX||mouseY!=lastMY)&&once_f==null){
+                mouse_f(mouseX,mouseY);
                 lastMX=mouseX;lastMY=mouseY;
-                /* Your function here */
-                for(const vec of varr){vec.calc_move(mouseX,mouseY);}
             }
             for(const vec of varr){vec.print();}
-            {/* cursor and fps */
+            if(!mouseIsPressed){/* cursor */
                 strokeWeight(1);
                 stroke('black');
                 noCursor();
@@ -188,6 +272,8 @@
                     ((mouseX+50)>width)?mouseX-50:mouseX+4,
                     ((mouseY-50)<0)?mouseY+32:mouseY-4
                 );
+            }
+            {/* fps */
                 textAlign(LEFT, TOP);
                 textSize(14);
                 strokeWeight(4);
@@ -201,9 +287,10 @@
             /*
                 vec.values.col:
                 step 0.02       step 1
-                shift > min     +alt > cmin
-                ctrl > max      +alt > cmax
+                shift > min     +alt > col.cmin
+                ctrl > max      +alt > col.cmax
             */
+            //TODO shift scroll arrow head size min/max
             const _min=1,_max=500,_cmin=0,_cmax=1,_ccmin=0,_ccmax=360,_cstep=0.02,_ccstep=1;
             if(event.shiftKey&&!event.ctrlKey&&event.altKey){
                 for (const vektor of varr) {
