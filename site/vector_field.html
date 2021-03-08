@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+.  _   _  _____ _      _     _____   _____ _   _  ___________ _____ 
+. | | | ||  ___| |    | |   |  _  | |_   _| | | ||  ___| ___ \  ___|
+. | |_| || |__ | |    | |   | | | |   | | | |_| || |__ | |_/ / |__  
+. |  _  ||  __|| |    | |   | | | |   | | |  _  ||  __||    /|  __| 
+. | | | || |___| |____| |___\ \_/ /   | | | | | || |___| |\ \| |___ 
+. \_| |_/\____/\_____/\_____/\___/    \_/ \_| |_/\____/\_| \_\____/ 
+-->
 <head>
     <meta charset="UTF-8">
     <title>Vektor-Field</title>
@@ -13,7 +21,10 @@
     </style>
     <script src="../libraries/p5_min-1.2.0/p5.min.js"></script>
     <script>
-        class _Vector{
+        /**
+         * __Vector-Class for drawing one arrow with `p5.js` - lots of variables__
+         */
+         class _Vector{
             values={
                 /** @type {{}} - direction - group */
                 dir:{
@@ -40,13 +51,14 @@
                 },
                 /** @type {{}} - triangle/arrow-head - group */
                 tri:{
-                    //TODO more val here ~
                     /** @type {number} - width in px `[0+]` */
                     width:10,
                     /** @type {number} - height in px `[0+]` */
                     height:10,
-                    /** @type {[number]|string} - fill "css-color"/["r","g","b"] each `[0-255]` */
+                    /** @type {number[]|string} - fill `"css-color"`/`[R,G,B]` each `[0-255]` */
                     fill:[0,0,0]||"black",
+                    /** @type {number} - multi for length `[0.01+]` */
+                    m:0.1,
                 },
                 /** @type {{}} - pos - group */
                 pos:{
@@ -70,10 +82,12 @@
                 },
                 /** @type {{}} - extras - group */
                 x:{
-                    /** @type {boolean} - render triangle _default `true`_ */
-                    triangle:true,
+                    /** @type {boolean} - uses the `_Vector.dir.min` / `.max` / `.m` and `.fac` vars for size _default `true`_ */
+                    limit_dist:true,
                     /** @type {boolean} - render line _default `true`_ */
                     line:true,
+                    /** @type {boolean} - render triangle _default `true`_ */
+                    triangle:true,
                     /** @type {boolean} - triangle instead of a line _default `false`_ */
                     tri_line:false,
                     /**
@@ -87,6 +101,8 @@
                      */
                     big_tri:false,
                 },
+                /** @type {number} - stroke weight of arrow in px `[>0]` */
+                stroke_w:3,
                 /** @type {number} - distance from origin to mouse _(in canvas)_ */
                 lm:0,
                 /** @type {number} - length of vec in px _(% * px-max)_ */
@@ -98,36 +114,45 @@
              * @param {number} _mY - Ypos in canvas to point the vector at - _default `mouseY`_
              */
             calc_move(_mX=mouseX,_mY=mouseY){
-                const _max_dis=sqrt(
-                    pow(
-                        ((width-this.values.pos.x)>this.values.pos.x)?
-                        (width-this.values.pos.x):this.values.pos.x
-                    ,2)+pow(
-                        ((height-this.values.pos.y)>this.values.pos.y)?
-                        (height-this.values.pos.y):this.values.pos.y
-                    ,2)
-                );
                 const _g = _mY - this.values.pos.y,
                     _a = _mX - this.values.pos.x;
                 this.values.dir.am = atan(_g/_a);
                 this.values.lm = sqrt(_g*_g+_a*_a);
-                this.values.dir.pl=map(this.values.lm,0,_max_dis,this.values.dir.min,this.values.dir.max);
-                const _cos=cos(this.values.dir.am)*pow(this.values.dir.m*this.values.dir.pl,this.values.dir.fac),
-                    _sin=sin(this.values.dir.am)*pow(this.values.dir.m*this.values.dir.pl,this.values.dir.fac);
                 this.values.dir.xt=_a<0;
-                if(this.values.dir.xt){
-                    this.values.dir.x=this.values.pos.x-(_cos);
-                    this.values.dir.y=this.values.pos.y-(_sin);
+                if(this.values.x.limit_dist){
+                    const _max_dis=sqrt(
+                        pow(
+                            ((width-this.values.pos.x)>this.values.pos.x)?
+                            (width-this.values.pos.x):this.values.pos.x
+                        ,2)+pow(
+                            ((height-this.values.pos.y)>this.values.pos.y)?
+                            (height-this.values.pos.y):this.values.pos.y
+                        ,2)
+                    );
+                    this.values.dir.pl=map(this.values.lm,0,_max_dis,this.values.dir.min,this.values.dir.max);
+                    const _pow=pow(this.values.dir.m*this.values.dir.pl,this.values.dir.fac);
+                    const _cos=cos(this.values.dir.am)*_pow,
+                        _sin=sin(this.values.dir.am)*_pow;
+                    if(this.values.dir.xt){
+                        this.values.dir.x=this.values.pos.x-(_cos);
+                        this.values.dir.y=this.values.pos.y-(_sin);
+                    }else{
+                        this.values.dir.x=this.values.pos.x+_cos;
+                        this.values.dir.y=this.values.pos.y+_sin;
+                    }
+                    this.values.lv = sqrt(
+                        ((this.values.dir.x-this.values.pos.x)*
+                        (this.values.dir.x-this.values.pos.x))+
+                        ((this.values.dir.y-this.values.pos.y)*
+                        (this.values.dir.y-this.values.pos.y))
+                    );
                 }else{
-                    this.values.dir.x=this.values.pos.x+_cos;
-                    this.values.dir.y=this.values.pos.y+_sin;
+                    this.values.dir.pl=1;
+                    this.values.dir.x=_mX;
+                    this.values.dir.y=_mY;
+                    this.values.lv=this.values.lm;
+                    // this.values.dir.m=200;
                 }
-                this.values.lv = sqrt(
-                    ((this.values.dir.x-this.values.pos.x)*
-                    (this.values.dir.x-this.values.pos.x))+
-                    ((this.values.dir.y-this.values.pos.y)*
-                    (this.values.dir.y-this.values.pos.y))
-                );
                 this.calc_color();
                 this.calc_ang();
             }
@@ -169,21 +194,22 @@
              * __print vec as p5-object on canvas__
              */
             print(){
-                strokeWeight(3);
+                strokeWeight(this.values.stroke_w);
                 stroke(this.values.col.rgb);
-                fill(0);
+                noFill();
                 if(!this.values.x.line&&!this.values.x.triangle){ellipse(this.values.pos.x, this.values.pos.y,1);}
                 if(this.values.x.line&&!this.values.x.big_tri&&!this.values.x.tri_line){line(this.values.pos.x, this.values.pos.y, this.values.dir.x, this.values.dir.y);}
                 if(this.values.x.triangle){
+                    fill(this.values.tri.fill);
                     push();
                     translate(this.values.dir.x,this.values.dir.y);
                     rotate(this.values.dir.am);
-                    const tr_h=this.values.x.tri_line?this.values.lv:(this.values.x.small_tri?1:(this.values.dir.m*(this.values.x.big_tri?1:0.1))*this.values.dir.pl*this.values.tri.height),
-                        tr_w=this.values.x.tri_line?(this.values.lv*0.5):(this.values.x.small_tri?1:(this.values.dir.m*(this.values.x.big_tri?1:0.1))*this.values.dir.pl*(this.values.tri.width*0.5));
+                    const tr_h=this.values.x.tri_line?this.values.lv:(this.values.x.small_tri?1:(this.values.dir.m*(this.values.x.big_tri?1:this.values.tri.m))*this.values.dir.pl*this.values.tri.height),
+                        tr_w=this.values.x.tri_line?(this.values.lv*0.5):(this.values.x.small_tri?1:(this.values.dir.m*(this.values.x.big_tri?1:this.values.tri.m))*this.values.dir.pl*(this.values.tri.width*0.5));
                     triangle(
-                        this.values.dir.xt?tr_h:-tr_h,-tr_w,
-                        0,0,
-                        this.values.dir.xt?tr_h:-tr_h,tr_w
+                        this.values.dir.xt?tr_h:-tr_h,-tr_w,    //__|\
+                        0,0,                                    //__| >
+                        this.values.dir.xt?tr_h:-tr_h,tr_w      //__|/
                     );
                     pop();
                 }
@@ -200,9 +226,13 @@
              * @param {number} _cmax - color-clip end in % `[0-1]` - _default `1`_
              * @param {number} _ccmin - color-hue start in deg `[0-360]` - _default `240`_
              * @param {number} _ccmax - color-hue end in deg `[0-360]` - _default `0`_
+             * @param {number} _stroke_w - stroke weight of arrow in px `[>0]` - _default `3`_
+             * @param {number} _tri_width - width in px `[0+]` - _default `10`_
+             * @param {number} _tri_height - height in px `[0+]` - _default `10`_
+             * @param {[number]|string} _tri_fill - fill `"css-color"`/`[R,G,B]` each `[0-255]` - _default `[0,0,0]`_
+             * @param {number} _tri_m - multi for length `[0.01+]` - _default `0.1`_
              */
-            constructor(_x=0,_y=0,_m=20,_fac=1.333,_min=0,_max=1,_cmin=0,_cmax=1,_ccmin=240,_ccmax=0){
-                //TODO add new vars in constructor
+            constructor(_x=0,_y=0,_m=20,_fac=1.333,_min=0,_max=1,_cmin=0,_cmax=1,_ccmin=240,_ccmax=0,_stroke_w=3,_tri_width=10,_tri_height=10,_tri_fill=[0,0,0],_tri_m=0.1){
                 this.set_pos(_x,_y);
                 this.values.dir.m=_m;
                 this.values.dir.fac=_fac;
@@ -212,14 +242,33 @@
                 this.values.col.max=_cmax;
                 this.values.col.cmin=_ccmin;
                 this.values.col.cmax=_ccmax;
+                this.values.stroke_w=_stroke_w;
+                this.values.tri.width=_tri_width;
+                this.values.tri.height=_tri_height;
+                this.values.tri.fill=_tri_fill;
+                this.values.tri.m=_tri_m;
             }
         };
-        let last_fps=0,lastMX = 0,lastMY = 0,varr = [];
-        const _FPS=30;
+        /** @type {number} - last FPS - used for FPS-text-smoothing */
+        let last_fps = 0;
+        /** @type {number} - last mouse-Xpos */
+        let lastMX = 0;
+        /** @type {number} - last mouse-Ypos */
+        let lastMY = 0;
+        /** @type {number} - stores all the vectors this array - live editable */
+        let varr = [];
+        /** @type {number} - (max) FPS of canvas - set before start */
+        const _FPS=60;
+        /**
+         * __mouse function - inside `draw()`__
+         * @param {number} _mx - Mouse-Xpos
+         * @param {number} _my - Mouse-Ypos
+         */
         let mouse_f=function(_mx,_my){/* Your mouse-function here */
             for(const vec of varr){vec.calc_move(_mx,_my);}
         };
-        let once_f=null;/* Your on-time-calc-function here */
+        /** __once function - inside `draw()`__ */
+        let once_f=null;/* Your one-time-calc-function here */
         function setup() {
             createCanvas(windowWidth, windowHeight - 0);
             lastMX=mouseX;
@@ -230,20 +279,21 @@
                     varr.push(new _Vector(_x,_y));
                 }
             }
-            console.log("%cmake functions with\n%c  %s \n  %s \n%calso try: \n%c  %s \n  %s ",
+            console.log("%cmake functions with\n%c  %s \n  %s \n%calso try: \n%c  %s \n  %s \n%cand feel free to modify the vector array \"varr\":%O",
                 "background-color:#000;color:#0f0;font-size:1.5em;font-family:serif;",
                 "background-color:#000;color:#0f0;font-family:monospace;",
                 "mouse_f=function(_mx,_my){/*varr[]*/};",
-                "once_f=function(){/*varr[]*/};once_f();",
+                "once_f=function(){/*varr[]*/};once_f(); /* if once_f != null then mouse_f() pauses calculating */",
                 "background-color:#000;color:#0f0;font-size:1.5em;font-family:serif;",
                 "background-color:#000;color:#0f0;font-family:monospace;",
                 "varr.forEach(e=>e.values.x.big_tri=true);",
-                "varr.forEach(e=>e.values.x.tri_line=true);"
+                "varr.forEach(e=>e.values.x.tri_line=true);",
+                "background-color:#000;color:#0f0;font-size:1.5em;font-family:serif;",
+                varr
             );
             frameRate(_FPS);
         }
         function draw() {
-            // TODO pause toggle "P" "return;"
             {/* background */
                 strokeWeight(3);
                 stroke('blue');
@@ -251,7 +301,7 @@
                 rectMode(CORNER);
                 rect(0, 0, width, height);
             }
-            if((mouseX!=lastMX||mouseY!=lastMY)&&once_f==null){
+            if((mouseX!=lastMX||mouseY!=lastMY)&&once_f===null){
                 mouse_f(mouseX,mouseY);
                 lastMX=mouseX;lastMY=mouseY;
             }
@@ -279,89 +329,80 @@
                 strokeWeight(4);
                 stroke('black');
                 fill('lime');
-                text(`FPS ${round((last_fps+frameRate())/2)}/${_FPS}`,4,4);
-                last_fps=frameRate();
+                text(`FPS ${last_fps}/${_FPS}`,4,4);
+                if(frameCount%7==0){last_fps=round((last_fps+frameRate())*0.5);}
             }
         }
         function mouseWheel(event) {
-            /*
-                vec.values.col:
-                step 0.02       step 1
-                shift > min     +alt > col.cmin
-                ctrl > max      +alt > col.cmax
+            /* keys (in order):
+                []vec.values.tri:
+                alt > m +-0.01
+                []vec.values.col:
+                ctrl > max +-0.02
+                shift > min +-0.02
+                []vec.values.dir:
+                normal > m ++--
             */
-            //TODO shift scroll arrow head size min/max
-            const _min=1,_max=500,_cmin=0,_cmax=1,_ccmin=0,_ccmax=360,_cstep=0.02,_ccstep=1;
-            if(event.shiftKey&&!event.ctrlKey&&event.altKey){
-                for (const vektor of varr) {
-                    if(event.delta>0){vektor.values.col.cmin-=_ccstep;}
-                    else if(event.delta<0){vektor.values.col.cmin+=_ccstep;}
-                    if(vektor.values.col.cmin >_ccmax){vektor.values.col.cmin =_ccmax;}
-                    else if(vektor.values.col.cmin <_ccmin){vektor.values.col.cmin =_ccmin;}
-                    vektor.calc_color(mouseX,mouseY);
+            const _min=1,_max=500,_cmin=0,_cmax=1,_cstep=0.02,_trimin=0.01,_trimax=500,_tristep=0.01;
+            if(event.altKey){/* tri-m */
+                for (const vector of varr) {
+                    if(event.delta>0){vector.values.tri.m-=_tristep;}
+                    else if(event.delta<0){vector.values.tri.m+=_tristep;}
+                    if(vector.values.tri.m >_trimax){vector.values.tri.m =_trimax;}
+                    else if(vector.values.tri.m <_trimin){vector.values.tri.m =_trimin;}
                 }
-                console.log("%ccol-cmin: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.cmin);
-            }else if(!event.shiftKey&&event.ctrlKey&&event.altKey){
-                for (const vektor of varr) {
-                    if(event.delta>0){vektor.values.col.cmax-=_ccstep;}
-                    else if(event.delta<0){vektor.values.col.cmax+=_ccstep;}
-                    if(vektor.values.col.cmax >_ccmax){vektor.values.col.cmax =_ccmax;}
-                    else if(vektor.values.col.cmax <_ccmin){vektor.values.col.cmax =_ccmin;}
-                    vektor.calc_color(mouseX,mouseY);
-                }
-                console.log("%ccol-cmax: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.cmax);
-            }else if(event.shiftKey&&!event.ctrlKey&&!event.altKey){
-                for (const vektor of varr) {
-                    if(event.delta>0){vektor.values.col.min-=_cstep;}
-                    else if(event.delta<0){vektor.values.col.min+=_cstep;}
-                    if(vektor.values.col.min >_cmax){vektor.values.col.min =_cmax;}
-                    else if(vektor.values.col.min <_cmin){vektor.values.col.min =_cmin;}
-                    vektor.calc_color(mouseX,mouseY);
-                }
-                console.log("%ccol-min: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.min);
-            }else if(!event.shiftKey&&event.ctrlKey&&!event.altKey){
-                for (const vektor of varr) {
-                    if(event.delta>0){vektor.values.col.max-=_cstep;}
-                    else if(event.delta<0){vektor.values.col.max+=_cstep;}
-                    if(vektor.values.col.max >_cmax){vektor.values.col.max =_cmax;}
-                    else if(vektor.values.col.max <_cmin){vektor.values.col.max =_cmin;}
-                    vektor.calc_color(mouseX,mouseY);
+                if(once_f==null){mouse_f(mouseX,mouseY);}else{once_f();}
+                console.log("%ctri-m: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.tri.m);
+            }else if(event.ctrlKey){/* col.max */
+                for (const vector of varr) {
+                    if(event.delta>0){vector.values.col.max-=_cstep;}
+                    else if(event.delta<0){vector.values.col.max+=_cstep;}
+                    if(vector.values.col.max >_cmax){vector.values.col.max =_cmax;}
+                    else if(vector.values.col.max <_cmin){vector.values.col.max =_cmin;}
+                    vector.calc_color();
                 }
                 console.log("%ccol-max: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.max);
-            }else{
-                for (const vektor of varr) {
-                    if(event.delta>0){vektor.values.dir.m--;}
-                    else if(event.delta<0){vektor.values.dir.m++;}
-                    if(vektor.values.dir.m>_max){vektor.values.dir.m=_max;}
-                    else if(vektor.values.dir.m<_min){vektor.values.dir.m=_min;}
-                    vektor.calc_move(mouseX,mouseY);
+            }else if(event.shiftKey){/* col.min */
+                for (const vector of varr) {
+                    if(event.delta>0){vector.values.col.min-=_cstep;}
+                    else if(event.delta<0){vector.values.col.min+=_cstep;}
+                    if(vector.values.col.min >_cmax){vector.values.col.min =_cmax;}
+                    else if(vector.values.col.min <_cmin){vector.values.col.min =_cmin;}
+                    vector.calc_color();
                 }
+                console.log("%ccol-min: %f","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.col.min);
+            }else{/* dir.m */
+                for (const vector of varr) {
+                    if(event.delta>0){vector.values.dir.m--;}
+                    else if(event.delta<0){vector.values.dir.m++;}
+                    if(vector.values.dir.m>_max){vector.values.dir.m=_max;}
+                    else if(vector.values.dir.m<_min){vector.values.dir.m=_min;}
+                }
+                if(once_f==null){mouse_f(mouseX,mouseY);}else{once_f();}
                 console.log("%cdir-m: %d","background-color:#000;color:#0f0;font-size:1.5em;",varr[0].values.dir.m);
             }
             return false;
         }
         /**
-         * __calc rgb from hue
+         * __calc rgb from hue__
          * @param {number} h - hue in deg `[0-360]`
-         * @returns {[3]} - rgb as array `[R,G,B]`
+         * @returns {number[]} - rgb as array `[R,G,B]`
          */
         function hue_rgb(h=240){
             // hsl: [h,1,0.5]
-            const hueToRgb=function hueToRgb(t1, t2, hue) {
+            const hue_to_rgb=function hue_to_rgb(hue) {
                 if (hue < 0) hue += 6;
                 if (hue >= 6) hue -= 6;
-                if (hue < 1) return (t2 - t1) * hue + t1;
-                else if(hue < 3) return t2;
-                else if(hue < 4) return (t2 - t1) * (4 - hue) + t1;
-                else return t1;
+                if (hue < 1) return hue;
+                else if(hue < 3) return 1;
+                else if(hue < 4) return (4 - hue);
+                else return 0;
             }
-            let t1, t2, r, g, b;
+            let r, g, b;
             h = h / 60;
-            t2=1;
-            t1=1-t2;
-            r = hueToRgb(t1, t2, h + 2) * 255;
-            g = hueToRgb(t1, t2, h) * 255;
-            b = hueToRgb(t1, t2, h - 2) * 255;
+            r = hue_to_rgb(h + 2) * 255;
+            g = hue_to_rgb(h) * 255;
+            b = hue_to_rgb(h - 2) * 255;
             return [r,g,b];
         }
         function windowResized(){resizeCanvas(windowWidth, windowHeight);return false;}
