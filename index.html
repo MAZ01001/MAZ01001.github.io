@@ -50,7 +50,6 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 20px;
-            overflow: auto;
             white-space: nowrap;
             text-align: center;
             vertical-align: middle;
@@ -62,8 +61,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 50px;
-            height: 435px;
-            width: 500px;
+            height: 560px;
+            width: 520px;
+            max-height: calc(100vh - 100px);
+            max-width: calc(100vw - 100px);
+            overflow-y: overlay;
+            overflow-x: hidden;
             box-shadow: 4px 4px 10px 0px black;
             background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 39px);
             background-size: calc(100% + 58px) 100%;
@@ -126,6 +129,14 @@
             color: #0ff;
             text-shadow: 0px 0px 15px #00f, 0px 0px 15px #00f, 0px 0px 15px #00f;
         }
+        h1{
+            font-style: italic;
+            font-size: 3.33em;
+            margin-block-start: 0.2em;
+            margin-block-end: 0.8em;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0px 0px 10px #f90, 0px 4px 20px #f90;
+        }
         h2,h3{
             display: inline;
             font-size: 3em;
@@ -153,6 +164,7 @@
     <img src="./img/logo.svg">
     <div>
         <div>
+            <h1>&lt;MAZ Coding Projects&gt;</h1>
             <h3><a href="./site/flowchart/index.html" target="_self" rel="noopener noreferrer" title="Unofficial Satisfactory U3 Flow Chart">Unofficial Satisfactory U3 Flow Chart</a></h3><br>
             <h2><a href="./site/canvas ball.html" target="_self" rel="noopener noreferrer" title="Ball Screensaver">Ball Screensaver</a></h2><br>
             <h2><a href="./site/dice.html" target="_self" rel="noopener noreferrer" title="Small Dice">Small Dice</a></h2><br>
