@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+.  _   _  _____ _      _     _____   _____ _   _  ___________ _____ 
+. | | | ||  ___| |    | |   |  _  | |_   _| | | ||  ___| ___ \  ___|
+. | |_| || |__ | |    | |   | | | |   | | | |_| || |__ | |_/ / |__  
+. |  _  ||  __|| |    | |   | | | |   | | |  _  ||  __||    /|  __| 
+. | | | || |___| |____| |___\ \_/ /   | | | | | || |___| |\ \| |___ 
+. \_| |_/\____/\_____/\_____/\___/    \_/ \_| |_/\____/\_| \_\____/ 
+-->
+<head>
+    <meta charset="UTF-8">
+    <title>PI-Day 2021</title>
+    <style>
+        body{
+            background-color: #222;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../libraries/p5_min-1.2.0/p5.min.js"></script>
+    <script>
+        //https://www.youtube.com/watch?v=EvS_a921dBo
+        function gcd(A,B){
+            if(A<B){[A,B]=[B,A];}
+            for(;A%B>0;[A,B]=[B,A%B]){}
+            return B;
+        }
+        const _FPS=60,
+            _max_arr=10000000;
+        let last_fps=60,
+            coprimec=0,
+            total=0,
+            arr=[],
+            step=0,
+            _num=1,
+            _txt='',
+            _digi=0,
+            __stop=false,
+            __it=0.01;
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            frameRate(_FPS);
+        }
+        function draw(){
+            {/* background */
+                strokeWeight(3);
+                stroke('blue');
+                fill('#202020');
+                rectMode(CORNER);
+                rect(0, 0, width, height);
+            }
+            if(!__stop){
+                switch (step) {
+                    case 0:/* make number array */
+                        for(let _i=0;_i<_max_arr*__it;_i++){
+                            arr.push(_num);
+                            _txt=_num.toString();
+                            _digi=map(_num,0,_max_arr,0,width);
+                            if(arr.length>=_max_arr){
+                                step++;
+                                _num=0;
+                                __it=0.01;
+                            }else{_num++;}
+                        }
+                        break;
+                    case 1:/* shuffle array */
+                        for(let _i=0;_i<_max_arr*__it;_i++){
+                            let ri = Math.floor(Math.random()*_num);
+                            [arr[_num],arr[ri]]=[arr[ri],arr[_num]];
+                            _txt=_num.toString();
+                            _digi=map(_num,0,arr.length-1,0,width);
+                            if(_num>=arr.length-1){
+                                step++;
+                                _num=0;
+                                __it=0;
+                            }else{_num++;}
+                        }
+                        break;
+                    case 2:/* calc PI with g.c.d. */
+                        for(let _i=0;_i<=__it;_i++){
+                            const A=arr[_num],
+                                B=arr[_num+1];
+                            if(gcd(A,B)==1){coprimec++;}
+                            total++;
+                            // console.log(A,B,gcd(A,B));
+                            _txt=nf(Math.sqrt(6*total/coprimec),1,8);
+                            _digi=map(_num,0,arr.length-1,0,width);
+                            if((_num-1)>=arr.length){
+                                step++;
+                                console.log(
+                                    "%c num 1-10'000'000 shuffled \n calc:\t%f \n PI:\t%f",
+                                    "background-color:#000;color:#0f0;font-size:2em;font-family:monospace;",
+                                    Math.sqrt(6*total/coprimec),
+                                    Math.PI
+                                );
+                                __it=0;
+                            }else{_num++;}
+                        }
+                        if(__it<100){__it+=0.1;}
+                        else{__it+=100;}
+                        break;
+                    default:break;
+                }
+            }
+            textAlign(CENTER, CENTER);
+            textSize(64);
+            fill(255);
+            textFont('Courier');
+            text(_txt,width/2,height/2);
+            stroke(255);
+            noFill();
+            rect(0,height/3,width,20);
+            fill(255);
+            rect(0,height/3,_digi,20);
+            if(!mouseIsPressed){/* cursor */
+                strokeWeight(1);
+                stroke('black');
+                noCursor();
+                noFill();
+                line(mouseX, 0, mouseX, height);
+                line(0, mouseY, width, mouseY);
+                textAlign(LEFT, BOTTOM);
+                noStroke();
+                textSize(12);
+                fill('yellow');
+                text(
+                    `x: ${parseInt(mouseX)}\ny: ${parseInt(mouseY)}`,
+                    ((mouseX+50)>width)?mouseX-50:mouseX+4,
+                    ((mouseY-50)<0)?mouseY+32:mouseY-4
+                );
+            }
+            {/* fps */
+                textAlign(LEFT, TOP);
+                textSize(14);
+                strokeWeight(4);
+                stroke('black');
+                fill('lime');
+                text(`FPS ${last_fps}/${_FPS}`,4,4);
+                if(frameCount%7==0){last_fps=round((last_fps+frameRate())*0.5);}
+            }
+        }
+        function windowResized(){resizeCanvas(windowWidth, windowHeight);return false;}
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
