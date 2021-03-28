@@ -51,6 +51,7 @@
                 rectMode(CORNER);
                 rect(0, 0, width, height);
             }
+            //TODO more visually appealing
             if(!__stop){
                 switch (step) {
                     case 0:/* make number array */
@@ -141,6 +142,7 @@
                 if(frameCount%7==0){last_fps=round((last_fps+frameRate())*0.5);}
             }
         }
+        function mouseReleased(){__stop=!__stop;}
         function windowResized(){resizeCanvas(windowWidth, windowHeight);return false;}
     </script>
 </head>
