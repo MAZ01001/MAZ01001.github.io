@@ -330,6 +330,7 @@
          * @returns {any} element of array
          */
         function take_from_array(array,index){
+            /*
             if(index<0){index=0;}
             if(index>=array.length){index=array.length-1;}
             const tmp=array[index];
@@ -337,7 +338,8 @@
                 if(i+1==array.length){array.pop();}
                 else{array[i]=array[i+1];}
             }
-            return tmp;
+            */
+            return array.splice(index,1)[0];
         }
         /**
          * __maps a number from a field to another in the same ratio to the ends__
