@@ -216,7 +216,7 @@
         }
     </style>
     <script>
-    function clickElement(element,event) {
+        function clickElement(element,event) {
             if (element == document.body && event.type=="dblclick") {
                 let exit = false;
                 event.path.forEach(e=>{if(e==document.getElementById('menuBox'))exit=true;});
