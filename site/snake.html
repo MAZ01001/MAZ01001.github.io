@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake</title>
+    <style>
+        :root{
+            --cborder:#0000ff;
+            --chead:#00ff00;
+            --ctail:#008800;
+            --cfruit:#ff0000;
+            --cdebug:#00aaaa;
+        }
+        body{
+            background-color: #222;
+            color: #f90;
+            font-family: serif;
+            font-size: 1em;
+        }
+        div#play{
+            position: fixed;
+            transform: translate(-50%,-50%);
+            top: 50%;left: 50%;
+            max-width: calc(100vw - .5em);
+            max-height: calc(100vh - 1em);
+            overflow: overlay;
+            background-color: #000;
+            color: #0a0;
+            font-family: monospace;
+            font-size: 1.5em;
+            line-break: strict;
+            white-space: nowrap;
+            height: max-content;
+            width: max-content;
+            padding: .5em 1em;
+        }
+        td>input[type="color"]{
+            background-color:#000;
+            border-color:#000;
+        }
+        input[type="number"]{
+            background-color:#000;
+            color: #0f0;
+        }
+        input#exs{width:5em;}
+        input#exw,
+        input#exh,
+        input#exf{width:4em;}
+        td>input[type="text"]{background-color:#000;}
+        color[type="border"],tr#sborder input[type="text"]{color:var(--cborder);}
+        color[type="head"],tr#shead input[type="text"]{color:var(--chead);}
+        color[type="tail"],tr#stail input[type="text"]{color:var(--ctail);}
+        color[type="fruit"],tr#sfruit input[type="text"]{color:var(--cfruit);}
+        color[type="debug"],tr#sbug input[type="text"]{color:var(--cdebug);}
+        div#rmenu table tr td>table{border-collapse:collapse;}
+        div#rmenu table tr td{vertical-align:top;}
+        div#rmenu table h1,
+        div#rmenu table h2{margin:0;text-decoration:underline;}
+        .bleft{border-left:1px solid #000}
+        .bright{border-right:1px solid #000;}
+        .btop{border-top:1px solid #000;}
+        .bbottom{border-bottom:1px solid #000;}
+        div#rmenu{
+            opacity: 0;
+            position: fixed;
+            top: -2em;
+            left: -2em;
+            transform: translate(-100%,-100%);
+            overflow: overlay;
+            max-width: calc((100vw - 2em) - 4px);
+            max-height: calc((100vh - 1em) - 4px);
+            transition: opacity 500ms ease-in 500ms, top 0s linear 1s, left 0s linear 1s, transform 0s linear 1s;
+            border: 2px solid #08f;
+            padding: .5em 1em;
+            background-color: #333;
+            color: #0F0F;
+            height: max-content;
+            width: max-content;
+        }
+        div#rmenu.visible{
+            opacity: 1;
+            transition: opacity 0s linear 0s, top 0s linear 0s, left 0s linear 0s, transform 0s linear 0s;
+        }
+        ::-webkit-scrollbar{width: 0.7em;height: 0.7em;}
+        ::-webkit-scrollbar-thumb:window-inactive{border-color: #040F !important;}
+        ::-webkit-scrollbar-thumb:vertical{
+            background-color: #0000;
+            border-right: 2px solid #080F;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:vertical:hover{
+            background-color: #0F0F;
+            border: none;
+            border-top-left-radius: 1em;
+            border-bottom-left-radius: 1em;
+        }
+        ::-webkit-scrollbar-thumb:horizontal{
+            background-color: #0000;
+            border-bottom: 2px solid #080F;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:horizontal:hover{
+            background-color: #0F0F;
+            border: none;
+            border-top-left-radius: 1em;
+            border-top-right-radius: 1em;
+        }
+        ::-webkit-scrollbar-track{display: none;background-color: #0000;}
+        ::-webkit-scrollbar-track-piece{display: none;background-color: #0000;}
+        ::-webkit-scrollbar-corner{display: none;background-color: #0000;}
+    </style>
+    <script>
+        /**
+         * __replaces a section of a string with another string and returns the result__
+         * @param {number} i - index
+         * @param {number} l - length
+         * @param {string} r - replacement string
+         * @returns {string} the modified string
+         * @example "Hello, World !".replaceIndex(5,7,' There');//=> "Hello There !"
+         */
+        String.prototype.replaceIndex=function(i,l,r){return this.substring(0,i)+r+this.substring(i+l);};
+        class SnakeC{
+            /**@type {{STOP:number;LEFT:number;UP:number;RIGHT:number;DOWN:number}} __snake direction for movement__*/
+            static mov={STOP:0,LEFT:1,UP:2,RIGHT:3,DOWN:4};
+            /**@type {{head:string;tail:string;}} __snake chars for printing__*/
+            static chars={
+                /**@type {string} __snake-head chars for printing `(STOP|LEFT|UP|RIGHT|DOWN)`__*/
+                head:'X<A>V',
+                /**@type {string} __snake-tail chars for printing `(CORNER|HORIZONTAL|VERTICAL)`__*/
+                tail:'+-|'
+            };
+            /**
+             * __creates a SnakeC object__
+             * @param {number} x - x position
+             * @param {number} y - y position
+             * @param {number} w - width of bounds
+             * @param {number} h - height of bounds
+             * @param {boolean} p - portal walls
+             */
+            constructor(x=0,y=0,w=0,h=0,p=false){
+                /**@type {number} __width of bounds__*/
+                this.w=w;
+                /**@type {number} __height of bounds__*/
+                this.h=h;
+                /**@type {number} __portal walls__*/
+                this.p=p;
+                /**@type {number} __x position__*/
+                this.x=x;
+                /**@type {number} __y position__*/
+                this.y=y;
+                /**@type {number} __current moving direction _(use with `SnakeC.mov.STOP`)___*/
+                this.dir=SnakeC.mov.STOP;
+                /**@type {number} __previous moving direction _(use with `SnakeC.mov.STOP`)___*/
+                this.pdir=SnakeC.mov.STOP;
+                /**@type {{x:number,y:number,c:string}[]} __tail pieces `(Xpos|Ypos|char)`__*/
+                this.tail=[];
+            }
+            /**
+             * __resets bounds for the snake__
+             * @param {number} w - width of bounds
+             * @param {number} h - height of bounds
+             */
+            setBounds(w,h){this.w=w;this.h=h;}
+            /**
+             * __adds a tail to the snake__ \
+             * _(duplicates last)_
+             */
+            addTail(){
+                if(this.tail.length>0){
+                    this.tail.push({
+                        x:this.tail[this.tail.length-1].x,
+                        y:this.tail[this.tail.length-1].y,
+                        c:this.tail[this.tail.length-1].c
+                    });
+                }else{
+                    this.tail.push({
+                        x:this.x,
+                        y:this.y,
+                        c:SnakeC.chars.tail[0]
+                    });
+                }
+            }
+            /**
+             * __tests if the snake-head is on its own tail__
+             * @returns {boolean} `true` if it is
+             */
+            onTail(){return this.tail.some(v=>v.x==this.x&&v.y==this.y,this);}
+            /**
+             * __tests if the snake-head is out of bounds__
+             * @returns {boolean} `true` if it is
+             */
+            headOutOfBounds(){return(
+                this.x<0
+                ||this.y<0
+                ||this.x>=this.w
+                ||this.y>=this.h
+            );}
+            /**
+             * __gets the char of the snake-head for the current moving direction__
+             * @returns {string} the snake-head char
+             */
+            getHead(){
+                switch(this.dir){
+                    case SnakeC.mov.LEFT:return SnakeC.chars.head[SnakeC.mov.LEFT];
+                    case SnakeC.mov.RIGHT:return SnakeC.chars.head[SnakeC.mov.RIGHT];
+                    case SnakeC.mov.UP:return SnakeC.chars.head[SnakeC.mov.UP];
+                    case SnakeC.mov.DOWN:return SnakeC.chars.head[SnakeC.mov.DOWN];
+                    case SnakeC.mov.STOP:return SnakeC.chars.head[SnakeC.mov.STOP];
+                }
+            } 
+            /**
+             * __moves the snake in current moving direction and checks for gameover__
+             * @returns {boolean} `false` if out of bounds or on own tail _(if that is forbidden)_
+             */
+            moveSnake(){
+                if(this.tail.length>0){
+                    this.tail.pop();
+                    this.tail.unshift({
+                        x:this.x,
+                        y:this.y,
+                        c:(
+                            this.pdir==this.dir?(
+                                (
+                                    this.dir==SnakeC.mov.LEFT
+                                    ||this.dir==SnakeC.mov.RIGHT
+                                )?SnakeC.chars.tail[1]:(
+                                    (
+                                        this.dir==SnakeC.mov.UP
+                                        ||this.dir==SnakeC.mov.DOWN
+                                    )?SnakeC.chars.tail[2]:SnakeC.chars.tail[0]
+                                )
+                            ):SnakeC.chars.tail[0]
+                        )
+                    });
+                }
+                this.pdir=this.dir;
+                switch(this.dir){
+                    case SnakeC.mov.LEFT:this.x--;break;
+                    case SnakeC.mov.RIGHT:this.x++;break;
+                    case SnakeC.mov.UP:this.y--;break;
+                    case SnakeC.mov.DOWN:this.y++;break;
+                    default:break;
+                }
+                if(this.p){
+                    if(this.x<0){this.x=this.w-1;}
+                    else if(this.x>=this.w){this.x=0;}
+                    if(this.y<0){this.y=this.h-1;}
+                    else if(this.y>=this.h){this.y=0;}
+                }else if(this.headOutOfBounds()){return false;}
+                if(this.onTail()){return false;}
+                return true;
+            }
+            /**
+             * __changes direction of movement__
+             * @param {number} dir - the new direction from `SnakeC.mov.STOP`
+             */
+            changeDir(dir=SnakeC.mov.STOP){this.dir=dir;}
+            /**
+             * __tests if snake-head is on given position__
+             * @param {number} x - Xpos
+             * @param {number} y - Ypos
+             * @returns {boolean} `true` if on position
+             */
+            onPos(x,y){return(this.x==x&&this.y==y);}
+        };
+        class FruitC{
+            /**@type {string} __fruit chars for printing `(LEFT|FLAG|RIGHT)`__*/
+            static chars='[F]';
+            /**
+             * __creates a FruitC object__
+             * @param {number} w - width of bounds
+             * @param {number} h - height of bounds
+             * @param {number} x - Xpos to avoid
+             * @param {number} y - Ypos to avoid
+             */
+            constructor(w,h,x,y){
+                /**@type {number} __width of bounds__*/
+                this.w=w;
+                /**@type {number} __height of bounds__*/
+                this.h=h;
+                /**@type {number} __x position__*/
+                this.x=Math.round(Math.random()*(w-1));
+                /**@type {number} __y position__*/
+                this.y=Math.round(Math.random()*(h-1));
+                while(x==this.x&&y==this.y){
+                    this.x=Math.round(Math.random()*(this.w-1));
+                    this.y=Math.round(Math.random()*(this.h-1));
+                }
+            }
+            /**
+             * __resets bounds__
+             * @param {number} w - width of bounds
+             * @param {number} h - height of bounds
+             */
+            setBounds(w,h){this.w=w;this.h=h;}
+            /**
+             * __generates new position__
+             * @param {number} x - Xpos to avoid
+             * @param {number} y - Ypos to avoid
+             */
+            genNew(x=this.x,y=this.y){
+                this.x=Math.round(Math.random()*(this.w-1));
+                this.y=Math.round(Math.random()*(this.h-1));
+                while(x==this.x&&y==this.y){
+                    this.x=Math.round(Math.random()*(this.w-1));
+                    this.y=Math.round(Math.random()*(this.h-1));
+                }
+            }
+        }
+        class GameC{
+            /**@type {{border:string;debug:string;}} __game chars for printing__*/
+            static chars={
+                /**@type {string} __game border chars for printing `(CORNER|HORIZONTAL|VERTICAL)`__*/
+                border:'+-|',
+                /**@type {string} __game debug chars for printing `(HORIZONTAL|VERTICAL)`__*/
+                debug:'·⁞'
+            };
+            /**
+             * __creates a GameC object__
+             * @param {HTMLElement} el - html element to print game
+             * @param {number} speed - ms delay between each drawn frame/game tick
+             * @param {number} w - with of play-field _(actual print is larger)_
+             * @param {number} h - height of play-field _(actual print is larger)_
+             * @param {boolean} portal - activates portal walls _(teleports to other side)_
+             * @param {boolean} bug - activates debug info printing
+             * @param {boolean} fbf - activates stepper-mode _(only tick if player moves)_
+             * @param {boolean} godMode a- ctivates god-mode _(invincible)_
+             */
+            constructor(el,speed=200,w=23,h=15,portal=false,bug=false,fbf=false,godMode=false){
+                /**@type {number} __with of play-field _(actual print is larger)___*/
+                this.width=w;
+                /**@type {number} __height of play-field _(actual print is larger)___*/
+                this.height=h;
+                /**@type {boolean} __activates debug info printing__*/
+                this.debugInfo=bug;
+                /**@type {boolean} __activates stepper-mode _(only tick if player moves)___*/
+                this.stepperMode=fbf;
+                /**@type {boolean} __activates portal walls _(teleports to other side)___*/
+                this.portalWalls=portal;
+                /**@type {boolean} __activates god-mode _(invincible)___*/
+                this.godMode=godMode;
+                /**@type {number} __potential death for god-mode__*/
+                this.pd=0;
+                /**@type {boolean} __activates color print__*/
+                this.color=true;
+                /**@type {boolean} __pauses the game on normal mode__*/
+                this.pause=true;
+                /**@type {number} __timer _(timestamp of start and end or ms time duration)___*/
+                this.timer=0;
+                /**@type {number} __current score__*/
+                this.score=0;
+                /**@type {number} __survive bonus interval__*/
+                this.survive=0;
+                /**@type {number} __original speed _(for reset)___*/
+                this.speedOg=speed;
+                /**@type {number} __current speed in [ms] as delay between each drawn frame/game tick _(decreases when progressing)___*/
+                this.speed=this.speedOg;
+                /**@type {HTMLElement} __html element to print game__*/
+                this.html=el;
+                /**@type {boolean} __`true` if game over detected__*/
+                this.gameOver=false;
+                /**@type {number} __current loop _(timeout link)___*/
+                this.loop=null;
+                /**@type {string} __old print string__*/
+                this.gameString='';
+                /**@type {SnakeC} __SnakeC object__*/
+                this.snake=new SnakeC(
+                    Math.floor(this.width*.5),
+                    Math.floor(this.height*.5),
+                    this.width,
+                    this.height,
+                    this.portalWalls
+                );
+                /**@type {FruitC} __FruitC object__*/
+                this.fruit=new FruitC(this.width,this.height,this.snake.x,this.snake.y);
+                /**@type {Function} __function for timeout__*/
+                this.delayF=()=>{
+                    this.tick();
+                    this.draw();
+                    if(this.gameOver){
+                        document.removeEventListener('keydown',this.keyF["initial"]);
+                        document.addEventListener('keydown',this.keyF["gameover"]);
+                    }else{this.loop=setTimeout(this.delayF,this.speed);}
+                };
+                /**@type {{stepping:(e:Event)=>void;initial:(e:Event)=>void;pause:(e:Event)=>void;gameover:(e:Event)=>void;}} __functions for keydown eventlistener__*/
+                this.keyF={
+                    /**@type {(e:Event)=>void} __function for stepper mode__*/
+                    "stepping":e=>{
+                        if(rmenu.classList.contains('visible')){return;}
+                        switch(e.code){
+                            case'ArrowUp':case'KeyW':this.snake.changeDir(SnakeC.mov.UP);this.tick();break;
+                            case'ArrowLeft':case'KeyA':this.snake.changeDir(SnakeC.mov.LEFT);this.tick();break;
+                            case'ArrowDown':case'KeyS':this.snake.changeDir(SnakeC.mov.DOWN);this.tick();break;
+                            case'ArrowRight':case'KeyD':this.snake.changeDir(SnakeC.mov.RIGHT);this.tick();break;
+                            case'KeyR':this.reset();break;
+                            case'Escape':this.timer=Date.now()-this.timer;this.gameOver=true;break;
+                        }
+                        if(this.gameOver){
+                            document.removeEventListener('keydown',this.keyF["stepping"]);
+                            document.addEventListener('keydown',this.keyF["gameover"]);
+                        }
+                        this.draw();
+                        return;
+                    },
+                    /**@type {(e:Event)=>void} __function for normal mode__*/
+                    "initial":e=>{
+                        if(rmenu.classList.contains('visible')){return;}
+                        switch(e.code){
+                            case'ArrowUp':case'KeyW':this.snake.changeDir(SnakeC.mov.UP);(this.timer>90?(this.snake.dir!==this.snake.pdir?this.drawI():null):null);break;
+                            case'ArrowLeft':case'KeyA':this.snake.changeDir(SnakeC.mov.LEFT);(this.timer>90?(this.snake.dir!==this.snake.pdir?this.drawI():null):null);break;
+                            case'ArrowDown':case'KeyS':this.snake.changeDir(SnakeC.mov.DOWN);(this.timer>90?(this.snake.dir!==this.snake.pdir?this.drawI():null):null);break;
+                            case'ArrowRight':case'KeyD':this.snake.changeDir(SnakeC.mov.RIGHT);(this.timer>90?(this.snake.dir!==this.snake.pdir?this.drawI():null):null);break;
+                            case'KeyP':
+                                this.timer=Date.now()-this.timer;
+                                this.pause=true;
+                                document.removeEventListener('keydown',this.keyF["initial"]);
+                                document.addEventListener('keydown',this.keyF["pause"]);
+                                clearTimeout(this.loop);
+                                this.draw();
+                                break;
+                            case'KeyR':this.reset();this.draw();break;
+                            case'Escape':
+                                this.timer=Date.now()-this.timer;
+                                this.gameOver=true;
+                                document.removeEventListener('keydown',this.keyF["initial"]);
+                                document.addEventListener('keydown',this.keyF["gameover"]);
+                                clearTimeout(this.loop);
+                                this.draw();
+                                break;
+                        }return;
+                    },
+                    /**@type {(e:Event)=>void} __function for pause during normal mode__*/
+                    "pause":e=>{
+                        if(rmenu.classList.contains('visible')){return;}
+                        if(this.snake.dir===SnakeC.mov.STOP){
+                            switch(e.code){
+                                case'ArrowUp':case'KeyW':this.snake.changeDir(SnakeC.mov.UP);break;
+                                case'ArrowLeft':case'KeyA':this.snake.changeDir(SnakeC.mov.LEFT);break;
+                                case'ArrowDown':case'KeyS':this.snake.changeDir(SnakeC.mov.DOWN);break;
+                                case'ArrowRight':case'KeyD':this.snake.changeDir(SnakeC.mov.RIGHT);break;
+                                default:this.snake.changeDir(SnakeC.mov.UP);break;
+                            }
+                        }
+                        this.pause=false;
+                        document.removeEventListener('keydown',this.keyF["pause"]);
+                        document.addEventListener('keydown',this.keyF["initial"]);
+                        this.loop=setTimeout(this.delayF,this.speed);
+                        this.timer=Date.now()-this.timer;
+                        return;
+                    },
+                    /**@type {(e:Event)=>void} __function for retry after game over__*/
+                    "gameover":e=>{
+                        if(rmenu.classList.contains('visible')){return;}
+                        if(e.code==="KeyR"){
+                            document.removeEventListener('keydown',this.keyF["gameover"]);
+                            if(this.stepperMode){
+                                document.addEventListener('keydown',this.keyF["stepping"]);
+                                this.reset();
+                            }else{
+                                this.reset();
+                                document.addEventListener('keydown',this.keyF["pause"]);
+                                this.pause=true;
+                                this.timer=0;
+                            }
+                            this.draw();
+                        }return;
+                    }
+                };
+                if(this.stepperMode){
+                    this.pause=false;
+                    document.addEventListener('keydown',this.keyF["stepping"]);
+                    this.timer=Date.now();
+                }else{document.addEventListener('keydown',this.keyF["pause"]);}
+                this.draw();
+            }
+            /**
+             * __resets game and a few values/positions/bounds__
+             */
+            reset(){
+                this.gameOver=false;
+                this.pd=0;
+                this.snake.tail.length=0;
+                this.snake.setBounds(this.width,this.height);
+                this.snake.p=this.portalWalls;
+                if(this.snake.headOutOfBounds()){
+                    this.snake.x=Math.floor(this.width*.5);
+                    this.snake.y=Math.floor(this.height*.5);
+                }
+                this.fruit.setBounds(this.width,this.height);
+                this.fruit.genNew(this.snake.x,this.snake.y);
+                this.score=0;
+                this.survive=0;
+                this.speed=this.speedOg;
+                this.timer=Date.now();
+            }
+            /**
+             * __calculates a game string width _(used for printing)___
+             * @returns {number} the calculated number
+             */
+            getPrintWidth(){return((this.width*2)+4);}
+            /**
+             * __sets new game size and resets the game__
+             * @param {number} w - new width
+             * @param {number} h - new height
+             */
+            changeSize(w,h){this.width=w;this.height=h;this.reset();}
+            /**
+             * __calculates one game tick/snake move__
+             */
+            tick(){
+                this.survive++;
+                if(this.survive%1000==0){this.score*=1.05;this.survive=0;}
+                else if(this.survive%200==0){this.score*=1.01;}
+                if(!this.snake.moveSnake()){
+                    if(this.godMode){
+                        this.pd++;
+                        if(this.snake.x>this.width){this.snake.x=this.width;}
+                        else if(this.snake.x<-1){this.snake.x=-1;}
+                        if(this.snake.y>this.height){this.snake.y=this.height;}
+                        else if(this.snake.y<-1){this.snake.y=-1;}
+                    }else{
+                        this.timer=Date.now()-this.timer;
+                        this.gameOver=true;
+                        this.snake.dir=SnakeC.mov.STOP;
+                        return;
+                    }
+                }
+                if(this.snake.onPos(this.fruit.x,this.fruit.y)){
+                    this.snake.addTail();
+                    this.fruit.genNew(this.snake.x,this.snake.y);
+                    this.score+=1/(this.speed/1000);
+                    if(this.speed>150){this.speed*=.95;}
+                    else if(this.speed<100){
+                        if(this.speed>50){this.speed*=.99999;}
+                        else{this.speed-=Number.EPSILON;}
+                    }else{this.speed*=.999;}
+                }
+            }
+            /**
+             * __prints the play field as a string and returns it__
+             * @returns {string} the play field
+             */
+            print(){
+                const wf=this.getPrintWidth();
+                let out=(
+                        (GameC.chars.border[0]+GameC.chars.border[1].repeat(wf-3)+GameC.chars.border[0]+'\n')
+                        +(GameC.chars.border[2]+' '.repeat(wf-3)+GameC.chars.border[2]+'\n').repeat(this.height)
+                        +(GameC.chars.border[0]+GameC.chars.border[1].repeat(wf-3)+GameC.chars.border[0])
+                    );
+                if(this.debugInfo){
+                    if(this.snake.y>=0&&this.snake.y<this.height){out=out.replaceIndex((wf*(this.snake.y+1))+1,wf-3,GameC.chars.debug[0].repeat(wf-3));}
+                    if(this.snake.x>=0&&this.snake.x<this.width){for(let i=0;i<this.height;i++){out=out.replaceIndex((wf*(i+1))+(this.snake.x*2)+2,1,GameC.chars.debug[1]);}}
+                }
+                out=out.replaceIndex((wf*(this.fruit.y+1))+(this.fruit.x*2)+2,1,FruitC.chars[1]);
+                this.snake.tail.forEach((v,i,a)=>{
+                    if(v.c===SnakeC.chars.tail[1]){
+                        if(this.godMode){
+                            if(v.x===this.width){out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+2,1,v.c);}
+                            else if(v.x===-1){out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+2,1,v.c);}
+                            else{out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+1,3,v.c.repeat(3));}
+                        }else{out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+1,3,v.c.repeat(3));}
+                    }else if(v.c===SnakeC.chars.tail[0]){
+                        if(
+                            (a[i+1]!=undefined&&(a[i+1].c===SnakeC.chars.tail[0]&&a[i+1].x>v.x))
+                            ||(a[i-1]!=undefined&&(a[i-1].c===SnakeC.chars.tail[0]&&a[i-1].x>v.x))
+                        ){out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+2,2,SnakeC.chars.tail[0]+SnakeC.chars.tail[1]);}
+                        else{out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+2,1,v.c);}
+                    }else{out=out.replaceIndex(wf*(v.y+1)+(v.x*2)+2,1,v.c);}
+                },this);
+                if(this.snake.dir===SnakeC.mov.LEFT){out=out.replaceIndex(wf*(this.snake.y+1)+(this.snake.x*2)+2,2,this.snake.getHead()+SnakeC.chars.tail[1]);}
+                else if(this.snake.dir===SnakeC.mov.RIGHT){out=out.replaceIndex(wf*(this.snake.y+1)+(this.snake.x*2)+1,2,SnakeC.chars.tail[1]+this.snake.getHead());}
+                else{out=out.replaceIndex(wf*(this.snake.y+1)+(this.snake.x*2)+2,1,this.snake.getHead());}
+                out=out.replaceIndex(wf*(this.fruit.y+1)+(this.fruit.x*2)+1,1,FruitC.chars[0]);
+                out=out.replaceIndex(wf*(this.fruit.y+1)+(this.fruit.x*2)+3,1,FruitC.chars[2]);
+                return out;
+            }
+            /**
+             * __formats `GameC.print()` for html__
+             * @returns {string} the play field
+             */
+            printHTML(color=true){
+                if(color){
+                    let p=this.print().split('\n').map(v=>v.split(''));
+                    const aMax=p.length-1,bMax=p[0].length-1;
+                    p[0][0]='<color type="border">'+p[0][0];
+                    p[aMax][bMax]+='</color>';
+                    for(let i=1;i<aMax;i++){
+                        p[i][0]+='<color type="tail">';
+                        p[i][bMax]='</color>'+p[i][bMax];
+                    }
+                    if(this.gameOver||this.godMode){
+                        const a_=this.snake.y+1,b_=this.snake.x*2+2;
+                        const v_=p[a_][b_];
+                        if(v_.length>1){
+                            if(/^\<\/?color/.test(v_)){p[a_][b_]=`${v_.slice(0,-1)}<color type="head">${v_.slice(-1)}</color>`}
+                            else{p[a_][b_]=`<color type="head">${v_.slice(0,1)}</color>${v_.slice(1)}`;}
+                        }else{p[a_][b_]=`<color type="head">${v_}</color>`;}
+                    }else{p[this.snake.y+1][this.snake.x*2+2]=`<color type="head">${p[this.snake.y+1][this.snake.x*2+2]}</color>`;}
+                    if(p[this.fruit.y+1][this.fruit.x*2+2]!=FruitC.chars[1]){
+                        const a_=this.fruit.y+1,b_=this.fruit.x*2+1;
+                        p[a_][b_]=`<color type="fruit">${p[a_][b_]}</color>`;
+                        p[a_][b_+2]=`<color type="fruit">${p[a_][b_+2]}</color>`;
+                    }else{
+                        const a_=this.fruit.y+1,b_=this.fruit.x*2+1;
+                        p[a_][b_]='<color type="fruit">'+p[a_][b_];
+                        p[a_][b_+2]+='</color>';
+                    }
+                    if(this.debugInfo){
+                        return p.map(v=>v.join('')).join('<br>')
+                        .replace(RegExp(`(?<=^.+)([${
+                            GameC.chars.debug
+                            .replaceAll('\\','\\\\')
+                            .replaceAll('^','\\^')
+                            .replaceAll('-','\\-')
+                        }]+)(?=.+$)`,'gum'),'<color type="debug">$1</color>')
+                        .replace(/(?<!\<\/?color[^>]*)\x20/g,'&nbsp;');
+                    }else{return p.map(v=>v.join('')).join('<br>').replace(/(?<!\<\/?color[^>]*)\x20/g,'&nbsp;');}
+                }else{return this.print().replaceAll(' ','&nbsp;').replaceAll('\n','<br>');}
+            }
+            /**
+             * __prints extra info about the game as string and returns it__
+             * @param {string} type - type of info to print
+             * @returns {string} printed info
+             */
+            printInfoHTML(type='info'){
+                switch(type){
+                    case'info':
+                        return("[ESC] End  [r] Reset  [p] Pause  [wasd/↑←↓→] Move"
+                            +("<br>time: "+(
+                                this.pause||this.gameOver?
+                                    (this.timer/1000)
+                                :((Date.now()-this.timer)/1000)
+                            )).padEnd(32,' ')+(
+                                this.color?
+                                `<color type="head">${(this.snake.dir===SnakeC.mov.UP?SnakeC.chars.head[2]:'·')}</color>`
+                                :(this.snake.dir===SnakeC.mov.UP?SnakeC.chars.head[2]:'·')
+                            )
+                            +("<br>score: "+this.score.toFixed(3)+(this.godMode?" <i>(GameOver: "+this.pd+")</i>":'')).padEnd(30,' ')+(
+                                this.color?
+                                `<color type="head">${(this.snake.dir===SnakeC.mov.LEFT?SnakeC.chars.head[1]:'·')}</color>`
+                                :(this.snake.dir===SnakeC.mov.LEFT?SnakeC.chars.head[1]:'·')
+                            )+"   "+(
+                                this.color?
+                                `<color type="head">${(this.snake.dir===SnakeC.mov.RIGHT?SnakeC.chars.head[3]:'·')}</color>`
+                                :(this.snake.dir===SnakeC.mov.RIGHT?SnakeC.chars.head[3]:'·')
+                            )
+                            +("<br>fps: "+(1/(this.speed/1000)).toFixed(3)).padEnd(32,' ')+(
+                                this.color?
+                                `<color type="head">${(this.snake.dir===SnakeC.mov.DOWN?SnakeC.chars.head[4]:'·')}</color>`
+                                :(this.snake.dir===SnakeC.mov.DOWN?SnakeC.chars.head[4]:'·')
+                            )
+                        ).replace(/(?<!\<[^>]*)\x20/g,'&nbsp;');
+                    case'state':
+                        return(this.pause?"<center>##  PAUSED  ##  press any key to continue  ##</center>"
+                            :this.gameOver?"<center>##  G a m e - O v e r  ##  again ?  [R]  ##</center>"
+                            :'<center>##  ASCII - Snake  ##</center>'
+                        ).replaceAll(' ','&nbsp;');
+                    case'debug':
+                        return(
+                            this.debugInfo?
+                                "speed: "+this.speed
+                                +"<br>survive: "+this.survive
+                                +"<br>dir: "+Object.keys(SnakeC.mov).find(k=>SnakeC.mov[k]===this.snake.dir,this)
+                                +`<br>X/Y: ${this.snake.x}/${this.snake.y}`
+                                +`<br>fruitX/Y: ${this.fruit.x}/${this.fruit.y}`
+                                +"<br>nTail: "+this.snake.tail.length
+                                +"<br>color: "+(this.color?'true':'false')
+                                +"<br>GodMode: "+(this.godMode?'true':'false')
+                                +"<br>portalWalls: "+(this.portalWalls?'true':'false')
+                                +"<br>stepperMode: "+(this.stepperMode?'true':'false')
+                                +"<br><hr>"
+                            :''
+                        ).replaceAll(' ','&nbsp;');
+                    default:return'';
+                }
+            }
+            /**
+             * __draws game formated to html element__
+             */
+            draw(){
+                this.gameString=this.printHTML(this.color);
+                this.html.innerHTML='<hr>'
+                    +this.printInfoHTML('state')
+                    +'<hr><center>'
+                    +this.gameString
+                    +'</center><hr>'
+                    +this.printInfoHTML('info')
+                    +'<hr>';
+                if(this.debugInfo){this.html.innerHTML+=this.printInfoHTML('debug');}
+                return;
+            }
+            /**
+             * __draws game formated to html element _(only updates interface)___
+             */
+            drawI(){
+                this.html.innerHTML='<hr>'
+                    +this.printInfoHTML('state')
+                    +'<hr><center>'
+                    +this.gameString
+                    +'</center><hr>'
+                    +this.printInfoHTML('info')
+                    +'<hr>';
+                if(this.debugInfo){this.html.innerHTML+=this.printInfoHTML('debug');}
+                return;
+            }
+        };
+        /**
+         * __get css color of ascii symbols__
+         * @param {string} cType - css color attribute `(border|head|tail|fruit|debug)`
+         * @returns css color as hex `#RRGGBB`
+         */
+        function getCssColor(cType){
+            if(cType===undefined){return'';}
+            return getComputedStyle(document.querySelector(':root')).getPropertyValue('--c'+cType);
+        }
+        /**
+         * __set css color of ascii symbols__
+         * @param {string} cType - css color attribute `(border|head|tail|fruit|debug)`
+         * @param {string} cColor - css color `#RRGGBB`
+         * @returns css color as hex `#RRGGBB`
+         */
+        function setCssColor(cType,cColor='initial'){
+            if(cType===undefined){return;}
+            document.querySelector(':root').style.setProperty('--c'+cType,cColor);
+            return getCssColor(cType);
+        }
+        // TODO (local)multiplayer?
+    </script>
+</head>
+<body>
+    <div id="play" class="addContext">Loading...</div>
+    <div id="rmenu">
+        <table title="Set game settings">
+            <tr><th colspan="2"><h1>&nbsp;&nbsp;&nbsp;&nbsp;Settings&nbsp;&nbsp;&nbsp;&nbsp;</h1></th></tr>
+            <tr>
+                <td>
+                    <table title="Set extra game settings and modes">
+                        <tr><th colspan="2"><h2>&nbsp;Extras:&nbsp;</h2></th></tr>
+                        <tr title="Set speed in milliseconds between each frame/tick. (! resets !)">
+                            <td class="bleft btop"><label for="exs">Speed:</label></td>
+                            <td class="bright btop"><input type="number" id="exs" min="0.00" max="1000.00" step="0.01"></td>
+                        </tr>
+                        <tr title="Set width/height of the game field. (! resets !)">
+                            <td class="bleft"><label>Width/Height:</label></td>
+                            <td class="bright">
+                                <input type="number" id="exw" min="2" max="1000" step="1">/
+                                <input type="number" id="exh" min="2" max="1000" step="1">
+                            </td>
+                        </tr>
+                        <tr title="Set the font size of the game in [px]">
+                            <td class="bleft"><label for="exf">Font Size:</label></td>
+                            <td class="bright"><input type="number" id="exf" min="0.1" max="500" step="0.1"></td>
+                        </tr>
+                        <tr title="Time only progresses when you move. (! resets !)">
+                            <td class="bleft"><label for="exfbf">Frame By Frame Mode:</label></td>
+                            <td class="bright"><input type="checkbox" id="exfbf"></td>
+                        </tr>
+                        <tr title="Turn the walls into portals that teleport you to the other side. (! resets !)">
+                            <td class="bleft"><label for="expw">Portal Walls:</label></td>
+                            <td class="bright"><input type="checkbox" id="expw"></td>
+                        </tr>
+                        <tr title="Enable coloring. (slower)">
+                            <td class="bleft"><label for="exc">Color:</label></td>
+                            <td class="bright"><input type="checkbox" id="exc"></td>
+                        </tr>
+                        <tr title="Prints more information. (slower)" id="exbug">
+                            <td class="bleft bbottom"><label for="exb">Debug:</label></td>
+                            <td class="bright bbottom"><input type="checkbox" id="exb"></td>
+                        </tr>
+                        <tr title="Enables god mode. (! resets !)" id="exgodmode" hidden="true">
+                            <td class="bleft bbottom"><label for="exgm">God Mode:</label></td>
+                            <td class="bright bbottom"><input type="checkbox" id="exgm"></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table id="ctbl" title="Set Color of symbols">
+                        <tr><th colspan="2"><h2>&nbsp;Colors:&nbsp;</h2></th></tr>
+                        <tr title="Set the color of the snake head symbol.">
+                            <td class="bleft btop"><label for="chead">Snake-Head:</label></td>
+                            <td class="bright btop"><input type="color" id="chead"></td>
+                        </tr>
+                        <tr title="Set the color of the snake tail symbols.">
+                            <td class="bleft"><label for="ctail">Snake-Tail:</label></td>
+                            <td class="bright"><input type="color" id="ctail"></td>
+                        </tr>
+                        <tr title="Set the color of the fruit symbols.">
+                            <td class="bleft"><label for="cfruit">Fruit:</label></td>
+                            <td class="bright"><input type="color" id="cfruit"></td>
+                        </tr>
+                        <tr title="Set the color of the border symbols." id="cborder">
+                            <td class="bleft bbottom"><label for="cborder">Border:</label></td>
+                            <td class="bright bbottom"><input type="color" id="cborder"></td>
+                        </tr>
+                        <tr title="Set the color of the debug symbols." id="cbug" hidden="true">
+                            <td class="bleft bbottom"><label for="cdebug">Debug:</label></td>
+                            <td class="bright bbottom"><input type="color" id="cdebug"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table style="width:100%;" title="Set symbols | can be unicode | use unique symbols in each row and for head/tail/fruit(/debug) to each other">
+                        <tr><th colspan="6"><h2>&nbsp;Symbols:&nbsp;</h2></th></tr>
+                        <tr id="shead">
+                            <td class="btop bleft"><label>Snake head:</label></td>
+                            <td class="btop"><input type="text" id="shs" title="STOP" maxlength="1" size="1"></td>
+                            <td class="btop"><input type="text" id="shl" title="LEFT" maxlength="1" size="1"></td>
+                            <td class="btop"><input type="text" id="shu" title="UP" maxlength="1" size="1"></td>
+                            <td class="btop"><input type="text" id="shr" title="RIGHT" maxlength="1" size="1"></td>
+                            <td class="btop bright"><input type="text" id="shd" title="DOWN" maxlength="1" size="1"></td>
+                        </tr>
+                        <tr id="stail">
+                            <td class="bleft"><label>Snake tail:</label></td>
+                            <td><input type="text" id="stc" title="CORNER" maxlength="1" size="1"></td>
+                            <td><input type="text" id="sth" title="HORIZONTAL" maxlength="1" size="1"></td>
+                            <td><input type="text" id="stv" title="VERTICAL" maxlength="1" size="1"></td>
+                            <td></td><td class="bright"></td>
+                        </tr>
+                        <tr id="sfruit">
+                            <td class="bleft"><label>Fruit:</label></td>
+                            <td><input type="text" id="sfl" title="LEFT-BRACKET" maxlength="1" size="1"></td>
+                            <td><input type="text" id="sff" title="FLAG" maxlength="1" size="1"></td>
+                            <td><input type="text" id="sfr" title="RIGHT-BRACKET" maxlength="1" size="1"></td>
+                            <td></td><td class="bright"></td>
+                        </tr>
+                        <tr id="sborder">
+                            <td class="bbottom bleft"><label>Border:</label></td>
+                            <td class="bbottom"><input type="text" id="sbc" title="CORNER" maxlength="1" size="1"></td>
+                            <td class="bbottom"><input type="text" id="sbh" title="HORIZONTAL" maxlength="1" size="1"></td>
+                            <td class="bbottom"><input type="text" id="sbv" title="VERTICAL" maxlength="1" size="1"></td>
+                            <td class="bbottom"></td><td class="bbottom bright"></td>
+                        </tr>
+                        <tr id="sbug" hidden="true">
+                            <td class="bbottom bleft"><label>Debug:</label></td>
+                            <td class="bbottom"><input type="text" id="sdh" title="HORIZONTAL" maxlength="1" size="1"></td>
+                            <td class="bbottom"><input type="text" id="sdv" title="VERTICAL" maxlength="1" size="1"></td>
+                            <td class="bbottom"></td><td class="bbottom"></td><td class="bbottom bright"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <!-- TODO editable controls - chose key -->
+        </table>
+    </div>
+    <script>
+        //# elements
+        const play=document.getElementById('play'),
+            game=new GameC(play),
+            rmenu=document.getElementById('rmenu'),
+            contextAll=document.body.querySelectorAll('.addContext');
+        //# all the events
+        Array.from(document.body.querySelectorAll('input[type="color"]')).forEach(v=>{
+            v.value=getCssColor(v.id.substring(1));
+            v.setAttribute('oninput','this.value=setCssColor(this.id.substring(1),this.value);');
+        });
+        document.getElementById('exs').value=game.speedOg.toString();
+        document.getElementById('exs').setAttribute(
+            'onchange',
+            "clearTimeout(this.loop);"
+            +"document.removeEventListener('keydown',game.keyF[\"stepping\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"initial\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"pause\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"gameover\"]);"
+            +"game.speedOg=Number(this.value)||200;"
+            +"if(game.stepperMode){"
+                +"document.addEventListener('keydown',game.keyF[\"stepping\"]);"
+                +"game.reset();"
+            +"}else{"
+                +"game.reset();"
+                +"document.addEventListener('keydown',game.keyF[\"pause\"]);"
+                +"game.pause=true;"
+                +"game.timer=0;"
+            +"}game.draw();"
+        );
+        document.getElementById('exw').value=game.width.toString();
+        document.getElementById('exw').setAttribute(
+            'onchange',
+            "clearTimeout(this.loop);"
+            +"document.removeEventListener('keydown',game.keyF[\"stepping\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"initial\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"pause\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"gameover\"]);"
+            +"game.width=Number(this.value)||20;"
+            +"if(game.stepperMode){"
+                +"document.addEventListener('keydown',game.keyF[\"stepping\"]);"
+                +"game.reset();"
+            +"}else{"
+                +"game.reset();"
+                +"document.addEventListener('keydown',game.keyF[\"pause\"]);"
+                +"game.pause=true;"
+                +"game.timer=0;"
+            +"}game.draw();"
+        );
+        document.getElementById('exh').value=game.height.toString();
+        document.getElementById('exh').setAttribute(
+            'onchange',
+            "clearTimeout(this.loop);"
+            +"document.removeEventListener('keydown',game.keyF[\"stepping\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"initial\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"pause\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"gameover\"]);"
+            +"game.height=Number(this.value)||20;"
+            +"if(game.stepperMode){"
+                +"document.addEventListener('keydown',game.keyF[\"stepping\"]);"
+                +"game.reset();"
+            +"}else{"
+                +"game.reset();"
+                +"document.addEventListener('keydown',game.keyF[\"pause\"]);"
+                +"game.pause=true;"
+                +"game.timer=0;"
+            +"}game.draw();"
+        );
+        document.getElementById('exf').value=parseFloat(getComputedStyle(play).fontSize).toFixed(1);
+        document.getElementById('exf').setAttribute('oninput',"play.style.fontSize=this.value+'px';");
+        document.getElementById('exfbf').checked=game.stepperMode;
+        document.getElementById('exfbf').setAttribute(
+            'onchange',
+            "clearTimeout(this.loop);"
+            +"document.removeEventListener('keydown',game.keyF[\"stepping\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"initial\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"pause\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"gameover\"]);"
+            +"game.stepperMode=this.checked;"
+            +"if(this.checked){"
+                +"document.addEventListener('keydown',game.keyF[\"stepping\"]);"
+                +"game.pause=false;game.reset();"
+            +"}else{"
+                +"game.reset();"
+                +"document.addEventListener('keydown',game.keyF[\"pause\"]);"
+                +"game.pause=true;"
+                +"game.timer=0;"
+            +"}game.draw();"
+        );
+        document.getElementById('expw').checked=game.portalWalls;
+        document.getElementById('expw').setAttribute(
+            'onchange',
+            "clearTimeout(this.loop);"
+            +"document.removeEventListener('keydown',game.keyF[\"stepping\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"initial\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"pause\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"gameover\"]);"
+            +"game.portalWalls=this.checked;"
+            +"if(game.stepperMode){"
+                +"document.addEventListener('keydown',game.keyF[\"stepping\"]);"
+                +"game.reset();"
+            +"}else{"
+                +"game.reset();"
+                +"document.addEventListener('keydown',game.keyF[\"pause\"]);"
+                +"game.pause=true;"
+                +"game.timer=0;"
+            +"}game.draw();"
+        );
+        document.getElementById('exc').checked=game.color;
+        document.getElementById('exc').setAttribute(
+            'onchange',
+            "game.color=this.checked;game.draw();"
+            +"document.getElementById('ctbl').hidden=!this.checked;"
+        );
+        document.getElementById('exb').checked=game.debugInfo;
+        document.getElementById('exb').setAttribute(
+            'onchange',
+            "game.debugInfo=this.checked;game.draw();"
+            +"document.getElementById('cbug').hidden=!this.checked;"
+            +"document.getElementById('sbug').hidden=!this.checked;"
+            +"document.getElementById('exgodmode').hidden=!this.checked;"
+            +"if(this.checked){Array.from(document.body.querySelectorAll('tr#cborder td,tr#sborder td,tr#exbug td')).forEach(v=>v.classList.remove('bbottom'));}"
+            +"else{Array.from(document.body.querySelectorAll('tr#cborder td,tr#sborder td,tr#exbug td')).forEach(v=>v.classList.add('bbottom'));}"
+        );
+        document.getElementById('exgm').checked=game.godMode;
+        document.getElementById('exgm').setAttribute(
+            'onchange',
+            "clearTimeout(this.loop);"
+            +"document.removeEventListener('keydown',game.keyF[\"stepping\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"initial\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"pause\"]);"
+            +"document.removeEventListener('keydown',game.keyF[\"gameover\"]);"
+            +"game.godMode=this.checked;"
+            +"if(game.stepperMode){"
+                +"document.addEventListener('keydown',game.keyF[\"stepping\"]);"
+                +"game.reset();"
+            +"}else{"
+                +"game.reset();"
+                +"document.addEventListener('keydown',game.keyF[\"pause\"]);"
+                +"game.pause=true;"
+                +"game.timer=0;"
+            +"}game.draw();"
+        );
+        document.getElementById('shs').value=SnakeC.chars.head[0];
+        document.getElementById('shs').setAttribute('oninput',"SnakeC.chars.head=SnakeC.chars.head.replaceIndex(0,1,this.value);game.draw();");
+        document.getElementById('shl').value=SnakeC.chars.head[1];
+        document.getElementById('shl').setAttribute('oninput',"SnakeC.chars.head=SnakeC.chars.head.replaceIndex(1,1,this.value);game.draw();");
+        document.getElementById('shu').value=SnakeC.chars.head[2];
+        document.getElementById('shu').setAttribute('oninput',"SnakeC.chars.head=SnakeC.chars.head.replaceIndex(2,1,this.value);game.draw();");
+        document.getElementById('shr').value=SnakeC.chars.head[3];
+        document.getElementById('shr').setAttribute('oninput',"SnakeC.chars.head=SnakeC.chars.head.replaceIndex(3,1,this.value);game.draw();");
+        document.getElementById('shd').value=SnakeC.chars.head[4];
+        document.getElementById('shd').setAttribute('oninput',"SnakeC.chars.head=SnakeC.chars.head.replaceIndex(4,1,this.value);game.draw();");
+        document.getElementById('stc').value=SnakeC.chars.tail[0];
+        document.getElementById('stc').setAttribute('oninput',"SnakeC.chars.tail=SnakeC.chars.tail.replaceIndex(0,1,this.value);game.draw();");
+        document.getElementById('sth').value=SnakeC.chars.tail[1];
+        document.getElementById('sth').setAttribute('oninput',"SnakeC.chars.tail=SnakeC.chars.tail.replaceIndex(1,1,this.value);game.draw();");
+        document.getElementById('stv').value=SnakeC.chars.tail[2];
+        document.getElementById('stv').setAttribute('oninput',"SnakeC.chars.tail=SnakeC.chars.tail.replaceIndex(2,1,this.value);game.draw();");
+        document.getElementById('sfl').value=FruitC.chars[0];
+        document.getElementById('sfl').setAttribute('oninput',"FruitC.chars=FruitC.chars.replaceIndex(0,1,this.value);game.draw();");
+        document.getElementById('sff').value=FruitC.chars[1];
+        document.getElementById('sff').setAttribute('oninput',"FruitC.chars=FruitC.chars.replaceIndex(1,1,this.value);game.draw();");
+        document.getElementById('sfr').value=FruitC.chars[2];
+        document.getElementById('sfr').setAttribute('oninput',"FruitC.chars=FruitC.chars.replaceIndex(2,1,this.value);game.draw();");
+        document.getElementById('sbc').value=GameC.chars.border[0];
+        document.getElementById('sbc').setAttribute('oninput',"GameC.chars.border=GameC.chars.border.replaceIndex(0,1,this.value);game.draw();");
+        document.getElementById('sbh').value=GameC.chars.border[1];
+        document.getElementById('sbh').setAttribute('oninput',"GameC.chars.border=GameC.chars.border.replaceIndex(1,1,this.value);game.draw();");
+        document.getElementById('sbv').value=GameC.chars.border[2];
+        document.getElementById('sbv').setAttribute('oninput',"GameC.chars.border=GameC.chars.border.replaceIndex(2,1,this.value);game.draw();");
+        document.getElementById('sdh').value=GameC.chars.debug[0];
+        document.getElementById('sdh').setAttribute('oninput',"GameC.chars.debug=GameC.chars.debug.replaceIndex(0,1,this.value);game.draw();");
+        document.getElementById('sdv').value=GameC.chars.debug[1];
+        document.getElementById('sdv').setAttribute('oninput',"GameC.chars.debug=GameC.chars.debug.replaceIndex(1,1,this.value);game.draw();");
+        //# scroll counting
+        rmenu.addEventListener('wheel',e=>{
+            if(!['exs','exh','exw','exf'].includes(e.target.id)){return;}
+            e.preventDefault();
+            e.stopPropagation();
+            if(e.target===document.activeElement){e.target.value=Number((Number(e.target.value)+(e.deltaY<0?+e.target.step:-e.target.step)).toFixed(3)).toString();}
+            else{e.target.value=(Number(e.target.value)+(e.deltaY<0?1:-1)).toString();}
+            if(e.target.id==='exf'){e.target.dispatchEvent(new Event('input',{bubbles:false}));}
+            else{e.target.dispatchEvent(new Event('change',{bubbles:false}));}
+        },{passive:false,bubbles:false});
+        //# context menu
+        contextAll.forEach(function(value,key,parent){value.addEventListener('contextmenu',event=>{
+            if(event.path.includes(rmenu)){return;}
+            event.preventDefault();
+            rmenu.classList.add('visible');
+            rmenu.dataset.top=event.pageY+'px';
+            rmenu.dataset.left=event.pageX+'px';
+            if(event.pageX>(window.innerWidth-event.pageX)){
+                if(rmenu.getBoundingClientRect().width>event.pageX){rmenu.style.maxWidth=`calc((${event.pageX}px - 2em) - 4px)`;}
+                else{rmenu.style.maxWidth='';}
+            }else if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)){rmenu.style.maxWidth=`calc((${(window.innerWidth-event.pageX)}px - 2em) - 4px)`;}
+            else{rmenu.style.maxWidth='';}
+            if(rmenu.getBoundingClientRect().height>(window.innerHeight-event.pageY)){
+                if(rmenu.getBoundingClientRect().height>window.innerHeight){
+                    if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(calc(-100% + 1px),-'+event.pageY+'px)';}
+                    else{rmenu.dataset.transform='translate(0,-'+event.pageY+'px)';}
+                }else{
+                    if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(calc(-100% + 1px),-'+(rmenu.getBoundingClientRect().height-(window.innerHeight-event.pageY))+'px)';}
+                    else{rmenu.dataset.transform='translate(0,-'+(rmenu.getBoundingClientRect().height-(window.innerHeight-event.pageY))+'px)';}
+                }
+            }else{
+                if(rmenu.getBoundingClientRect().width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(calc(-100% + 1px),0)';}
+                else{rmenu.dataset.transform='translate(0,0)';}
+            }
+            rmenu.style.top=rmenu.dataset.top;
+            rmenu.style.left=rmenu.dataset.left;
+            rmenu.style.transform=rmenu.dataset.transform;
+            // TODO click outside window closes it
+        });});
+        rmenu.addEventListener('mouseleave',event=>{
+            rmenu.style.top='';
+            rmenu.style.left='';
+            rmenu.style.transform='';
+            rmenu.classList.remove('visible');
+        });
+        rmenu.addEventListener('mouseover',event=>{
+            rmenu.classList.add('visible');
+            rmenu.style.top=rmenu.dataset.top;
+            rmenu.style.left=rmenu.dataset.left;
+            rmenu.style.transform=rmenu.dataset.transform;
+        });
+        alert("For the best experience use chrome / a modern browser with mouse (right-click / scroll) and keyboard (shown keys).");
+    </script>
+</body>
+</html>
