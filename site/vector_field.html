@@ -24,9 +24,10 @@
         /**
          * __Vector-Class for drawing one arrow with `p5.js` - lots of variables__
          */
-         class _Vector{
+        class _Vector{
+            /** @type {{dir:{min:number;max:number;x:number;y:number;m:number;pl:number;fac:number;am:number;xt:boolean;ang:number;};tri:{width:number;height:number;fill:number[3]|string;m:number;};pos:{x:number;y:number;};col:{min:number;max:number;cmin:number;cmax:number;rgb:number[3];};x:{limit_dist:boolean;line:boolean;triangle:boolean;tri_line:boolean;small_tri:boolean;big_tri:boolean;};stroke_w:number;lm:number;lv:number;}} - values of vector */
             values={
-                /** @type {{}} - direction - group */
+                /** @type {{min:number;max:number;x:number;y:number;m:number;pl:number;fac:number;am:number;xt:boolean;ang:number;}} - direction - group */
                 dir:{
                     /** @type {number} - min-length in % `[0-1]` */
                     min:0.01,
@@ -49,25 +50,25 @@
                     /** @type {number} - current angle (in deg) */
                     ang:0,
                 },
-                /** @type {{}} - triangle/arrow-head - group */
+                /** @type {{width:number;height:number;fill:number[3]|string;m:number;}} - triangle/arrow-head - group */
                 tri:{
                     /** @type {number} - width in px `[0+]` */
                     width:10,
                     /** @type {number} - height in px `[0+]` */
                     height:10,
-                    /** @type {number[]|string} - fill `"css-color"`/`[R,G,B]` each `[0-255]` */
+                    /** @type {number[3]|string} - fill `"css-color"`/`[R,G,B]` each `[0-255]` */
                     fill:[0,0,0]||"black",
                     /** @type {number} - multi for length `[0.01+]` */
                     m:0.1,
                 },
-                /** @type {{}} - pos - group */
+                /** @type {{x:number;y:number;}} - pos - group */
                 pos:{
                     /** @type {number} - x-pos in canvas in px `[0+]` */
                     x:0,
                     /** @type {number} - x-pos in canvas in px `[0+]` */
                     y:0,
                 },
-                /** @type {{}} - color - group */
+                /** @type {{min:number;max:number;cmin:number;cmax:number;rgb:number[3]}} - color - group */
                 col:{
                     /** @type {number} - min-color-clipping in % `[0-1]` */
                     min:0,
@@ -77,10 +78,10 @@
                     cmin:240,
                     /** @type {number} - max-color hue `[0-360]` */
                     cmax:0,
-                    /** @type {number[]} - current rgb-color `[r,g,b]` */
+                    /** @type {number[3]} - current rgb-color `[r,g,b]` */
                     rgb:[0,0,0],
                 },
-                /** @type {{}} - extras - group */
+                /** @type {{limit_dist:boolean;line:boolean;triangle:boolean;tri_line:boolean;small_tri:boolean;big_tri:boolean;}} - extras - group */
                 x:{
                     /** @type {boolean} - uses the `_Vector.dir.min` / `.max` / `.m` and `.fac` vars for size _default `true`_ */
                     limit_dist:true,
@@ -229,7 +230,7 @@
              * @param {number} _stroke_w - stroke weight of arrow in px `[>0]` - _default `3`_
              * @param {number} _tri_width - width in px `[0+]` - _default `10`_
              * @param {number} _tri_height - height in px `[0+]` - _default `10`_
-             * @param {[number]|string} _tri_fill - fill `"css-color"`/`[R,G,B]` each `[0-255]` - _default `[0,0,0]`_
+             * @param {number[3]|string} _tri_fill - fill `"css-color"`/`[R,G,B]` each `[0-255]` - _default `[0,0,0]`_
              * @param {number} _tri_m - multi for length `[0.01+]` - _default `0.1`_
              */
             constructor(_x=0,_y=0,_m=20,_fac=1.333,_min=0,_max=1,_cmin=0,_cmax=1,_ccmin=240,_ccmax=0,_stroke_w=3,_tri_width=10,_tri_height=10,_tri_fill=[0,0,0],_tri_m=0.1){
@@ -255,19 +256,18 @@
         let lastMX = 0;
         /** @type {number} - last mouse-Ypos */
         let lastMY = 0;
-        /** @type {number} - stores all the vectors this array - live editable */
+        /** @type {_Vector[]} - stores all the vectors this array - live editable */
         let varr = [];
         /** @type {number} - (max) FPS of canvas - set before start */
         const _FPS=60;
         /**
          * __mouse function - inside `draw()`__
+         * @type {(_mx:number,_my:number)=>void}
          * @param {number} _mx - Mouse-Xpos
          * @param {number} _my - Mouse-Ypos
          */
-        let mouse_f=function(_mx,_my){/* Your mouse-function here */
-            for(const vec of varr){vec.calc_move(_mx,_my);}
-        };
-        /** __once function - inside `draw()`__ */
+        let mouse_f=function(_mx,_my){for(const vec of varr){vec.calc_move(_mx,_my);}};/* Your mouse-function here */
+        /** @type {()=>void|null} - __once function - inside `draw()`__ */
         let once_f=null;/* Your one-time-calc-function here */
         function setup() {
             createCanvas(windowWidth, windowHeight - 0);
