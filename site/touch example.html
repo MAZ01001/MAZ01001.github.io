@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>test mobile touch</title>
+    </head>
+    <style>
+        :root{--col:#000;}
+        body{
+            background-color: #000;
+            font-size: 5em;
+            font-family: serif;
+            color: var(--col);
+        }
+        div#t{
+            background-color: #222;
+            text-align: center;
+            height: 50vh;
+            width: 50vw;
+            padding-top: 25vh;
+            border: 1px solid #fff;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+        }
+    </style>
+    <script>
+        class _touch_det{
+            static detect=Object.freeze({
+                1:'UP',     'UP':1,
+                2:'RIGHT',  'RIGHT':2,
+                3:'DOWN',   'DOWN':3,
+                4:'LEFT',   'LEFT':4,
+                5:'CLICK',  'CLICK':5,
+                6:'HOLD',   'HOLD':6,
+                7:'DBCLICK','DBCLICK':7
+            });
+            static dbclick_delay=400;//// ~200-500 ms ; or faster (two short touches) "visible delay" because it waits a bit for possible dbclick !
+            static hold_delay=650;//// ~650-700 ms ; or longer (one long touch)
+            /**
+             * @param {HTMLElement} el - html element
+             * @param {(this:_touch_det,type:number,timeStamp:number)=>void} clbk - callback function - use `_touch_det.detect[type]` to get the string equivalent
+             * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `false`_
+             */
+            constructor(el,clbk,pvdf=false){
+                if(!(el instanceof HTMLElement)){throw new TypeError('[el] is not a html element.');}
+                if(typeof clbk!=="function"){throw new TypeError('[clbk] is not a function.');}
+                if(typeof pvdf!=="boolean"){throw new TypeError('[pvdf] is not a boolean.');}
+                /** @type {HTMLElement} html element */
+                this.el=el;
+                /** @type {boolean} prevent default on touch event listeners */
+                this.pvdf=pvdf;
+                /** @type {{passive:boolean}} passive object for event listener */
+                this.ev_passive=Object.freeze({passive:!this.pvdf});
+                /** @type {(this:_touch_det,type:number,timeStamp:number)=>void} callback function */
+                this.clbk=clbk;
+                /** @type {{current:number;l_x:number;l_y:number;l_t:number;c_x:number;c_y:number;c_t:number;timer_db:number;}} used for tmp value storage*/
+                this.touch_vals={
+                    current:0,
+                    l_x:0,l_y:0,l_t:0,
+                    c_x:0,c_y:0,c_t:0,
+                    timer_db:0
+                };
+                if(this.pvdf){
+                    this.el.style.touchAction='none';
+                    this.el.addEventListener('touchstart',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                    this.el.addEventListener('touchmove',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                    this.el.addEventListener('touchend',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                }else{
+                    this.el.addEventListener('touchstart',ev=>this.t_handler(ev),this.ev_passive);
+                    this.el.addEventListener('touchmove',ev=>this.t_handler(ev),this.ev_passive);
+                    this.el.addEventListener('touchend',ev=>this.t_handler(ev),this.ev_passive);
+                }
+            }
+            /** __remove the eventListeners from this element__ */
+            remove_det(){
+                clearTimeout(this.touch_vals.timer_db);
+                if(this.pvdf){
+                    this.el.style.touchAction='';
+                    this.el.removeEventListener('touchstart',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                    this.el.removeEventListener('touchmove',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                    this.el.removeEventListener('touchend',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                }else{
+                    this.el.removeEventListener('touchstart',ev=>this.t_handler(ev),this.ev_passive);
+                    this.el.removeEventListener('touchmove',ev=>this.t_handler(ev),this.ev_passive);
+                    this.el.removeEventListener('touchend',ev=>this.t_handler(ev),this.ev_passive);
+                }
+                clearTimeout(this.touch_vals.timer_db);
+            }
+            /** @param {TouchEvent} ev - touch event */
+            t_handler(ev){
+                if(!ev.isTrusted)return;
+                // if(ev.touches.length>1)return;//// no support for multi-touch anyway
+                //// no lag/delay on "click" if "dbclick" would be removed from here !
+                switch(ev.type){
+                    case'touchstart':
+                        this.touch_vals.c_x=ev.touches[0].clientX;
+                        this.touch_vals.c_y=ev.touches[0].clientY;
+                        this.touch_vals.c_t=ev.timeStamp;
+                        if(this.touch_vals.current===2){
+                            if(
+                                ev.timeStamp-this.touch_vals.l_t<=_touch_det.dbclick_delay
+                                &&Math.abs(this.touch_vals.l_x-this.touch_vals.c_x)<=ev.changedTouches[0].radiusX<<1
+                                &&Math.abs(this.touch_vals.l_y-this.touch_vals.c_y)<=ev.changedTouches[0].radiusY<<1
+                            ){
+                                clearTimeout(this.touch_vals.timer_db);
+                                this.touch_vals.current=3;
+                            }else{
+                                clearTimeout(this.touch_vals.timer_db);
+                                this.clbk.call(this,_touch_det.detect.CLICK,this.touch_vals.l_t);
+                                this.touch_vals.current=0;
+                            }
+                        }else{this.touch_vals.current=0;}
+                        break;
+                    case'touchmove':
+                        if(this.touch_vals.current===1)break;
+                        const _dx=ev.touches[0].clientX-this.touch_vals.c_x,
+                            _dy=ev.touches[0].clientY-this.touch_vals.c_y,
+                            _2rx=ev.touches[0].radiusX<<1,
+                            _2ry=ev.touches[0].radiusY<<1;
+                        if(!(Math.abs(_dx)>=_2rx||Math.abs(_dy)>=_2ry))break;
+                        this.touch_vals.current=1;
+                        clearTimeout(this.touch_vals.timer_db);
+                        this.clbk.call(this,(
+                            (Math.abs(_dx)>Math.abs(_dy))
+                            ?(_dx<0?_touch_det.detect.LEFT:_touch_det.detect.RIGHT)
+                            :(_dy<0?_touch_det.detect.UP:_touch_det.detect.DOWN)
+                        ),ev.timeStamp);
+                        break;
+                    case'touchend':
+                        if(this.touch_vals.current===1)break;
+                        if(ev.timeStamp-this.touch_vals.c_t>=_touch_det.hold_delay){this.clbk.call(this,_touch_det.detect.HOLD,ev.timeStamp);}
+                        else if(this.touch_vals.current===3){this.clbk.call(this,_touch_det.detect.DBCLICK,ev.timeStamp);}
+                        else{
+                            this.touch_vals.current=2;
+                            this.touch_vals.l_x=this.touch_vals.c_x;
+                            this.touch_vals.l_y=this.touch_vals.c_y;
+                            this.touch_vals.l_t=ev.timeStamp;
+                            this.touch_vals.timer_db=setTimeout(()=>{
+                                this.touch_vals.current=0;
+                                this.clbk.call(this,_touch_det.detect.CLICK,this.touch_vals.l_t);
+                            },_touch_det.dbclick_delay);
+                        }
+                        break;
+                    default:break;
+                }
+            }
+        };
+    </script>
+    <body>
+        <div id="t">TOUCH<br>HERE</div>
+        <script>
+            let i=0,last=0;
+            const _t=document.getElementById("t"),
+                getColor=x=>{switch(x){case 1:return'#f90';case 2:return'#0f0';default:i=1;return getColor(i);}};
+                fnk=(type,time)=>{
+                    document.querySelector(':root').style.setProperty('--col',getColor(last===type?++i:i));
+                    _t.innerHTML=_touch_det.detect[type]+'<br><small>(@'+(time^0)/1000+'sec)</small>';
+                    console.log(_touch_det.detect[type],time);
+                    last=type;
+                };
+            let _t_touch=new _touch_det(_t,fnk,true);
+            // _t_touch.remove_det();delete _t_touch;
+            alert('there is a small delay for "click"\n    because it waits for a potential "dbclick"!\nno multi-touch!');
+        </script>
+    </body>
+</html>
