@@ -41,20 +41,23 @@
             /**
              * @param {HTMLElement} el - html element
              * @param {(this:_touch_det,type:number,timeStamp:number)=>void} clbk - callback function - use `_touch_det.detect[type]` to get the string equivalent
-             * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `false`_
+             * @param {boolean} db - if dbclick should be captured (delay on click !) - _default `false`_
+             * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `true`_
              */
-            constructor(el,clbk,pvdf=false){
+            constructor(el,clbk,db=false,pvdf=true){
                 if(!(el instanceof HTMLElement)){throw new TypeError('[el] is not a html element.');}
                 if(typeof clbk!=="function"){throw new TypeError('[clbk] is not a function.');}
                 if(typeof pvdf!=="boolean"){throw new TypeError('[pvdf] is not a boolean.');}
                 /** @type {HTMLElement} html element */
                 this.el=el;
+                /** @type {(this:_touch_det,type:number,timeStamp:number)=>void} callback function */
+                this.clbk=clbk;
+                /** @type {boolean} if dbclick should be captured */
+                this.db=db;
                 /** @type {boolean} prevent default on touch event listeners */
                 this.pvdf=pvdf;
                 /** @type {{passive:boolean}} passive object for event listener */
                 this.ev_passive=Object.freeze({passive:!this.pvdf});
-                /** @type {(this:_touch_det,type:number,timeStamp:number)=>void} callback function */
-                this.clbk=clbk;
                 /** @type {{current:number;l_x:number;l_y:number;l_t:number;c_x:number;c_y:number;c_t:number;timer_db:number;}} used for tmp value storage*/
                 this.touch_vals={
                     current:0,
@@ -86,19 +89,17 @@
                     this.el.removeEventListener('touchmove',ev=>this.t_handler(ev),this.ev_passive);
                     this.el.removeEventListener('touchend',ev=>this.t_handler(ev),this.ev_passive);
                 }
-                clearTimeout(this.touch_vals.timer_db);
             }
             /** @param {TouchEvent} ev - touch event */
             t_handler(ev){
                 if(!ev.isTrusted)return;
                 // if(ev.touches.length>1)return;//// no support for multi-touch anyway
-                //// no lag/delay on "click" if "dbclick" would be removed from here !
                 switch(ev.type){
                     case'touchstart':
                         this.touch_vals.c_x=ev.touches[0].clientX;
                         this.touch_vals.c_y=ev.touches[0].clientY;
                         this.touch_vals.c_t=ev.timeStamp;
-                        if(this.touch_vals.current===2){
+                        if(this.db&&this.touch_vals.current===2){
                             if(
                                 ev.timeStamp-this.touch_vals.l_t<=_touch_det.dbclick_delay
                                 &&Math.abs(this.touch_vals.l_x-this.touch_vals.c_x)<=ev.changedTouches[0].radiusX<<1
@@ -132,7 +133,7 @@
                         if(this.touch_vals.current===1)break;
                         if(ev.timeStamp-this.touch_vals.c_t>=_touch_det.hold_delay){this.clbk.call(this,_touch_det.detect.HOLD,ev.timeStamp);}
                         else if(this.touch_vals.current===3){this.clbk.call(this,_touch_det.detect.DBCLICK,ev.timeStamp);}
-                        else{
+                        else if(this.db){
                             this.touch_vals.current=2;
                             this.touch_vals.l_x=this.touch_vals.c_x;
                             this.touch_vals.l_y=this.touch_vals.c_y;
@@ -141,6 +142,9 @@
                                 this.touch_vals.current=0;
                                 this.clbk.call(this,_touch_det.detect.CLICK,this.touch_vals.l_t);
                             },_touch_det.dbclick_delay);
+                        }else{
+                            this.touch_vals.current=0;
+                            this.clbk.call(this,_touch_det.detect.CLICK,ev.timeStamp);
                         }
                         break;
                     default:break;
@@ -160,7 +164,7 @@
                     console.log(_touch_det.detect[type],time);
                     last=type;
                 };
-            let _t_touch=new _touch_det(_t,fnk,true);
+            let _t_touch=new _touch_det(_t,fnk,true);////dbclick now optional
             // _t_touch.remove_det();delete _t_touch;
             alert('there is a small delay for "click"\n    because it waits for a potential "dbclick"!\nno multi-touch!');
         </script>

@@ -119,6 +119,85 @@
          * @example "Hello, World !".replaceIndex(5,7,' There');//=> "Hello There !"
          */
         String.prototype.replaceIndex=function(i,l,r){return this.substring(0,i)+r+this.substring(i+l);};
+        class TouchControlC{
+            static detect=Object.freeze({
+                1:'UP',     'UP':1,
+                2:'RIGHT',  'RIGHT':2,
+                3:'DOWN',   'DOWN':3,
+                4:'LEFT',   'LEFT':4,
+                5:'CLICK',  'CLICK':5,
+                6:'HOLD',   'HOLD':6,
+                7:'DBCLICK','DBCLICK':7
+            });
+            static hold_delay=650;//// ~650-700 ms ; or longer (one long touch)
+            /**
+             * @param {HTMLElement} el - html element
+             * @param {(this:_touch_det,type:number,timeStamp:number)=>void} clbk - callback function - use `_touch_det.detect[type]` to get the string equivalent
+             */
+            constructor(el,clbk){
+                if(!(el instanceof HTMLElement)){throw new TypeError('[el] is not a html element.');}
+                if(typeof clbk!=="function"){throw new TypeError('[clbk] is not a function.');}
+                if(typeof pvdf!=="boolean"){throw new TypeError('[pvdf] is not a boolean.');}
+                /** @type {HTMLElement} html element */
+                this.el=el;
+                /** @type {(this:_touch_det,type:number,timeStamp:number)=>void} callback function */
+                this.clbk=clbk;
+                /** @type {boolean} prevent default on touch event listeners */
+                this.pvdf=true;
+                /** @type {{passive:boolean}} passive object for event listener */
+                this.ev_passive=Object.freeze({passive:false});
+                /** @type {{current:number;l_x:number;l_y:number;l_t:number;c_x:number;c_y:number;c_t:number;timer_db:number;}} used for tmp value storage*/
+                this.touch_vals={
+                    current:0,
+                    c_x:0,c_y:0,c_t:0
+                };
+                this.el.style.touchAction='none';
+                this.el.addEventListener('touchstart',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                this.el.addEventListener('touchmove',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                this.el.addEventListener('touchend',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+            }
+            /** __remove the eventListeners from this element__ */
+            remove_det(){
+                this.el.style.touchAction='';
+                this.el.removeEventListener('touchstart',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                this.el.removeEventListener('touchmove',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+                this.el.removeEventListener('touchend',ev=>{ev.preventDefault();this.t_handler(ev)},this.ev_passive);
+            }
+            /** @param {TouchEvent} ev - touch event */
+            t_handler(ev){
+                if(!ev.isTrusted)return;
+                // if(ev.touches.length>1)return;//// no support for multi-touch anyway
+                switch(ev.type){
+                    case'touchstart':
+                        this.touch_vals.c_x=ev.touches[0].clientX;
+                        this.touch_vals.c_y=ev.touches[0].clientY;
+                        this.touch_vals.c_t=ev.timeStamp;
+                        this.touch_vals.current=0;
+                        break;
+                    case'touchmove':
+                        if(this.touch_vals.current===1)break;
+                        const _dx=ev.touches[0].clientX-this.touch_vals.c_x,
+                            _dy=ev.touches[0].clientY-this.touch_vals.c_y,
+                            _2rx=ev.touches[0].radiusX<<1,
+                            _2ry=ev.touches[0].radiusY<<1;
+                        if(!(Math.abs(_dx)>=_2rx||Math.abs(_dy)>=_2ry))break;
+                        this.touch_vals.current=1;
+                        clearTimeout(this.touch_vals.timer_db);
+                        this.clbk.call(this,(
+                            (Math.abs(_dx)>Math.abs(_dy))
+                            ?(_dx<0?_touch_det.detect.LEFT:_touch_det.detect.RIGHT)
+                            :(_dy<0?_touch_det.detect.UP:_touch_det.detect.DOWN)
+                        ),ev.timeStamp);
+                        break;
+                    case'touchend':
+                        if(this.touch_vals.current===1)break;
+                        if(ev.timeStamp-this.touch_vals.c_t>=_touch_det.hold_delay){this.clbk.call(this,_touch_det.detect.HOLD,ev.timeStamp);}
+                        else{this.clbk.call(this,_touch_det.detect.CLICK,ev.timeStamp);}
+                        break;
+                    default:break;
+                }
+            }
+        };
         class SnakeC{
             /**@type {{STOP:number;LEFT:number;UP:number;RIGHT:number;DOWN:number}} __snake direction for movement__*/
             static mov={STOP:0,LEFT:1,UP:2,RIGHT:3,DOWN:4};
@@ -725,8 +804,8 @@
             return getCssColor(cType);
         }
         // TODO (local)multiplayer pvp like tron
-        // TODO touch controls
-        // TODO editable controls#
+        // TODO implement TouchControlC ~ edit all event listeners in GameC
+        // TODO editable controls for keyboard
         // TODO GameC.print only HTML print > array for better color management
         // TODO extra layer for rmenu when clicked outside hide instandly ~ opaque and blur
     </script>
