@@ -39,7 +39,7 @@
 - dice for random numbers
 - choose min/max number of eyes (0-9)
 - left-click on dice for stats
-- "true" random - may display the same number multiple times in a row
+- uses `Math.random()` for random numbers - colors button differently for each new number ('cause sometimes the same number is generated multiple times in a row)
 
 ## [Pascal's Triangle](./site/pascal's%20triangle.html)
 
