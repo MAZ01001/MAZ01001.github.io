@@ -5,22 +5,20 @@
 
 ## Table of Contents
 
-- [MAZ01001.github.io](#maz01001githubio)
-  - [Table of Contents](#table-of-contents)
-  - [Unofficial Satisfactory U3 Flow Chart](#unofficial-satisfactory-u3-flow-chart)
-  - [Ball Screensaver](#ball-screensaver)
-  - [Small Dice](#small-dice)
-  - [Pascal's Triangle](#pascals-triangle)
-  - [Math Function Drawer](#math-function-drawer)
-  - [Error Correction Codes](#error-correction-codes)
-  - [Enigma](#enigma)
-  - [Vector Field](#vector-field)
-  - [ASCII Snake](#ascii-snake)
-  - [_hidden_](#hidden)
-    - [Context menu example](#context-menu-example)
-    - [4 PI-Day 2021](#4-pi-day-2021)
-    - [Touch example](#touch-example)
-    - [3D-Card example](#3d-card-example)
+- [[Unofficial Satisfactory U3 Flow Chart]](#unofficial-satisfactory-u3-flow-chart)
+- [[Ball Screensaver]](#ball-screensaver)
+- [[Small Dice]](#small-dice)
+- [[Pascal's Triangle]](#pascals-triangle)
+- [[Math Function Drawer]](#math-function-drawer)
+- [[Error Correction Codes]](#error-correction-codes)
+- [[Enigma]](#enigma)
+- [[Vector Field]](#vector-field)
+- [[ASCII Snake]](#ascii-snake)
+- [_hidden_](#hidden)
+  - [[Context menu example]](#context-menu-example)
+  - [[4 PI-Day 2021]](#4-pi-day-2021)
+  - [[Touch example]](#touch-example)
+  - [[3D-Card example]](#3d-card-example)
 
 ----
 
