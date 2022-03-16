@@ -92,7 +92,7 @@
 
 ## [ASCII Snake](./site/snake.html)
 
-- snake game in ascii style ([port from c++](./../other-projects/README.md#snake_cmd-game.cpp))
+- snake game in ascii style ([port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp))
 - right-click for more options
 
 ----
