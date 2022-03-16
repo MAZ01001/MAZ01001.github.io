@@ -12,7 +12,7 @@
             font-family: 'Times New Roman', Times, serif;
             font-size: large;
         }
-        div#border{
+        div#box{
             position: absolute;
             top: 50%;left: 50%;
             transform:translate(-50%, -50%);
@@ -25,6 +25,17 @@
             border-radius: 1em;
             text-align: center;
         }
+        div#box>h1{font-family: 'Times New Roman', Times, serif;}
+        table#border{
+            width: calc(100% - 40px);
+            margin: 0 20px;
+            /* border-collapse: collapse; */
+        }
+        table#border tr>td{
+            border: 3px groove #444;
+            padding: 8px;
+        }
+        table#border tr>td:hover{border-color: #f90;}
         ::-webkit-scrollbar{width: 0.7em;height: 0.7em;}
         ::-webkit-scrollbar-thumb:window-inactive{border-color: #040F !important;}
         ::-webkit-scrollbar-thumb:vertical{
@@ -1423,7 +1434,7 @@
     </script>
 </head>
 <body>
-    <div id="border">
+    <div id="box">
         <!-- TODO - something like this:
             . +--------------------------------------------------------+
             . | output base (drop-down-list) [currentBase]             |
@@ -1431,34 +1442,37 @@
             . | last (grayed out) [lastNumber.toString(currentBase)]   |
             . +--------------------------------------------------------+
             . | current (input) [→currentNumber]                       |
-            . +--------------------------------------------------------+
-            . | buttons for [FUNCTIONS]                                |
-            . |                                                        |
-            . |                                                        |
-            . +--------------------------------------------------------+
+            . +------------------------------+-------------------------+
+            . | buttons for [FUNCTIONS]      | list of [savedNumbers]  |
+            . |                              |                         |
+            . |                              |                         |
+            . +------------------------------+-------------------------+
             . | if error → error name and message (if not "")          |
             . +--------------------------------------------------------+
         -->
-        <div>
-            <h1>WIP</h1>
-            <p><!-- test scrolling -->
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
-                Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-                Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.
-                Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.
-                In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.
-                Integer tincidunt.Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.
-                Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.
-                Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus.
-                Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet.
-                Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus.
-                Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum.
-                Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.
-                Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt.
-                Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna.
-                Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, ...
-            </p>
-        </div>
+        <h1>big integer calculator</h1>
+        <table id="border">
+            <tr><td colspan="2" id="base-chooser">
+                [ base-chooser ]
+            </td></tr>
+            <tr><td colspan="2" id="last-calc">
+                [ last-calc ]
+            </td></tr>
+            <tr><td colspan="2" id="current-calc">
+                [ current-calc ]
+            </td></tr>
+            <tr>
+                <td id="function-buttons">
+                    [ function-buttons ]
+                </td>
+                <td id="saved-numbers">
+                    [ saved-numbers ]
+                </td>
+            </tr>
+            <tr><td colspan="2" id="error-output">
+                [ error-output ]
+            </td></tr>
+        </table>
     </div>
     <script>
         // #### EVENT LISTENERS ####
