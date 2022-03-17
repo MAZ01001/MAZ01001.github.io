@@ -89,7 +89,7 @@
         ::-webkit-scrollbar-track-piece{display: none;background-color: #0000;}
         ::-webkit-scrollbar-corner{display: none;background-color: #0000;}
     </style>
-    <script data-info="2022-03-14 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js">
+    <script data-info="2022-03-18 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js">
         class BigIntType{
             //~ property/method names starting with '#' are private - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields for details
             /*
@@ -553,18 +553,21 @@
             */
             isEven(){return !this.isOdd();}
             /**
-            * __determines if `this` number is equal to 0__
-            * @returns {boolean} `this === 0`
+            * __determines if `this` number is equal to 0__ \
+            * _only compares digit not sign_
+            * @returns {boolean} `abs(this) === 0`
             */
             isZero(){return(this.length===1&&this.#digits[0]===0);}
             /**
-            * __determines if `this` number is equal to 1__
-            * @returns {boolean} `this === 1`
+            * __determines if `this` number is equal to 1__ \
+            * _only compares digit not sign_
+            * @returns {boolean} `abs(this) === 1`
             */
             isOne(){return(this.length===1&&this.#digits[0]===1);}
             /**
-            * __determines if `this` number is equal to 2__
-            * @returns {boolean} `this === 2`
+            * __determines if `this` number is equal to 2__ \
+            * _only compares digit not sign_
+            * @returns {boolean} `abs(this) === 2`
             */
             isTwo(){return(this.length===1&&this.#digits[0]===2);}
             /**
