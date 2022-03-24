@@ -39,8 +39,8 @@
             overflow: visible;
             font-family: 'Times New Roman', Times, serif;
             font-size: large;
-            user-select: none;
         }
+        *{user-select: none;}
         div#box{
             position: absolute;
             top: 50%;left: 50%;
@@ -57,7 +57,7 @@
         }
         div#border{
             display: grid;
-            grid-template-columns:17em auto 50%;
+            grid-template-columns: auto auto 50%;
             /* grid-template-rows: auto auto auto auto auto; */
             /* align-items: center; */
             min-width: 40em;
@@ -72,10 +72,9 @@
         }
         div#border>div[data-content]:hover{border-color: #a70;}
         div#border>div[data-content="base-chooser"]{grid-area: 1/1/2/2;}
-        div#border>div[data-content="last-calc"]{grid-area: 2/1/3/4;}
-        div#border>div[data-content="current-calc"]{grid-area: 3/1/4/4;}
-        div#border>div[data-content="function-buttons"]{grid-area: 4/1/5/3;}    div#border>div[data-content="saved-numbers"]{grid-area: 4/3/5/4;}
-        div#border>div[data-content="error-output"]{grid-area: 5/1/6/4;}
+        div#border>div[data-content="number-a"]{grid-area: 2/1/3/3;}           div#border>div[data-content="number-b"]{grid-area: 2/3/3/4;}
+        div#border>div[data-content="function-buttons"]{grid-area: 3/1/4/3;}    div#border>div[data-content="saved-numbers"]{grid-area: 3/3/4/4;}
+        div#border>div[data-content="error-output"]{grid-area: 4/1/5/4;}
         div.button{display: inline;white-space: nowrap;}
         div[data-content="function-buttons"]{
             display: grid;
@@ -83,31 +82,37 @@
             min-width: min-content;
             gap: .2em .1em;
         }
+        /* TODO rename ids */
         #abs{grid-area: 1/1/2/2;}   #inc{grid-area: 1/2/2/3;}   #add{grid-area: 1/3/2/4;}   #mul{grid-area: 1/4/2/5;}   #double{grid-area: 1/5/2/6;}
         #neg{grid-area: 2/1/3/2;}   #dec{grid-area: 2/2/3/3;}   #sub{grid-area: 2/3/3/4;}   #mod{grid-area: 2/4/3/5;}   #pow{grid-area: 2/5/3/6;}
-        div[data-content="div"]{grid-area: 3/1/4/3;}            div[data-content="half"]{grid-area: 3/3/4/5;}
-        #bitls{grid-area: 4/1/5/3;}                             #bitrs{grid-area: 4/3/5/5;}                             #ie{grid-area: 4/5/5/6;}
-        #bitno{grid-area: 5/1/6/2;} #bitan{grid-area: 5/2/6/3;} #bitor{grid-area: 5/3/6/4;} #bitxo{grid-area: 5/4/6/5;} #io{grid-area: 5/5/6/6;}
-        #ilt{grid-area: 6/1/7/2;}   #ilet{grid-area: 6/2/7/3;}  #igt{grid-area: 6/3/7/4;}   #iget{grid-area: 6/4/7/5;}  #ieqt{grid-area: 6/5/7/6;}
-        div#border>div[data-content="last-calc"],
-        div#border>div[data-content="current-calc"]{text-align: left;}
-        #last-calc,
-        #current-calc{
-            width: calc(100% - 8em);
-            height: 1.2em;
+        div[data-content="div"]{grid-area: 3/1/4/3;}            div[data-content="half"]{grid-area: 3/3/4/5;}           #switch{grid-area: 3/5/4/6;}
+        #AbitlsB{grid-area: 4/1/5/3;}                             #AbitrsB{grid-area: 4/3/5/5;}                             #Aie{grid-area: 4/5/5/6;}
+        #bitnoA{grid-area: 5/1/6/2;} #AbitanB{grid-area: 5/2/6/3;} #AbitorB{grid-area: 5/3/6/4;} #AbitxoB{grid-area: 5/4/6/5;} #Bie{grid-area: 5/5/6/6;}
+        #AltB{grid-area: 6/1/7/2;}   #AlteqB{grid-area: 6/2/7/3;}  #AgtB{grid-area: 6/3/7/4;}   #AgteqB{grid-area: 6/4/7/5;}  #AeqB{grid-area: 6/5/7/6;}
+        div#border>div[data-content="base-chooser"],
+        div#border>div[data-content="number-a"],
+        div#border>div[data-content="number-b"]{text-align: left;}
+        .number{
+            display: block;
+            width: calc(100% - 0.5em);
+            min-height: 1rem;
+            max-height: 10rem;
+            height: fit-content;
+            overflow-y: overlay;
             font-family: 'consolas', monospace, serif;
-            user-select: contain;
+            user-select: text;
+            resize: vertical;
         }
         #error-output{
             color: #f00 !important;
-            width: 99%;
+            width: calc(100% - 0.5em);
             height: fit-content;
             font-weight: bold;
             font-family: 'consolas', monospace, serif;
-            user-select: contain;
+            user-select: text;
             resize: none;
         }
-        select,button,#last-calc,#current-calc,#error-output{
+        select,button,.number,#error-output{
             background-color: #000;
             color: #0f0;
             border-radius: 0;
@@ -115,10 +120,13 @@
             border-style: outset;
             outline: none !important;
         }
-        select:hover,button:hover,#last-calc:hover,#current-calc:hover,#error-output:hover{border-color: #080;}
-        select:active,button:active,#last-calc:active,#current-calc:active,#error-output:active{border-color: #0d0;}
-        select:focus,button:focus,#last-calc:focus,#current-calc:focus,#error-output:focus{border-color: #0d0;}
-        #ilt,#ilet,#igt,#iget,#ieqt,#ie,#io{border-color: #000;}
+        select:hover,button:hover,#number-a:hover,#number-b:hover,#error-output:hover{border-color: #080;}
+        select:focus,button:focus,#number-a:focus,#number-b:focus,#error-output:focus{border-color: #0a0;}
+        select:active,button:active,#number-a:active,#number-b:active,#error-output:active{border-color: #0f0 !important;}
+        #AltB,#AlteqB,#AgtB,#AgteqB,#AeqB,#Aie,#Bie{
+            border-color: #000;
+            color: #444;
+        }
         /* TODO */
         div#box>h1,div#box label[for="base-chooser"]{user-select: text;}
     </style>
@@ -1496,15 +1504,20 @@
                     <option value="0">braille-pattern (256)</option>
                 </select>
             </div>
-            <div data-content="last-calc">
-                <input type="text" id="last-calc" class="number" title="the last calculation result" readonly value="">
-                <button id="zero" title="set this number to zero">= zero</button>
+            <div data-content="number-a">
+                <label for="number-a">A</label>
+                <textarea id="number-a" class="number" title="[A] input a number for calculation">0</textarea>
+                <button id="Azero" title="[A] set to zero">set zero</button>
+                <button id="AseqB" title="[A] set equal to B">copy B</button>
             </div>
-            <div data-content="current-calc">
-                <input type="text" id="current-calc" class="number" title="input/second number for calculations" value="0">
-                <button id="seq" title="set equal to above number">= above</button>
+            <div data-content="number-b">
+                <label for="number-b">B</label>
+                <textarea id="number-b" class="number" title="[B] input a number for calculation">0</textarea>
+                <button id="Bzero" title="[B] set to zero">set zero</button>
+                <button id="BseqA" title="[B] set equal to A">copy A</button>
             </div>
             <div data-content="function-buttons">
+                <!-- TODO rename id and buttone value "|A|"/"-A"/"A++"/"A+B"/... -->
                 <button id="abs" title="absolute current number">abs</button>
                 <button id="neg" title="negates current number">neg</button>
                 <button id="inc" title="increment 1">+1</button>
@@ -1514,7 +1527,7 @@
                 <button id="mul" title="multiplication">*</button>
                 <button id="mod" title="modulo">%</button>
                 <button id="double" title="doubles current number">*2</button>
-                <button id="pow" title="the last number to the power of the current one">^</button>
+                <button id="pow" title="the last number to the power of the current one">A ** B</button>
                 <div class="button" data-content="div">
                     <button id="div" title="division">/</button>
                     <select class="rounding" title="rounding for [/]">
@@ -1532,19 +1545,22 @@
                         <option value="c" selected>ceiled</option>
                     </select>
                 </div>
-                <button id="bitls" title="shifts the bits of first number by the amount of the second number to the left">&lt;&lt;</button>
-                <button id="bitrs" title="shifts the bits of first number by the amount of the second number to the right">&gt;&gt;</button>
-                <button id="bitno" title="applies logical NOT to current number">NOT</button>
-                <button id="bitan" title="applies logical AND to first and second number">AND</button>
-                <button id="bitor" title="applies logical OR to first and second number">OR</button>
-                <button id="bitxo" title="applies logical XOR to first and second number">XOR</button>
-                <button id="ie" disabled title="if highlighted green: current number is even">even</button>
-                <button id="io" disabled title="if highlighted green: current number is odd">odd</button>
-                <button id="ilt" disabled title="if highlighted green: current number is less than the above">&lt;?</button>
-                <button id="ilet" disabled title="if highlighted green: current number is less or equal to the above">&lt;=?</button>
-                <button id="igt" disabled title="if highlighted green: current number is greater than the above">&gt;?</button>
-                <button id="iget" disabled title="if highlighted green: current number is greater or equal to the above">&gt;=?</button>
-                <button id="ieqt" disabled title="if highlighted green: current number is equal to the above">==?</button>
+                <button id="switch" title="switch A and B">switch AB</button>
+                <button id="AbitlsB" title="shifts the bits of A by the amount of B to the left">A&lt;&lt;B</button>
+                <button id="AbitrsB" title="shifts the bits of A by the amount of B to the right">A&gt;&gt;B</button>
+                <button id="bitnoA" title="applies logical NOT to A">! A</button>
+                <!-- TODO "! B" -->
+                <button id="AbitanB" title="applies logical AND to A and B">A & B</button>
+                <button id="AbitorB" title="applies logical OR to A and B">A | B</button>
+                <button id="AbitxoB" title="applies logical XOR to A and B">A ^ B</button>
+                <!-- TODO change to 1 dynamic button "=="/">"/"<" -->
+                <button id="Aie" disabled title="if highlighted green: A is even">A even</button>
+                <button id="Bie" disabled title="if highlighted green: B is even">B even</button>
+                <button id="AltB" disabled title="if highlighted green: A is less than B">A&lt;B</button>
+                <button id="AlteqB" disabled title="if highlighted green: A is less or equal to B">A&lt;=B</button>
+                <button id="AgtB" disabled title="if highlighted green: A is greater than B">A&gt;B</button>
+                <button id="AgteqB" disabled title="if highlighted green: A is greater or equal to B">A&gt;=B</button>
+                <button id="AeqB" disabled title="if highlighted green: A is equal to B">A==B</button>
                 <!-- TODO GCD() randomInt() mapRange() -->
             </div>
             <div data-content="saved-numbers">
