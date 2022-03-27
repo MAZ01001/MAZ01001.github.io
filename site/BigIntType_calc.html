@@ -55,11 +55,10 @@
             border-radius: 1em;
             text-align: center;
         }
+        div#box>h1,div#box label[for="base_chooser"]{user-select: text;}
         div#border{
             display: grid;
-            grid-template-columns: auto auto 50%;
-            /* grid-template-rows: auto auto auto auto auto; */
-            /* align-items: center; */
+            grid-template-columns: 18.2rem auto calc(50% - 17rem) 17rem;
             min-width: 40em;
             padding: 1em;
             width: max-content;
@@ -71,27 +70,49 @@
             padding: .3em .5em;
         }
         div#border>div[data-content]:hover{border-color: #a70;}
-        div#border>div[data-content="base-chooser"]{grid-area: 1/1/2/2;}
-        div#border>div[data-content="number-a"]{grid-area: 2/1/3/3;}           div#border>div[data-content="number-b"]{grid-area: 2/3/3/4;}
-        div#border>div[data-content="function-buttons"]{grid-area: 3/1/4/3;}    div#border>div[data-content="saved-numbers"]{grid-area: 3/3/4/4;}
-        div#border>div[data-content="error-output"]{grid-area: 4/1/5/4;}
+        div#border>div[data-content="base_chooser"]{grid-area: 1/1/2/2;}        div#border>div[data-content="memory_size"]{grid-area: 1/4/2/5;}
+        div#border>div[data-content="number_a"]{grid-area: 2/1/3/3;}            div#border>div[data-content="number_b"]{grid-area: 2/3/3/5;}
+        div#border>div[data-content="function-buttons"]{grid-area: 3/1/4/3;}    div#border>div[data-content="saved_numbers"]{grid-area: 3/3/6/5;}
+        div#border>div[data-content="Arandom"]{grid-area: 4/1/5/3;}
+        div#border>div[data-content="Amap"]{grid-area: 5/1/6/3;}
+        div#border>div[data-content="error_output"]{grid-area: 6/1/7/5;}
         div.button{display: inline;white-space: nowrap;}
         div[data-content="function-buttons"]{
             display: grid;
-            grid-template-columns: auto auto auto auto auto;
+            grid-auto-columns: 5;
             min-width: min-content;
             gap: .2em .1em;
         }
-        /* TODO rename ids */
-        #abs{grid-area: 1/1/2/2;}   #inc{grid-area: 1/2/2/3;}   #add{grid-area: 1/3/2/4;}   #mul{grid-area: 1/4/2/5;}   #double{grid-area: 1/5/2/6;}
-        #neg{grid-area: 2/1/3/2;}   #dec{grid-area: 2/2/3/3;}   #sub{grid-area: 2/3/3/4;}   #mod{grid-area: 2/4/3/5;}   #pow{grid-area: 2/5/3/6;}
-        div[data-content="div"]{grid-area: 3/1/4/3;}            div[data-content="half"]{grid-area: 3/3/4/5;}           #switch{grid-area: 3/5/4/6;}
-        #AbitlsB{grid-area: 4/1/5/3;}                             #AbitrsB{grid-area: 4/3/5/5;}                             #Aie{grid-area: 4/5/5/6;}
-        #bitnoA{grid-area: 5/1/6/2;} #AbitanB{grid-area: 5/2/6/3;} #AbitorB{grid-area: 5/3/6/4;} #AbitxoB{grid-area: 5/4/6/5;} #Bie{grid-area: 5/5/6/6;}
-        #AltB{grid-area: 6/1/7/2;}   #AlteqB{grid-area: 6/2/7/3;}  #AgtB{grid-area: 6/3/7/4;}   #AgteqB{grid-area: 6/4/7/5;}  #AeqB{grid-area: 6/5/7/6;}
-        div#border>div[data-content="base-chooser"],
-        div#border>div[data-content="number-a"],
-        div#border>div[data-content="number-b"]{text-align: left;}
+        #AaddB{grid-area: 1/1/2/2;}                     #AsubB{grid-area: 1/2/2/3;}     #AmulB{grid-area: 1/3/2/4;}     #AmodB{grid-area: 1/4/2/5;}     #ApowB{grid-area: 1/5/2/6;}
+        div[data-content="AdivB"]{grid-area: 2/1/3/4;}  #switchAB{grid-area: 2/4/3/6;}
+        #bitAlsB{grid-area: 3/1/4/3;}                   #bitArsB{grid-area: 3/3/4/5;}   #gcdAB{grid-area: 3/5/4/6;}
+        #bitnoA{grid-area: 4/1/5/2;}                    #bitnoB{grid-area: 4/2/5/3;}    #bitAanB{grid-area: 4/3/5/4;}   #bitAorB{grid-area: 4/4/5/5;}   #bitAxoB{grid-area: 4/5/5/6;}
+        #AtB{grid-area: 6/1/7/6;}
+        div[data-content="Arandom"]{
+            display: grid;
+            grid-template-columns: auto auto 50%;
+            min-width: min-content;
+            gap: .2em .1em;
+            text-align: left;
+        }
+        #Arandom{grid-area: 1/1/2/2;}
+        label[for="Arandommin"]{grid-area: 2/1/3/3;}    label[for="Arandommax"]{grid-area: 2/3/3/4;}
+        #Arandommin{grid-area: 3/1/4/3;}                #Arandommax{grid-area: 3/3/4/4;}
+        div[data-content="Amap"]{
+            display: grid;
+            grid-template-columns: auto auto 50%;
+            min-width: min-content;
+            gap: .2em .1em;
+            text-align: left;
+        }
+        #Amap{grid-area: 1/1/2/2;}                      div[data-content="Amaplimit"]{grid-area: 1/3/2/4;}
+        label[for="Amapmin1"]{grid-area: 2/1/3/3;}      label[for="Amapmax1"]{grid-area: 2/3/3/4;}
+        #Amapmin1{grid-area: 3/1/4/3;}                  #Amapmax1{grid-area: 3/3/4/4;}
+        label[for="Amapmin2"]{grid-area: 4/1/5/3;}      label[for="Amapmax2"]{grid-area: 4/3/5/4;}
+        #Amapmin2{grid-area: 5/1/6/3;}                  #Amapmax2{grid-area: 5/3/6/4;}
+        div#border>div[data-content="base_chooser"],
+        div#border>div[data-content="number_a"],
+        div#border>div[data-content="number_b"]{text-align: left;}
         .number{
             display: block;
             width: calc(100% - 0.5em);
@@ -99,20 +120,12 @@
             max-height: 10rem;
             height: fit-content;
             overflow-y: overlay;
-            font-family: 'consolas', monospace, serif;
+            font-family: 'consolas', monospace;
             user-select: text;
             resize: vertical;
         }
-        #error-output{
-            color: #f00 !important;
-            width: calc(100% - 0.5em);
-            height: fit-content;
-            font-weight: bold;
-            font-family: 'consolas', monospace, serif;
-            user-select: text;
-            resize: none;
-        }
-        select,button,.number,#error-output{
+        .number:invalid{color: #f00;}
+        select,button,.number,#error_output{
             background-color: #000;
             color: #0f0;
             border-radius: 0;
@@ -120,15 +133,28 @@
             border-style: outset;
             outline: none !important;
         }
-        select:hover,button:hover,#number-a:hover,#number-b:hover,#error-output:hover{border-color: #080;}
-        select:focus,button:focus,#number-a:focus,#number-b:focus,#error-output:focus{border-color: #0a0;}
-        select:active,button:active,#number-a:active,#number-b:active,#error-output:active{border-color: #0f0 !important;}
-        #AltB,#AlteqB,#AgtB,#AgteqB,#AeqB,#Aie,#Bie{
-            border-color: #000;
-            color: #444;
+        select:hover,button:hover,.number:hover,#error_output:hover{border-color: #080;}
+        select:focus,button:focus,.number:focus,#error_output:focus{border-color: #0a0;}
+        select:active,button:active,.number:active,#error_output:active{border-color: #0f0 !important;}
+        #AtB{
+            background-color: #000;
+            color: #0f0;
+            display: inline-block;
+            white-space: nowrap;
+            font-family: 'consolas', monospace;
+            font-size: 1rem;
+            padding: .1rem .5rem;
         }
-        /* TODO */
-        div#box>h1,div#box label[for="base-chooser"]{user-select: text;}
+        #error_output{
+            color: #f00 !important;
+            width: calc(100% - 0.5em);
+            min-height: 1rem;
+            max-height: 10rem;
+            font-weight: bold;
+            font-family: 'consolas', monospace;
+            user-select: text;
+            resize: none;
+        }
     </style>
     <script data-info="2022-03-25 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js">
         class BigIntType{
@@ -1524,7 +1550,7 @@
          * @param {number} base - base 0=braille, 2-10 [0-9], 11-36 [0-9A-F], 37-256 [0-9](comma-separated list of numbers)
          * @returns {RegExp} regexp for `base` - if out of range only matches `+0` and `-0`
          */
-        const REGEXP_STRING=base=>{
+        const _REGEXP_STRING=base=>{
             base=Math.abs(Number(base));if(Number.isNaN(base)){return/^([+-]?)(0)$/;}
             switch(Number(base)){
                 case 0:return/^([+-]?)(\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)$/;// unicode braille-pattern
@@ -1532,9 +1558,7 @@
                 case 2:return/^([+-]?)(?:0b)?(0|1[01]*)$/i;
                 case 8:return/^([+-]?)(?:0o)?(0|[1-7][0-7]*)$/i;
                 case 16:return/^([+-]?)(?:0x)?(0|[1-9A-F][0-9A-F]*)$/i;
-                case 36:return/^([+-]?)(0|[1-9A-Z][0-9A-Z]*)$/i;
-                case 256:return/^([+-]?)(0|(?:[1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(?:\,(?:[1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))*)$/;
-                default:
+                default:// all bases up to 256
                     if(base<=10){return new RegExp(`^([+-]?)(0|[1-${base-1}][0-${base-1}]*)$`);}
                     else if(base<=36){return new RegExp(`^([+-]?)(0|[1-9A-${String.fromCharCode(54+base)}][0-9A-${String.fromCharCode(54+base)}]*)$`,'i');}
                     else if(base<=256){// 37-256 (comma-separated list of numbers)
@@ -1567,23 +1591,115 @@
             }
             return/^([+-]?)(0)$/;//~ no more bases implemented
         };
-        /**@type {BigIntType[]} saved numbers for later calculations*/
-        let savedNumbers=[],
-            /**@type {BigIntType} number of last calculation*/
-            lastNumber=BigIntType.Zero,
-            /**@type {BigIntType} current number for next calculation*/
-            currentNumber=BigIntType.Zero,
-            /**@type {boolean} current radix for string output*/
-            currentBase=10;
+        /**__numbers as BigIntType objects stored in this convenient object__*/
+        let _NUMBERS=Object.freeze({
+                /**@type {BigIntType[]}*/
+                mem:[],//~ max 10 memory nubers
+                a:BigIntType.One,
+                b:BigIntType.Zero,
+                rand:Object.freeze({
+                    min:BigIntType.Zero,
+                    max:BigIntType.One,
+                }),
+                map:Object.freeze({
+                    min1:BigIntType.Zero,
+                    max1:BigIntType.One,
+                    min2:BigIntType.Zero,
+                    max2:BigIntType.One,
+                }),
+            }),
+            /**@type {number} current memory size of all numbers*/
+            _CURRENT_MEM_SIZE=500,
+            /**@type {number} current radix of all numbers*/
+            _CURRENT_BASE=10;
+        /**
+         * __prints the `message` to the html-error-element__ \
+         * auto resize to fit-content
+         * @param {string} message - message to print
+         */
+        function _error_html(message){
+            error_output.value=message;
+            error_output.style.height="";
+            error_output.style.height=error_output.scrollHeight + "px";
+        }
+        /**
+         * __custom validity `message` for `element`__
+         * @param {HTMLElement} element - element to apply
+         * @param {string} message - message to apply
+         */
+        function _error_css(element,message){
+            element.setCustomValidity(message);
+            element.reportValidity();
+        }
+        /**
+         * __checks if number input is in correct base format__ \
+         * _and reports if not valid_
+         * @param {HTMLElement} element - html element
+         */
+        function _numberInput(element){
+            if(!(_REGEXP_STRING(_CURRENT_BASE).test(element.value))){_error_css(element,"not in correct format for base "+(_CURRENT_BASE===0?"256(braille)":_CURRENT_BASE));}
+            else{_error_css(element,"");}
+        }
+        /**
+         * __checks if number entered is in correct base format__ \
+         * _and reports if not valid_ \
+         * set number variable if entered number is valid \
+         * and sets the A to B comparison field
+         * @param {HTMLElement} element - html element
+         */
+        function _numberChange(element){
+            _error_html("");
+            _error_css(element,"");
+            if(_REGEXP_STRING(_CURRENT_BASE).test(element.value)){
+                try{
+                    switch(element.id){
+                        case"number_a":_NUMBERS.a.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"number_b":_NUMBERS.b.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"Arandommin":_NUMBERS.rand.min.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"Arandommax":_NUMBERS.rand.max.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"Amapmin1":_NUMBERS.map.min1.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"Amapmax1":_NUMBERS.map.max1.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"Amapmin2":_NUMBERS.map.min2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"Amapmax2":_NUMBERS.map.max2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                    }
+                    if(element.id==="number_a"||element.id==="number_b"){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?">":(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?"<":"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
+                }catch(error){
+                    console.error(error);
+                    _error_html(`{InputError} reseted number entered because it was to large\ninput:\n${element.value}`);
+                    switch(element.id){
+                        case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"Arandommin":element.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"Arandommax":element.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"Amapmin1":element.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"Amapmax1":element.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"Amapmin2":element.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"Amapmax2":element.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    }
+                }
+            }else{
+                _error_html(`{InputError} reseted number entered because it was not in correct format for base ${_CURRENT_BASE===0?"256(braille)":_CURRENT_BASE}`);
+                switch(element.id){
+                    case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"Arandommin":element.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"Arandommax":element.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"Amapmin1":element.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"Amapmax1":element.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"Amapmin2":element.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"Amapmax2":element.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                }
+            }
+        }
     </script>
 </head>
 <body>
     <div id="box">
         <h1>big integer calculator</h1>
         <div id="border">
-            <div data-content="base-chooser" title="base of the numbers for calculation (visually)">
-                <label for="base-chooser">Numerical Base:</label>
-                <select id="base-chooser">
+            <div data-content="base_chooser" title="base of the numbers for calculation (visually)">
+                <label for="base_chooser">Numerical Base:</label>
+                <select id="base_chooser">
                     <option disabled>Select Base</option>
                     <option value="2">binary (2)</option>
                     <option value="4">quaternary (4)</option>
@@ -1595,74 +1711,244 @@
                     <option value="0">braille-pattern (256)</option>
                 </select>
             </div>
-            <div data-content="number-a">
-                <label for="number-a">A</label>
-                <textarea id="number-a" class="number" title="[A] input a number for calculation">0</textarea>
-                <button id="Azero" title="[A] set to zero">set zero</button>
-                <button id="AseqB" title="[A] set equal to B">copy B</button>
+            <div data-content="memory_size" title="maximum length of each number in memory (! resets numbers if they are to large !)">
+                <label for="memory_size">max memory:</label>
+                <select id="memory_size">
+                    <option disabled>Select memory size</option>
+                    <option value="500" selected>500 Byte</option>
+                    <option value="1000">1 Kilo Byte</option>
+                    <option value="5000">5 Kilo Byte</option>
+                    <option value="10000">10 Kilo Byte</option>
+                    <option value="50000">50 Kilo Byte</option>
+                    <option value="100000">100 Kilo Byte</option>
+                    <option value="500000">500 Kilo Byte</option>
+                    <option value="1000000">1 Mega Byte</option>
+                    <option value="1048576">1 Mebi Byte</option>
+                </select>
             </div>
-            <div data-content="number-b">
-                <label for="number-b">B</label>
-                <textarea id="number-b" class="number" title="[B] input a number for calculation">0</textarea>
-                <button id="Bzero" title="[B] set to zero">set zero</button>
-                <button id="BseqA" title="[B] set equal to A">copy A</button>
-            </div>
-            <div data-content="function-buttons">
-                <!-- TODO rename id and buttone value "|A|"/"-A"/"A++"/"A+B"/... -->
-                <button id="abs" title="absolute current number">abs</button>
-                <button id="neg" title="negates current number">neg</button>
-                <button id="inc" title="increment 1">+1</button>
-                <button id="dec" title="decrement 1">-1</button>
-                <button id="add" title="addition">+</button>
-                <button id="sub" title="subtraction">-</button>
-                <button id="mul" title="multiplication">*</button>
-                <button id="mod" title="modulo">%</button>
-                <button id="double" title="doubles current number">*2</button>
-                <button id="pow" title="the last number to the power of the current one">A ** B</button>
-                <div class="button" data-content="div">
-                    <button id="div" title="division">/</button>
-                    <select class="rounding" title="rounding for [/]">
-                        <option disabled>rounding</option>
-                        <option value="f">floored</option>
-                        <option value="c">ceiled</option>
-                        <option value="r" selected>rounded</option>
-                    </select>
-                </div>
-                <div class="button" data-content="half">
-                    <button id="half" title="halfes current number">/2</button>
+            <div data-content="number_a">
+                <label for="number_a" title="[A] input a number for calculation">A</label>
+                <textarea id="number_a" class="number" title="[A] input a number for calculation">1</textarea>
+                <button id="AseqB" title="[A] set equal to B">=B</button>
+                <button id="Aabs" title="set sign of A absolute">|A|</button>
+                <button id="Aneg" title="negates the sign of A">-A</button>
+                <button id="Ainc" title="increments A once">++</button>
+                <button id="Adec" title="decrements A once">--</button>
+                <button id="Adouble" title="doubles A">*2</button>
+                <div class="button" data-content="Ahalf">
+                    <button id="Ahalf" title="halfes A">/2</button>
                     <select class="rounding" title="rounding for [/2]">
                         <option disabled>rounding</option>
                         <option value="f">floored</option>
                         <option value="c" selected>ceiled</option>
                     </select>
                 </div>
-                <button id="switch" title="switch A and B">switch AB</button>
-                <button id="AbitlsB" title="shifts the bits of A by the amount of B to the left">A&lt;&lt;B</button>
-                <button id="AbitrsB" title="shifts the bits of A by the amount of B to the right">A&gt;&gt;B</button>
+            </div>
+            <div data-content="number_b">
+                <label for="number_b" title="[B] input a number for calculation">B</label>
+                <textarea id="number_b" class="number" title="[B] input a number for calculation">0</textarea>
+                <button id="BseqA" title="[B] set equal to A">=A</button>
+                <button id="Babs" title="set sign of B absolute">|B|</button>
+                <button id="Bneg" title="negates the sign of B">-B</button>
+                <button id="Binc" title="increments B once">++</button>
+                <button id="Bdec" title="decrements B once">--</button>
+                <button id="Bdouble" title="doubles B">*2</button>
+                <div class="button" data-content="Bhalf">
+                    <button id="Bhalf" title="halfes B">/2</button>
+                    <select class="rounding" title="rounding for [/2]">
+                        <option disabled>rounding</option>
+                        <option value="f">floored</option>
+                        <option value="c" selected>ceiled</option>
+                    </select>
+                </div>
+            </div>
+            <div data-content="function-buttons">
+                <button id="AaddB" title="set A to: A plus B">A + = B</button>
+                <button id="AsubB" title="set A to: A minus B">A - = B</button>
+                <button id="AmulB" title="set A to: A times B">A * = B</button>
+                <button id="AmodB" title="set A to: A modulo B">A % = B</button>
+                <button id="ApowB" title="set A to: A to the power of B">A ** = B</button>
+                <div class="button" data-content="AdivB">
+                    <button id="AdivB" title="set A to: A divided by B">A / = B</button>
+                    <select class="rounding" title="rounding for [A / = B]">
+                        <option disabled>rounding</option>
+                        <option value="f">floored</option>
+                        <option value="c">ceiled</option>
+                        <option value="r" selected>rounded</option>
+                    </select>
+                </div>
+                <button id="switchAB" title="switches A and B">switch A and B</button>
+                <button id="bitAlsB" title="shifts the bits of A by B amount to the left">A &lt;&lt; = B</button>
+                <button id="bitArsB" title="shifts the bits of A by B amount to the right">A &gt;&gt; = B</button>
+                <button id="gcdAB" title="set A to: greatest common divisor of A and B">GCD</button>
                 <button id="bitnoA" title="applies logical NOT to A">! A</button>
-                <!-- TODO "! B" -->
-                <button id="AbitanB" title="applies logical AND to A and B">A & B</button>
-                <button id="AbitorB" title="applies logical OR to A and B">A | B</button>
-                <button id="AbitxoB" title="applies logical XOR to A and B">A ^ B</button>
-                <!-- TODO change to 1 dynamic button "=="/">"/"<" -->
-                <button id="Aie" disabled title="if highlighted green: A is even">A even</button>
-                <button id="Bie" disabled title="if highlighted green: B is even">B even</button>
-                <button id="AltB" disabled title="if highlighted green: A is less than B">A&lt;B</button>
-                <button id="AlteqB" disabled title="if highlighted green: A is less or equal to B">A&lt;=B</button>
-                <button id="AgtB" disabled title="if highlighted green: A is greater than B">A&gt;B</button>
-                <button id="AgteqB" disabled title="if highlighted green: A is greater or equal to B">A&gt;=B</button>
-                <button id="AeqB" disabled title="if highlighted green: A is equal to B">A==B</button>
-                <!-- TODO GCD() randomInt() mapRange() -->
+                <button id="bitnoB" title="applies logical NOT to B">! B</button>
+                <button id="bitAanB" title="applies logical AND to A and B">A & B</button>
+                <button id="bitAorB" title="applies logical OR to A and B">A | B</button>
+                <button id="bitAxoB" title="applies logical XOR to A and B">A ^ B</button>
+                <div id="AtB" title="shows if A and B are even or odd and if one is greater than the other one and vice versa">A (even) == B (even)</div>
             </div>
-            <div data-content="saved-numbers">
-                <!-- TODO -->
-                [ saved-numbers ]
+            <div data-content="Arandom">
+                <button id="Arandom" title="set A to a random number in set bounds">random number</button>
+                <label for="Arandommin" title="set minimum number for random generator">minimum:</label>
+                <textarea id="Arandommin" class="number" title="set minimum number for random generator">0</textarea>
+                <label for="Arandommax" title="set maximum number for random generator">maximum:</label>
+                <textarea id="Arandommax" class="number" title="set maximum number for random generator">1</textarea>
             </div>
-            <div data-content="error-output"><textarea id="error-output" title="if errors occur, they will be displayed here" readonly></textarea></div>
+            <div data-content="Amap">
+                <button id="Amap" title="map A from set initial bounds to set final bounds">map range</button>
+                <div class="button" data-content="Amaplimit">
+                    <label for="Amaplimit" title="limits the mapping from A to its final bounds">limit</label>
+                    <input type="checkbox" id="Amaplimit" title="limits the mapping from A to its final bounds">
+                    &verbar;
+                    <select class="rounding" title="rounding for [map range]">
+                        <option disabled>rounding</option>
+                        <option value="f">floored</option>
+                        <option value="c">ceiled</option>
+                        <option value="r" selected>rounded</option>
+                    </select>
+                </div>
+                <label for="Amapmin1" title="set initial minimum for mapping">initial minimum:</label>
+                <textarea id="Amapmin1" class="number" title="set initial minimum for mapping">0</textarea>
+                <label for="Amapmax1" title="set initial maximum for mapping">initial maximum:</label>
+                <textarea id="Amapmax1" class="number" title="set initial maximum for mapping">1</textarea>
+                <label for="Amapmin2" title="set final minimum for mapping">final minimum:</label>
+                <textarea id="Amapmin2" class="number" title="set final minimum for mapping">0</textarea>
+                <label for="Amapmax2" title="set final maximum for mapping">final maximum:</label>
+                <textarea id="Amapmax2" class="number" title="set final maximum for mapping">1</textarea>
+            </div>
+            <div data-content="saved_numbers">
+                <!-- TODO -->[ WIP ]
+            </div>
+            <div data-content="error_output"><textarea id="error_output" title="displays errors when they occur" readonly></textarea></div>
         </div>
     </div>
     <script>
-        // #### EVENT LISTENERS ####
+        // ## elements
+        const base_chooser=document.getElementById("base_chooser"),
+            memory_size=document.getElementById("memory_size"),
+            number_a=document.getElementById("number_a"),
+            AseqB=document.getElementById("AseqB"),Aabs=document.getElementById("Aabs"),Aneg=document.getElementById("Aneg"),Ainc=document.getElementById("Ainc"),Adec=document.getElementById("Adec"),Adouble=document.getElementById("Adouble"),Ahalf=document.getElementById("Ahalf"),Ahalf_round=document.body.querySelector("#Ahalf+select.rounding"),
+            number_b=document.getElementById("number_b"),
+            BseqA=document.getElementById("BseqA"),Babs=document.getElementById("Babs"),Bneg=document.getElementById("Bneg"),Binc=document.getElementById("Binc"),Bdec=document.getElementById("Bdec"),Bdouble=document.getElementById("Bdouble"),Bhalf=document.getElementById("Bhalf"),Bhalf_round=document.body.querySelector("#Bhalf+select.rounding"),
+            AaddB=document.getElementById("AaddB"),AsubB=document.getElementById("AsubB"),AmulB=document.getElementById("AmulB"),AmodB=document.getElementById("AmodB"),ApowB=document.getElementById("ApowB"),
+            AdivB=document.getElementById("AdivB"),AdivB_round=document.body.querySelector("#AdivB+select.rounding"),switchAB=document.getElementById("switchAB"),
+            bitAlsB=document.getElementById("bitAlsB"),bitArsB=document.getElementById("bitArsB"),
+            bitnoA=document.getElementById("bitnoA"),bitnoB=document.getElementById("bitnoB"),bitAanB=document.getElementById("bitAanB"),bitAorB=document.getElementById("bitAorB"),bitAxoB=document.getElementById("bitAxoB"),
+            AtB=document.getElementById("AtB"),
+            error_output=document.getElementById("error_output"),
+            Arandom=document.getElementById("Arandom"),
+            Arandommin=document.getElementById("Arandommin"),Arandommax=document.getElementById("Arandommax"),
+            Amap=document.getElementById("Amap"),Amap_round=document.body.querySelector("#Amap+div>select.rounding"),Amaplimit=document.getElementById("Amaplimit"),
+            Amapmin1=document.getElementById("Amapmin1"),Amapmax1=document.getElementById("Amapmax1"),
+            Amapmin2=document.getElementById("Amapmin2"),Amapmax2=document.getElementById("Amapmax2");
+        _error_html("Errors may be displayed here...\nclick anywhere on the page but here to remove this message");
+        // ## event listeners
+        document.addEventListener("click",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
+        switchAB.addEventListener("click",ev=>{[number_a.value,number_b.value]=[number_b.value,number_a.value];},{passive:true});
+        base_chooser.addEventListener("change",ev=>{
+            _CURRENT_BASE=Number(base_chooser.value);
+            number_a.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            number_b.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+        },{passive:true});
+        memory_size.addEventListener("change",ev=>{
+            _CURRENT_MEM_SIZE=Number(memory_size.value);
+            BigIntType.MAX_SIZE=_CURRENT_MEM_SIZE;
+            /**@type {number} - counter for amount of reseted numbers*/
+            let r=0;
+            if(_NUMBERS.a.length>BigIntType.MAX_SIZE){
+                _NUMBERS.a.setEqualTo(BigIntType.Zero);
+                number_a.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.b.length>BigIntType.MAX_SIZE){
+                _NUMBERS.b.setEqualTo(BigIntType.Zero);
+                number_b.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.rand.min.length>BigIntType.MAX_SIZE){
+                _NUMBERS.rand.min.setEqualTo(BigIntType.Zero);
+                Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.rand.max.length>BigIntType.MAX_SIZE){
+                _NUMBERS.rand.max.setEqualTo(BigIntType.Zero);
+                Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.map.min1.length>BigIntType.MAX_SIZE){
+                _NUMBERS.map.min1.setEqualTo(BigIntType.Zero);
+                Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.map.max1.length>BigIntType.MAX_SIZE){
+                _NUMBERS.map.max1.setEqualTo(BigIntType.Zero);
+                Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.map.min2.length>BigIntType.MAX_SIZE){
+                _NUMBERS.map.min2.setEqualTo(BigIntType.Zero);
+                Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(_NUMBERS.map.max2.length>BigIntType.MAX_SIZE){
+                _NUMBERS.map.max2.setEqualTo(BigIntType.Zero);
+                Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                r++;
+            }
+            if(r>0){
+                if(r===1){_error_html("{MemSizeError} reseted number because it was to large for selected memory size");}
+                else{_error_html("{MemSizeError} reseted numbers because they where to large for selected memory size");}
+            }
+        },{passive:true});
+        // ## numbers
+        for(const _number of Array.from(document.body.querySelectorAll("textarea.number"))){
+            _number.addEventListener("keydown",ev=>{
+                if(ev.key==="Enter"){
+                    ev.preventDefault();
+                    ev.target.blur();
+                }
+            },{passive:false});
+            _number.addEventListener("input",ev=>_numberInput(ev.target),{passive:true});
+            _number.addEventListener("change",ev=>_numberChange(ev.target),{passive:true});
+        }
+        // ## buttons
+        // TODO
+        AseqB.addEventListener("click",ev=>{},{passive:true});
+        BseqA.addEventListener("click",ev=>{},{passive:true});
+        Aabs.addEventListener("click",ev=>{},{passive:true});
+        Babs.addEventListener("click",ev=>{},{passive:true});
+        Aneg.addEventListener("click",ev=>{},{passive:true});
+        Bneg.addEventListener("click",ev=>{},{passive:true});
+        Ainc.addEventListener("click",ev=>{},{passive:true});
+        Binc.addEventListener("click",ev=>{},{passive:true});
+        Adec.addEventListener("click",ev=>{},{passive:true});
+        Bdec.addEventListener("click",ev=>{},{passive:true});
+        Adouble.addEventListener("click",ev=>{},{passive:true});
+        Bdouble.addEventListener("click",ev=>{},{passive:true});
+        Ahalf.addEventListener("click",ev=>{Ahalf_round.value;},{passive:true});
+        Bhalf.addEventListener("click",ev=>{Bhalf_round.value;},{passive:true});
+        AaddB.addEventListener("click",ev=>{},{passive:true});
+        AsubB.addEventListener("click",ev=>{},{passive:true});
+        AmulB.addEventListener("click",ev=>{},{passive:true});
+        AmodB.addEventListener("click",ev=>{},{passive:true});
+        ApowB.addEventListener("click",ev=>{},{passive:true});
+        AdivB.addEventListener("click",ev=>{AdivB_round.value;},{passive:true});
+        bitAlsB.addEventListener("click",ev=>{},{passive:true});
+        bitArsB.addEventListener("click",ev=>{},{passive:true});
+        bitnoA.addEventListener("click",ev=>{},{passive:true});
+        bitnoB.addEventListener("click",ev=>{},{passive:true});
+        bitAanB.addEventListener("click",ev=>{},{passive:true});
+        bitAorB.addEventListener("click",ev=>{},{passive:true});
+        bitAxoB.addEventListener("click",ev=>{},{passive:true});
+        Arandom.addEventListener("click",ev=>{},{passive:true});
+        Amap.addEventListener("click",ev=>{Amaplimit.checked;Amap_round.value;},{passive:true});
     </script>
 </body>
 </html>
