@@ -79,15 +79,16 @@
         div.button{display: inline;white-space: nowrap;}
         div[data-content="function-buttons"]{
             display: grid;
-            grid-auto-columns: 5;
+            grid-auto-columns: 6;
             min-width: min-content;
             gap: .2em .1em;
         }
-        #AaddB{grid-area: 1/1/2/2;}                     #AsubB{grid-area: 1/2/2/3;}     #AmulB{grid-area: 1/3/2/4;}     #AmodB{grid-area: 1/4/2/5;}     #ApowB{grid-area: 1/5/2/6;}
-        div[data-content="AdivB"]{grid-area: 2/1/3/4;}  #switchAB{grid-area: 2/4/3/6;}
-        #bitAlsB{grid-area: 3/1/4/3;}                   #bitArsB{grid-area: 3/3/4/5;}   #gcdAB{grid-area: 3/5/4/6;}
-        #bitnoA{grid-area: 4/1/5/2;}                    #bitnoB{grid-area: 4/2/5/3;}    #bitAanB{grid-area: 4/3/5/4;}   #bitAorB{grid-area: 4/4/5/5;}   #bitAxoB{grid-area: 4/5/5/6;}
-        #AtB{grid-area: 6/1/7/6;}
+        #AaddB{grid-area: 1/1/2/2;}                     #AsubB{grid-area: 1/2/2/3;}     #AmulB{grid-area: 1/3/2/5;}     #ApowB{grid-area: 1/5/2/6;}     #switchAB{grid-area: 1/6/2/7;}
+        div[data-content="AdivB"]{grid-area: 2/1/3/4;}  div[data-content="AmodB"]{grid-area: 2/4/3/7;}
+        #bitAls{grid-area: 3/1/4/3;}                    #bitAls_x{grid-area: 3/3/4/6;}  #gcdAB{grid-area: 3/6/5/7;}
+        #bitArs{grid-area: 4/1/5/3;}                    #bitArs_x{grid-area: 4/3/5/6;}
+        #bitnoA{grid-area: 5/1/6/2;}                    #bitnoB{grid-area: 5/2/6/3;}    #bitAanB{grid-area: 5/3/6/5;}   #bitAorB{grid-area: 5/5/6/6;}   #bitAxoB{grid-area: 5/6/6/7;}
+        #AtB{grid-area: 6/1/7/7;}
         div[data-content="Arandom"]{
             display: grid;
             grid-template-columns: auto auto 50%;
@@ -125,6 +126,19 @@
             resize: vertical;
         }
         .number:invalid{color: #f00;}
+        #Amaplimit{
+            position: fixed;
+            left: -10rem;
+            opacity: 0;
+        }
+        label[for="Amaplimit"]{
+            border: 2px outset #040;
+            outline: none !important;
+            padding: .1em .5em;
+            font-size: smaller;
+        }
+        #Amaplimit:not(:checked)+label[for="Amaplimit"]{background-color: #000;}
+        #Amaplimit:checked+label[for="Amaplimit"]{background-color: #040;}
         select,button,.number,#error_output{
             background-color: #000;
             color: #0f0;
@@ -133,9 +147,9 @@
             border-style: outset;
             outline: none !important;
         }
-        select:hover,button:hover,.number:hover,#error_output:hover{border-color: #080;}
-        select:focus,button:focus,.number:focus,#error_output:focus{border-color: #0a0;}
-        select:active,button:active,.number:active,#error_output:active{border-color: #0f0 !important;}
+        select:hover,button:hover,.number:hover,#error_output:hover,label[for="Amaplimit"]:hover{border-color: #080;}
+        select:focus,button:focus,.number:focus,#error_output:focus,#Amaplimit:focus+label[for="Amaplimit"]{border-color: #0a0;}
+        select:active,button:active,.number:active,#error_output:active,label[for="Amaplimit"]:active{border-color: #0f0 !important;}
         #AtB{
             background-color: #000;
             color: #0f0;
@@ -155,8 +169,28 @@
             user-select: text;
             resize: none;
         }
+        div#loader{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            background-image: radial-gradient(transparent,transparent,black,black);
+        }
+        div#loader>div{
+            font-size: 2em;
+            font-family: serif;
+            position: absolute;
+            transform: translate(-50%,-50%);
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            text-align: center;
+        }
     </style>
-    <script data-info="2022-03-25 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js">
+    <script data-info="2022-03-28 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js">
         class BigIntType{
             //~ property/method names starting with '#' are private - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields for details
             /*
@@ -1026,7 +1060,7 @@
             bitShiftL(x=1){
                 x=Number(x);if(x<0||!Number.isSafeInteger(x)){throw new TypeError("[bitshiftL] x is not a positive save integer");}
                 if(Math.floor(x/8)+this.length>BigIntType.MAX_SIZE){throw new RangeError(`[bitshiftL] would result in a number longer than MAX_SIZE`);}
-                this.times256ToThePowerOf(Math.ceil(x/8));
+                this.times256ToThePowerOf(Math.floor(x/8));
                 x=x%8
                 if(x===0){return this;}
                 this.#digits=new Uint8Array([...this.#digits,0]);
@@ -1348,6 +1382,7 @@
                             [...Array.from(n.#digits,String),...new Array(len-n.length).fill('0')]
                         )));
                     }catch(e){throw(e instanceof RangeError)?new RangeError("[mul] would result in a number longer than MAX_SIZE"):e;}
+                    if(this.length>BigIntType.MAX_SIZE){new RangeError("[mul] would result in a number longer than MAX_SIZE");}
                 }
                 this.#sign=this.#sign===n.#sign;
                 return this;
@@ -1396,6 +1431,7 @@
                         [...base,...new Array(karatsubaLen-base.length).fill('0')],
                         [...base,...new Array(karatsubaLen-base.length).fill('0')]
                     );
+                    if(result.length>2147483648||base.length>2147483648){throw new RangeError("[pow] would result in a number longer than MAX_SIZE");}//~ safety? (2GiB)
                 }
                 BigIntType.#removeLeadingZeros(result);
                 if(result.length>BigIntType.MAX_SIZE){throw new RangeError("[pow] would result in a number longer than MAX_SIZE");}
@@ -1417,6 +1453,7 @@
              * @param {boolean} limit - if `true` caps the result at final bound
              * @returns {BigIntType} `this` in `finalLow` to `finalHigh` range (rounded/caped as set) (`this` modified)
              * @throws {TypeError} - if `initialLow`,`initialHigh`,`finalLow` or `finalHigh` are not instances of `BigIntType`
+             * @throws {RangeError} - if `initialLow` and `initialHigh` or `finalLow` and `finalHigh` are the same value
              * @throws {SyntaxError} - if `rounding` is not a valid option
              * @throws {RangeError} - if new number would be longer than `BigIntType.MAX_SIZE`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
@@ -1426,10 +1463,11 @@
                 if(!(initialHigh instanceof BigIntType)){throw new TypeError("[mapRange] initialHigh is not an instance of BigIntType");}
                 if(!(finalLow instanceof BigIntType)){throw new TypeError("[mapRange] finalLow is not an instance of BigIntType");}
                 if(!(finalHigh instanceof BigIntType)){throw new TypeError("[mapRange] finalHigh is not an instance of BigIntType");}
+                if(initialLow.isEqualTo(initialHigh)){throw new RangeError("[mapRange] initialLow and initialHigh are the same value");}
+                if(finalLow.isEqualTo(finalHigh)){throw new RangeError("[mapRange] finalLow and finalHigh are the same value");}
                 rounding=String(rounding);if(!/^(r|round|f|floor|c|ceil)$/.test(rounding)){throw new SyntaxError("[mapRange] rounding is not a valid option");}
                 limit=Boolean(limit);
                 try{
-                    // TODO ~ could be faster with BigIntType.#calc... methods (divRest and karazuba need extra handeling) also no false "larger than max size" throw
                     initialHigh=initialHigh.copy().sub(initialLow);
                     this.sub(initialLow)
                         .mul(finalHigh.copy().sub(finalLow))
@@ -1484,55 +1522,6 @@
                     throw error;
                 }
             }
-            /* TODO's
-
-                [!] use String.fromCharCode(10240+n) and (10240-s.charCodeAt(0)) (2Byte per number) in stead of "0"-"256" (wich uses up to 6Bytes per number)
-
-                [!] private method for converting from every base (2-256) to every base (2-256) (string[]/Uint8Array) (see base 10 conversion ~)
-                    to use in constructor and toString method
-                [!] also an extra private method for "hexadecimal"=16 conversion/translation (switch in constructor, toString and logConsole) with every known base names ~
-
-                root(n)
-                ( n-root(n,x) => pow(x,1/n) ) ~ 1/x if x>2 is rounded 0 !
-
-                log(x)(y)=z <-> (x^z=y) https://en.wikipedia.org/wiki/Logarithm#Change_of_base
-                log(x)(y) = ( log(2)(y) / log(2)(x) ) log of 2 to log of any base
-
-
-                (；￢＿￢) basically BigInt but slower (just a proof of concept and a fun math challenge)
-
-                probably for the best to use BigInt (in fraction-class) and copy methods from here as needed, 'cause speed
-
-                <num_frac([a+(b/c)])>
-                    frac2decString - [PowerShell]
-                            $b=123456;  # first number
-                            $c=789123;  # second number
-                            $n=100;     # number of decimals
-                            $r=$true;   # rounding on/off
-                            $out="0.";  # decimal output
-                            $b_=$b;
-                            for($i=0;$i -lt $n;$i++){
-                                $d=[math]::floor($b_*10/$c);
-                                if($r -and ($i -eq ($n-1))){
-                                    # rounding >=5 up
-                                    $d_=[math]::floor((($b_*10)-($c*$d))*10/$c);
-                                    if($d_ -ge 5){
-                                        # $d_ >=10 !!
-                                        $out+=[string]($d+1);
-                                    }else{$out+=[string]$d}
-                                }else{$out+=[string]$d}
-                                $b_=($b_*10)-($c*$d);
-                            };
-                            Out-String -InputObject "PS estimate: $($b/$c)";
-                            Out-String -InputObject "$($n) decimal: $($out)";
-
-                    E PI sqrt2 ?! ~> e^() e^(()*PI) ...
-                    Trigenomitry: https://en.wikipedia.org/wiki/Trigonometric_functions
-                    Sine,Tangent,Secant https://upload.wikimedia.org/wikipedia/commons/e/ec/TrigFunctionDiagram.svg
-                    +arc-*,co-*,hyperbolic-*,arc-co-*,co-hyperbolic-*,arc-hyperbolic-*,arc-co-hyperbolic-*
-                    COS: https://wikimedia.org/api/rest_v1/media/math/render/svg/b81fe2f5f9ac74cbd88ec71d23baf9a1e39b8f04
-                    SIN: https://wikimedia.org/api/rest_v1/media/math/render/svg/2d12b4b66e58abfcf03c1f452658b85f662ce228
-            */
         } //~ or just u know use the actual BigInt xD - it might not have base 256 and a few of the methods here but it's a lot faster since it's coded on a lower level ^^
         try{console.log(BigIntType.HelloThere.toString("braille"));}
         catch(error){
@@ -1551,6 +1540,7 @@
          * @returns {RegExp} regexp for `base` - if out of range only matches `+0` and `-0`
          */
         const _REGEXP_STRING=base=>{
+            // TODO add support for ignoring '_' after prefix and between digits (except comma separated list)
             base=Math.abs(Number(base));if(Number.isNaN(base)){return/^([+-]?)(0)$/;}
             switch(Number(base)){
                 case 0:return/^([+-]?)(\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)$/;// unicode braille-pattern
@@ -1594,7 +1584,7 @@
         /**__numbers as BigIntType objects stored in this convenient object__*/
         let _NUMBERS=Object.freeze({
                 /**@type {BigIntType[]}*/
-                mem:[],//~ max 10 memory nubers
+                mem:[],//~ max 10 memory numbers
                 a:BigIntType.One,
                 b:BigIntType.Zero,
                 rand:Object.freeze({
@@ -1610,8 +1600,8 @@
             }),
             /**@type {number} current memory size of all numbers*/
             _CURRENT_MEM_SIZE=500,
-            /**@type {number} current radix of all numbers*/
-            _CURRENT_BASE=10;
+            /**@type {string} current radix of all numbers*/
+            _CURRENT_BASE="10";
         /**
          * __prints the `message` to the html-error-element__ \
          * auto resize to fit-content
@@ -1637,7 +1627,7 @@
          * @param {HTMLElement} element - html element
          */
         function _numberInput(element){
-            if(!(_REGEXP_STRING(_CURRENT_BASE).test(element.value))){_error_css(element,"not in correct format for base "+(_CURRENT_BASE===0?"256(braille)":_CURRENT_BASE));}
+            if(!(_REGEXP_STRING(_CURRENT_BASE==="braille"?0:Number(_CURRENT_BASE)).test(element.value))){_error_css(element,"not in correct format for base "+(_CURRENT_BASE===0?"256(braille)":_CURRENT_BASE));}
             else{_error_css(element,"");}
         }
         /**
@@ -1650,47 +1640,48 @@
         function _numberChange(element){
             _error_html("");
             _error_css(element,"");
-            if(_REGEXP_STRING(_CURRENT_BASE).test(element.value)){
+            if(_REGEXP_STRING(_CURRENT_BASE==="braille"?0:Number(_CURRENT_BASE)).test(element.value)){
                 try{
                     switch(element.id){
-                        case"number_a":_NUMBERS.a.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"number_b":_NUMBERS.b.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"Arandommin":_NUMBERS.rand.min.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"Arandommax":_NUMBERS.rand.max.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"Amapmin1":_NUMBERS.map.min1.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"Amapmax1":_NUMBERS.map.max1.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"Amapmin2":_NUMBERS.map.min2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
-                        case"Amapmax2":_NUMBERS.map.max2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE===0?"braille":_CURRENT_BASE));break;
+                        case"number_a":_NUMBERS.a.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"number_b":_NUMBERS.b.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"Arandommin":_NUMBERS.rand.min.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"Arandommax":_NUMBERS.rand.max.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"Amapmin1":_NUMBERS.map.min1.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"Amapmax1":_NUMBERS.map.max1.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"Amapmin2":_NUMBERS.map.min2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
+                        case"Amapmax2":_NUMBERS.map.max2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
                     }
-                    if(element.id==="number_a"||element.id==="number_b"){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?">":(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?"<":"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
+                    if(element.id==="number_a"||element.id==="number_b"){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
                 }catch(error){
                     console.error(error);
                     _error_html(`{InputError} reseted number entered because it was to large\ninput:\n${element.value}`);
                     switch(element.id){
-                        case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"Arandommin":element.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"Arandommax":element.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"Amapmin1":element.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"Amapmax1":element.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"Amapmin2":element.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                        case"Amapmax2":element.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                        case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE);break;
+                        case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE);break;
+                        case"Arandommin":element.value=_NUMBERS.rand.min.toString(_CURRENT_BASE);break;
+                        case"Arandommax":element.value=_NUMBERS.rand.max.toString(_CURRENT_BASE);break;
+                        case"Amapmin1":element.value=_NUMBERS.map.min1.toString(_CURRENT_BASE);break;
+                        case"Amapmax1":element.value=_NUMBERS.map.max1.toString(_CURRENT_BASE);break;
+                        case"Amapmin2":element.value=_NUMBERS.map.min2.toString(_CURRENT_BASE);break;
+                        case"Amapmax2":element.value=_NUMBERS.map.max2.toString(_CURRENT_BASE);break;
                     }
                 }
             }else{
-                _error_html(`{InputError} reseted number entered because it was not in correct format for base ${_CURRENT_BASE===0?"256(braille)":_CURRENT_BASE}`);
+                _error_html(`{InputError} reseted number entered because it was not in correct format for base ${_CURRENT_BASE==="braille"?"256(braille)":_CURRENT_BASE}`);
                 switch(element.id){
-                    case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"Arandommin":element.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"Arandommax":element.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"Amapmin1":element.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"Amapmax1":element.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"Amapmin2":element.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
-                    case"Amapmax2":element.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);break;
+                    case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE);break;
+                    case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE);break;
+                    case"Arandommin":element.value=_NUMBERS.rand.min.toString(_CURRENT_BASE);break;
+                    case"Arandommax":element.value=_NUMBERS.rand.max.toString(_CURRENT_BASE);break;
+                    case"Amapmin1":element.value=_NUMBERS.map.min1.toString(_CURRENT_BASE);break;
+                    case"Amapmax1":element.value=_NUMBERS.map.max1.toString(_CURRENT_BASE);break;
+                    case"Amapmin2":element.value=_NUMBERS.map.min2.toString(_CURRENT_BASE);break;
+                    case"Amapmax2":element.value=_NUMBERS.map.max2.toString(_CURRENT_BASE);break;
                 }
             }
         }
+        // TODO functions for _NUMBERS.mem;
     </script>
 </head>
 <body>
@@ -1708,7 +1699,7 @@
                     <option value="16">hexadecimal (16)</option>
                     <option value="36">bin-text (36)</option>
                     <option value="256">byte (256)</option>
-                    <option value="0">braille-pattern (256)</option>
+                    <option value="braille">braille-pattern (256)</option>
                 </select>
             </div>
             <div data-content="memory_size" title="maximum length of each number in memory (! resets numbers if they are to large !)">
@@ -1727,7 +1718,7 @@
                 </select>
             </div>
             <div data-content="number_a">
-                <label for="number_a" title="[A] input a number for calculation">A</label>
+                <label for="number_a" title="[A] input a number for calculation">A <small>(this)</small></label>
                 <textarea id="number_a" class="number" title="[A] input a number for calculation">1</textarea>
                 <button id="AseqB" title="[A] set equal to B">=B</button>
                 <button id="Aabs" title="set sign of A absolute">|A|</button>
@@ -1745,7 +1736,7 @@
                 </div>
             </div>
             <div data-content="number_b">
-                <label for="number_b" title="[B] input a number for calculation">B</label>
+                <label for="number_b" title="[B] input a number for calculation">B <small>(n)</small></label>
                 <textarea id="number_b" class="number" title="[B] input a number for calculation">0</textarea>
                 <button id="BseqA" title="[B] set equal to A">=A</button>
                 <button id="Babs" title="set sign of B absolute">|B|</button>
@@ -1766,8 +1757,8 @@
                 <button id="AaddB" title="set A to: A plus B">A + = B</button>
                 <button id="AsubB" title="set A to: A minus B">A - = B</button>
                 <button id="AmulB" title="set A to: A times B">A * = B</button>
-                <button id="AmodB" title="set A to: A modulo B">A % = B</button>
                 <button id="ApowB" title="set A to: A to the power of B">A ** = B</button>
+                <button id="switchAB" title="switches A and B">A &LeftArrowRightArrow; B</button>
                 <div class="button" data-content="AdivB">
                     <button id="AdivB" title="set A to: A divided by B">A / = B</button>
                     <select class="rounding" title="rounding for [A / = B]">
@@ -1777,9 +1768,21 @@
                         <option value="r" selected>rounded</option>
                     </select>
                 </div>
-                <button id="switchAB" title="switches A and B">switch A and B</button>
-                <button id="bitAlsB" title="shifts the bits of A by B amount to the left">A &lt;&lt; = B</button>
-                <button id="bitArsB" title="shifts the bits of A by B amount to the right">A &gt;&gt; = B</button>
+                <div class="button" data-content="AmodB">
+                    <button id="AmodB" title="set A to: A modulo B">A % = B</button>
+                    <select class="type" title="type for [A % = B]">
+                        <option disabled>type</option>
+                        <option value="e" selected>euclidean</option>
+                        <option value="t">truncated</option>
+                        <option value="f">floored</option>
+                        <option value="c">ceiled</option>
+                        <option value="r">rounded</option>
+                    </select>
+                </div>
+                <button id="bitAls" title="shifts the bits of A by set amount to the left">A &lt;&lt; = x</button>
+                <input type="number" id="bitAls_x" min="0" max="9007199254740991" class="number" title="amount for [A &lt;&lt; = x]" value="1">
+                <button id="bitArs" title="shifts the bits of A by set amount to the right">A &gt;&gt; = B</button>
+                <input type="number" id="bitArs_x" min="0" max="9007199254740991" class="number" title="amount for [A &gt;&gt; = x]" value="1">
                 <button id="gcdAB" title="set A to: greatest common divisor of A and B">GCD</button>
                 <button id="bitnoA" title="applies logical NOT to A">! A</button>
                 <button id="bitnoB" title="applies logical NOT to B">! B</button>
@@ -1798,8 +1801,8 @@
             <div data-content="Amap">
                 <button id="Amap" title="map A from set initial bounds to set final bounds">map range</button>
                 <div class="button" data-content="Amaplimit">
-                    <label for="Amaplimit" title="limits the mapping from A to its final bounds">limit</label>
-                    <input type="checkbox" id="Amaplimit" title="limits the mapping from A to its final bounds">
+                    <input type="checkbox" id="Amaplimit">
+                    <label for="Amaplimit" title="limits the mapping from A to its final bounds (toggle)">limit</label>
                     &verbar;
                     <select class="rounding" title="rounding for [map range]">
                         <option disabled>rounding</option>
@@ -1823,6 +1826,34 @@
             <div data-content="error_output"><textarea id="error_output" title="displays errors when they occur" readonly></textarea></div>
         </div>
     </div>
+    <div id="loader">
+        <div>
+            <svg width="100%" height="100%" viewBox="0 0 350 100">
+                <title>please wait...</title>
+                <rect x="0" y="0" width="100%" height="100%" style="fill: transparent;"/>
+                <g style="overflow:hidden;text-anchor: middle;">
+                    <defs>
+                        <mask id="textMask"><text style="fill: white;" x="175" y="55">please wait...</text></mask>
+                        <filter id="innerShadow" x="-15%" y="-15%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur"/>
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur2"/>
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur3"/>
+                            <feMerge result="blur">
+                                <feMergeNode in="blur" mode="normal"/>
+                                <feMergeNode in="blu2" mode="normal"/>
+                                <feMergeNode in="blur3" mode="normal"/>
+                            </feMerge>
+                            <feOffset in="blur" dx="0.7" dy="0.7"/>
+                        </filter>
+                    </defs>
+                    <g mask="url(#textMask)">
+                        <rect x="0" y="0" width="350" height="75" style="fill: black;"/>
+                        <text style="fill: #0f0f;filter: url(#innerShadow);" x="175" y="55">please wait...</text>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
     <script>
         // ## elements
         const base_chooser=document.getElementById("base_chooser"),
@@ -1831,9 +1862,10 @@
             AseqB=document.getElementById("AseqB"),Aabs=document.getElementById("Aabs"),Aneg=document.getElementById("Aneg"),Ainc=document.getElementById("Ainc"),Adec=document.getElementById("Adec"),Adouble=document.getElementById("Adouble"),Ahalf=document.getElementById("Ahalf"),Ahalf_round=document.body.querySelector("#Ahalf+select.rounding"),
             number_b=document.getElementById("number_b"),
             BseqA=document.getElementById("BseqA"),Babs=document.getElementById("Babs"),Bneg=document.getElementById("Bneg"),Binc=document.getElementById("Binc"),Bdec=document.getElementById("Bdec"),Bdouble=document.getElementById("Bdouble"),Bhalf=document.getElementById("Bhalf"),Bhalf_round=document.body.querySelector("#Bhalf+select.rounding"),
-            AaddB=document.getElementById("AaddB"),AsubB=document.getElementById("AsubB"),AmulB=document.getElementById("AmulB"),AmodB=document.getElementById("AmodB"),ApowB=document.getElementById("ApowB"),
-            AdivB=document.getElementById("AdivB"),AdivB_round=document.body.querySelector("#AdivB+select.rounding"),switchAB=document.getElementById("switchAB"),
-            bitAlsB=document.getElementById("bitAlsB"),bitArsB=document.getElementById("bitArsB"),
+            AaddB=document.getElementById("AaddB"),AsubB=document.getElementById("AsubB"),AmulB=document.getElementById("AmulB"),ApowB=document.getElementById("ApowB"),switchAB=document.getElementById("switchAB"),
+            AdivB=document.getElementById("AdivB"),AdivB_round=document.body.querySelector("#AdivB+select.rounding"),AmodB=document.getElementById("AmodB"),AmodB_type=document.body.querySelector("#AmodB+select.type"),
+            bitAls=document.getElementById("bitAls"),bitAls_x=document.getElementById("bitAls_x"),gcdAB=document.getElementById("gcdAB"),
+            bitArs=document.getElementById("bitArs"),bitArs_x=document.getElementById("bitArs_x"),
             bitnoA=document.getElementById("bitnoA"),bitnoB=document.getElementById("bitnoB"),bitAanB=document.getElementById("bitAanB"),bitAorB=document.getElementById("bitAorB"),bitAxoB=document.getElementById("bitAxoB"),
             AtB=document.getElementById("AtB"),
             error_output=document.getElementById("error_output"),
@@ -1841,21 +1873,23 @@
             Arandommin=document.getElementById("Arandommin"),Arandommax=document.getElementById("Arandommax"),
             Amap=document.getElementById("Amap"),Amap_round=document.body.querySelector("#Amap+div>select.rounding"),Amaplimit=document.getElementById("Amaplimit"),
             Amapmin1=document.getElementById("Amapmin1"),Amapmax1=document.getElementById("Amapmax1"),
-            Amapmin2=document.getElementById("Amapmin2"),Amapmax2=document.getElementById("Amapmax2");
-        _error_html("Errors may be displayed here...\nclick anywhere on the page but here to remove this message");
+            Amapmin2=document.getElementById("Amapmin2"),Amapmax2=document.getElementById("Amapmax2"),
+            loader=document.getElementById("loader");
+        _error_html("Errors may be displayed here...\ndouble click anywhere on the page (except here) to remove this message");
+        AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
         // ## event listeners
-        document.addEventListener("click",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
+        document.addEventListener("dblclick",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
         switchAB.addEventListener("click",ev=>{[number_a.value,number_b.value]=[number_b.value,number_a.value];},{passive:true});
         base_chooser.addEventListener("change",ev=>{
-            _CURRENT_BASE=Number(base_chooser.value);
-            number_a.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            number_b.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
-            Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+            _CURRENT_BASE=base_chooser.value;
+            number_a.value=_NUMBERS.a.toString(_CURRENT_BASE);
+            number_b.value=_NUMBERS.b.toString(_CURRENT_BASE);
+            Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE);
+            Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE);
+            Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE);
+            Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE);
+            Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE);
+            Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE);
         },{passive:true});
         memory_size.addEventListener("change",ev=>{
             _CURRENT_MEM_SIZE=Number(memory_size.value);
@@ -1864,42 +1898,42 @@
             let r=0;
             if(_NUMBERS.a.length>BigIntType.MAX_SIZE){
                 _NUMBERS.a.setEqualTo(BigIntType.Zero);
-                number_a.value=_NUMBERS.a.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                number_a.value=_NUMBERS.a.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.b.length>BigIntType.MAX_SIZE){
                 _NUMBERS.b.setEqualTo(BigIntType.Zero);
-                number_b.value=_NUMBERS.b.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                number_b.value=_NUMBERS.b.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.rand.min.length>BigIntType.MAX_SIZE){
                 _NUMBERS.rand.min.setEqualTo(BigIntType.Zero);
-                Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.rand.max.length>BigIntType.MAX_SIZE){
                 _NUMBERS.rand.max.setEqualTo(BigIntType.Zero);
-                Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.map.min1.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.min1.setEqualTo(BigIntType.Zero);
-                Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.map.max1.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.max1.setEqualTo(BigIntType.Zero);
-                Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.map.min2.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.min2.setEqualTo(BigIntType.Zero);
-                Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE);
                 r++;
             }
             if(_NUMBERS.map.max2.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.max2.setEqualTo(BigIntType.Zero);
-                Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE===0?"braille":_CURRENT_BASE);
+                Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE);
                 r++;
             }
             if(r>0){
@@ -1908,7 +1942,7 @@
             }
         },{passive:true});
         // ## numbers
-        for(const _number of Array.from(document.body.querySelectorAll("textarea.number"))){
+        for(const _number of document.body.querySelectorAll("textarea.number")){
             _number.addEventListener("keydown",ev=>{
                 if(ev.key==="Enter"){
                     ev.preventDefault();
@@ -1918,37 +1952,532 @@
             _number.addEventListener("input",ev=>_numberInput(ev.target),{passive:true});
             _number.addEventListener("change",ev=>_numberChange(ev.target),{passive:true});
         }
+        for(const _number of document.body.querySelectorAll("input.number")){
+            _number.addEventListener("keydown",ev=>{
+                if(ev.key==="Enter"){
+                    ev.preventDefault();
+                    ev.target.blur();
+                }
+            },{passive:false});
+            _number.addEventListener("input",ev=>{
+                if(/^0*$/.test(ev.target.value)){ev.target.value='0';}
+                else if(ev.target.value.length>16||!Number.isSafeInteger(Number(ev.target.value))){ev.target.value=String(Number.MAX_SAFE_INTEGER);}
+                else{ev.target.value=String(Number(ev.target.value));}
+            },{passive:true});
+        }
         // ## buttons
-        // TODO
-        AseqB.addEventListener("click",ev=>{},{passive:true});
-        BseqA.addEventListener("click",ev=>{},{passive:true});
-        Aabs.addEventListener("click",ev=>{},{passive:true});
-        Babs.addEventListener("click",ev=>{},{passive:true});
-        Aneg.addEventListener("click",ev=>{},{passive:true});
-        Bneg.addEventListener("click",ev=>{},{passive:true});
-        Ainc.addEventListener("click",ev=>{},{passive:true});
-        Binc.addEventListener("click",ev=>{},{passive:true});
-        Adec.addEventListener("click",ev=>{},{passive:true});
-        Bdec.addEventListener("click",ev=>{},{passive:true});
-        Adouble.addEventListener("click",ev=>{},{passive:true});
-        Bdouble.addEventListener("click",ev=>{},{passive:true});
-        Ahalf.addEventListener("click",ev=>{Ahalf_round.value;},{passive:true});
-        Bhalf.addEventListener("click",ev=>{Bhalf_round.value;},{passive:true});
-        AaddB.addEventListener("click",ev=>{},{passive:true});
-        AsubB.addEventListener("click",ev=>{},{passive:true});
-        AmulB.addEventListener("click",ev=>{},{passive:true});
-        AmodB.addEventListener("click",ev=>{},{passive:true});
-        ApowB.addEventListener("click",ev=>{},{passive:true});
-        AdivB.addEventListener("click",ev=>{AdivB_round.value;},{passive:true});
-        bitAlsB.addEventListener("click",ev=>{},{passive:true});
-        bitArsB.addEventListener("click",ev=>{},{passive:true});
-        bitnoA.addEventListener("click",ev=>{},{passive:true});
-        bitnoB.addEventListener("click",ev=>{},{passive:true});
-        bitAanB.addEventListener("click",ev=>{},{passive:true});
-        bitAorB.addEventListener("click",ev=>{},{passive:true});
-        bitAxoB.addEventListener("click",ev=>{},{passive:true});
-        Arandom.addEventListener("click",ev=>{},{passive:true});
-        Amap.addEventListener("click",ev=>{Amaplimit.checked;Amap_round.value;},{passive:true});
+        // TODO → abort (button on loader) mid calculation !? promise
+        AseqB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.setEqualTo(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        BseqA.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.setEqualTo(_NUMBERS.a).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Aabs.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.abs().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Babs.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.abs().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Aneg.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.neg().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Bneg.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.neg().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Ainc.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.inc().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Binc.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.inc().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Adec.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.dec().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Bdec.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.dec().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Adouble.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.double().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Bdouble.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.double().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Ahalf.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.half(Ahalf_round.value).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Bhalf.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.half(Bhalf_round.value).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        AaddB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.add(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        AsubB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.sub(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        AmulB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.mul(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        AmodB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.modulo(_NUMBERS.b,AmodB_type.value).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        ApowB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.pow(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        AdivB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.div(_NUMBERS.b,AdivB_round.value).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitAls.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.bitShiftL(Number(bitAls_x.value)).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitArs.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.bitShiftR(Number(bitArs_x.value)).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        gcdAB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.setEqualTo(BigIntType.GCD(_NUMBERS.a,_NUMBERS.b)).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitnoA.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.bitNOT().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitnoB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.b.bitNOT().toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_b.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitAanB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.bitAND(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitAorB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.bitOR(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        bitAxoB.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.bitXOR(_NUMBERS.b).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Arandom.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.setEqualTo(BigIntType.randomInt(_NUMBERS.rand.min,_NUMBERS.rand.max)).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        Amap.addEventListener("click",ev=>{
+            loader.style.display="";
+            _error_html("");
+            new Promise((resolve,reject)=>{
+                try{resolve(_NUMBERS.a.mapRange(_NUMBERS.map.min1,_NUMBERS.map.max1,_NUMBERS.map.min2,_NUMBERS.map.max2,Amap_round.value,Amaplimit.checked).toString(_CURRENT_BASE));}
+                catch(error){reject(error);}
+            }).then(
+                value=>{number_a.value=value;},
+                error=>{
+                    _error_html(`{${error.name}} : "${error.message}"`);
+                    console.error(error);
+                }
+            ).finally(()=>{
+                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+                loader.style.display="none";
+            });
+        },{passive:true});
+        loader.style.display="none";
     </script>
 </body>
 </html>
