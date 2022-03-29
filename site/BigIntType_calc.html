@@ -1290,25 +1290,6 @@
                 return this;
             }
             /**
-             * __doubles a number__ \
-             * does not remove leading zeros
-             * @param {string[]} A - digits-array (original will be altered)
-             * @returns {string[]} `A * 2` (modified `A`)
-             */
-            static #calcDouble(A){
-                if(A.some(v=>v!=='0')){
-                    for(let i=0,o=false;i<A.length||o;i++){
-                        if(A[i]==='0'&&!o){continue;}
-                        A[i]=String((Number(A[i])<<1)+(o?1:0));
-                        if(Number(A[i])>=256){
-                            A[i]=String(Number(A[i])-256);
-                            o=true;
-                        }else{o=false;}
-                    }
-                }
-                return A;
-            }
-            /**
              * __Karatsubas Multiplication Algorithm__ \
              * _with recursion_ \
              * for `mul()`
@@ -1321,15 +1302,8 @@
                 if(X.every(v=>v==='0')||Y.every(v=>v==='0')){return ['0'];}
                 //~ assume here that`X` and `Y` are of same length and the length is a power of 2
                 if(X.length===1){//~ small enough to conpute savely with JS-Number
-                    if(X[0]==='1'&&Y[0]==='1'){return['1'];}
-                    else if(X[0]==='1'){return Y.slice();}
-                    else if(Y[0]==='1'){return X.slice();}
-                    else if(Y[0]==='2'){return BigIntType.#calcDouble(X.slice());}
-                    else if(X[0]==='2'){return BigIntType.#calcDouble(Y.slice());}
-                    else{
-                        const A=Number(X[0])*Number(Y[0]);
-                        return[String(A%256),String(Math.floor(A/256))];
-                    }
+                    const A=Number(X[0])*Number(Y[0]);
+                    return[String(A&255),String(A>>>8)];
                 }
                 let Xl=X.slice(0,Math.floor(X.length*.5)),Xh=X.slice(Math.floor(X.length*.5)),
                     Yl=Y.slice(0,Math.floor(Y.length*.5)),Yh=Y.slice(Math.floor(Y.length*.5));
@@ -1523,11 +1497,7 @@
                 }
             }
         } //~ or just u know use the actual BigInt xD - it might not have base 256 and a few of the methods here but it's a lot faster since it's coded on a lower level ^^
-        try{console.log(BigIntType.HelloThere.toString("braille"));}
-        catch(error){
-            console.log("{%s} : \"%s\"",error.name,error.message);//~ show only recent message (on screen) and not the whole stack
-            console.error(error);//~ but do log the whole error message with stack to console
-        }
+        // TODO {see Math-Js/BigIntType.js}
     </script>
     <script>
         /**
@@ -1589,13 +1559,13 @@
                 b:BigIntType.Zero,
                 rand:Object.freeze({
                     min:BigIntType.Zero,
-                    max:BigIntType.One,
+                    max:new BigIntType("1000000","10"),
                 }),
                 map:Object.freeze({
                     min1:BigIntType.Zero,
-                    max1:BigIntType.One,
-                    min2:BigIntType.Zero,
-                    max2:BigIntType.One,
+                    max1:new BigIntType("1000000","10"),
+                    min2:new BigIntType("1000000","10"),
+                    max2:BigIntType.Zero,
                 }),
             }),
             /**@type {number} current memory size of all numbers*/
@@ -1719,7 +1689,7 @@
             </div>
             <div data-content="number_a">
                 <label for="number_a" title="[A] input a number for calculation">A <small>(this)</small></label>
-                <textarea id="number_a" class="number" title="[A] input a number for calculation">1</textarea>
+                <textarea id="number_a" maxlength="2147483648" class="number" title="[A] input a number for calculation">1</textarea>
                 <button id="AseqB" title="[A] set equal to B">=B</button>
                 <button id="Aabs" title="set sign of A absolute">|A|</button>
                 <button id="Aneg" title="negates the sign of A">-A</button>
@@ -1737,7 +1707,7 @@
             </div>
             <div data-content="number_b">
                 <label for="number_b" title="[B] input a number for calculation">B <small>(n)</small></label>
-                <textarea id="number_b" class="number" title="[B] input a number for calculation">0</textarea>
+                <textarea id="number_b" maxlength="2147483648" class="number" title="[B] input a number for calculation">0</textarea>
                 <button id="BseqA" title="[B] set equal to A">=A</button>
                 <button id="Babs" title="set sign of B absolute">|B|</button>
                 <button id="Bneg" title="negates the sign of B">-B</button>
@@ -1794,9 +1764,9 @@
             <div data-content="Arandom">
                 <button id="Arandom" title="set A to a random number in set bounds">random number</button>
                 <label for="Arandommin" title="set minimum number for random generator">minimum:</label>
-                <textarea id="Arandommin" class="number" title="set minimum number for random generator">0</textarea>
+                <textarea id="Arandommin" maxlength="2147483648" class="number" title="set minimum number for random generator">0</textarea>
                 <label for="Arandommax" title="set maximum number for random generator">maximum:</label>
-                <textarea id="Arandommax" class="number" title="set maximum number for random generator">1</textarea>
+                <textarea id="Arandommax" maxlength="2147483648" class="number" title="set maximum number for random generator">1000000</textarea>
             </div>
             <div data-content="Amap">
                 <button id="Amap" title="map A from set initial bounds to set final bounds">map range</button>
@@ -1812,13 +1782,13 @@
                     </select>
                 </div>
                 <label for="Amapmin1" title="set initial minimum for mapping">initial minimum:</label>
-                <textarea id="Amapmin1" class="number" title="set initial minimum for mapping">0</textarea>
+                <textarea id="Amapmin1" maxlength="2147483648" class="number" title="set initial minimum for mapping">0</textarea>
                 <label for="Amapmax1" title="set initial maximum for mapping">initial maximum:</label>
-                <textarea id="Amapmax1" class="number" title="set initial maximum for mapping">1</textarea>
+                <textarea id="Amapmax1" maxlength="2147483648" class="number" title="set initial maximum for mapping">1000000</textarea>
                 <label for="Amapmin2" title="set final minimum for mapping">final minimum:</label>
-                <textarea id="Amapmin2" class="number" title="set final minimum for mapping">0</textarea>
+                <textarea id="Amapmin2" maxlength="2147483648" class="number" title="set final minimum for mapping">1000000</textarea>
                 <label for="Amapmax2" title="set final maximum for mapping">final maximum:</label>
-                <textarea id="Amapmax2" class="number" title="set final maximum for mapping">1</textarea>
+                <textarea id="Amapmax2" maxlength="2147483648" class="number" title="set final maximum for mapping">0</textarea>
             </div>
             <div data-content="saved_numbers">
                 <!-- TODO -->[ WIP ]
@@ -1877,6 +1847,16 @@
             loader=document.getElementById("loader");
         _error_html("Errors may be displayed here...\ndouble click anywhere on the page (except here) to remove this message");
         AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+        try{//~ Test number to console
+            console.log(
+                "TEST NUMBER: %c %s",
+                "background-color:#000;color:#0f0;font-family:consolas;font-size:2em;",
+                BigIntType.HelloThere.toString("braille")
+            );
+        }catch(error){
+            _error_html(`[TEST NUMBER] : {${error.name}} : \"${error.message}\"`);//~ show only recent message (on screen) and not the whole stack
+            console.error(error);//~ but do log the whole error object to console
+        }
         // ## event listeners
         document.addEventListener("dblclick",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
         switchAB.addEventListener("click",ev=>{[number_a.value,number_b.value]=[number_b.value,number_a.value];},{passive:true});
@@ -1966,7 +1946,7 @@
             },{passive:true});
         }
         // ## buttons
-        // TODO → abort (button on loader) mid calculation !? promise
+        // TODO → abort (button on loader) mid calculation !? abort promise ?!
         AseqB.addEventListener("click",ev=>{
             loader.style.display="";
             _error_html("");
