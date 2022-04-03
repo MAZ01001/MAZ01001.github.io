@@ -97,7 +97,7 @@
 ## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html)
 
 + Calculator for arbitrary-length-integers
-+ see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js#BigIntType.js) for more description
++ see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js#biginttypejs) for more description
 
 ----
 
