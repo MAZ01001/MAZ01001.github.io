@@ -175,11 +175,24 @@
             left: 0;
             right: 0;
             bottom: 0;
-            backdrop-filter: blur(6px);
             z-index: 9999;
+            user-select: none;
+            pointer-events: visible;
+            transition: opacity 500ms ease-out;/* fade in */
+            backdrop-filter: blur(6px);
             background-image: radial-gradient(transparent,transparent,black,black);
         }
+        div#loader.hid{
+            opacity: 0;
+            visibility: hidden;
+            transition: visibility 0s linear 500ms,
+                opacity 500ms ease-in;/* fade out */
+        }
+        @keyframes pulseColor{50%{fill: #070f;}}
+        text#loaderText{animation: pulseColor 3s infinite;}
         div#loader>div{
+            color: #0f0;
+            animation: pulseColor 1s infinite;
             font-size: 2em;
             font-family: serif;
             position: absolute;
@@ -1651,6 +1664,34 @@
                 }
             }
         }
+        /**
+         * __for use in button eventlisteners__
+         * @discription set a delay in a promise that resolves after `t`ms
+         * @param {number} t - time in ms to delay
+         * @returns {Promise} Promise that resolves after `t`ms
+         * @throw {TypeError} if `t` is not a save integer
+         */
+        function _promise_delay(t=100){
+            t=Number(t);if(!Number.isSafeInteger(t)){throw new TypeError("[delay]:[t] is not a save integer");}
+            return new Promise(resolve=>setTimeout(resolve,t));
+        }
+        /**
+         * __for use in button eventlisteners__
+         * @discription outputs error to `error_output` and console
+         * @param {Error} error from promise
+         */
+        function _promise_error(error){
+            _error_html(`{${error.name}} : "${error.message}"`);
+            console.error(error);
+        }
+        /**
+         * __for use in button eventlisteners__
+         * @discription set the value of `AtB` and hides the loader
+         */
+        function _promise_finally(){
+            AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+            loader.classList.add("hid");
+        }
         // TODO functions for _NUMBERS.mem;
     </script>
 </head>
@@ -1796,15 +1837,15 @@
             <div data-content="error_output"><textarea id="error_output" title="displays errors when they occur" readonly></textarea></div>
         </div>
     </div>
-    <div id="loader">
+    <div id="loader" class="hid">
         <div>
             <svg width="100%" height="100%" viewBox="0 0 350 100">
                 <title>please wait...</title>
                 <rect x="0" y="0" width="100%" height="100%" style="fill: transparent;"/>
                 <g style="overflow:hidden;text-anchor: middle;">
                     <defs>
-                        <mask id="textMask"><text style="fill: white;" x="175" y="55">please wait...</text></mask>
-                        <filter id="innerShadow" x="-15%" y="-15%" width="140%" height="140%">
+                        <mask id="loaderTextMask"><text style="fill: white;" x="175" y="55">please wait...</text></mask>
+                        <filter id="loaderInnerShadow" x="-15%" y="-15%" width="140%" height="140%">
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur"/>
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur2"/>
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur3"/>
@@ -1816,9 +1857,9 @@
                             <feOffset in="blur" dx="0.7" dy="0.7"/>
                         </filter>
                     </defs>
-                    <g mask="url(#textMask)">
+                    <g mask="url(#loaderTextMask)">
                         <rect x="0" y="0" width="350" height="75" style="fill: black;"/>
-                        <text style="fill: #0f0f;filter: url(#innerShadow);" x="175" y="55">please wait...</text>
+                        <text id="loaderText" style="fill: #0f0f;filter:url(#loaderInnerShadow);" x="175" y="55">please wait...</text>
                     </g>
                 </g>
             </svg>
@@ -1946,519 +1987,246 @@
             },{passive:true});
         }
         // ## buttons
-        // TODO → abort (button on loader) mid calculation !? abort promise ?!
-        // TODO → loader force html render ? or no promises ?
-        AseqB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        AseqB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.setEqualTo(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        BseqA.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        BseqA.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.setEqualTo(_NUMBERS.a).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Aabs.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Aabs.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.abs().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Babs.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Babs.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.abs().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Aneg.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Aneg.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.neg().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Bneg.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Bneg.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.neg().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Ainc.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Ainc.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.inc().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Binc.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Binc.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.inc().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Adec.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Adec.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.dec().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Bdec.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Bdec.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.dec().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Adouble.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Adouble.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.double().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Bdouble.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Bdouble.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.double().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Ahalf.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Ahalf.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.half(Ahalf_round.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Bhalf.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Bhalf.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.half(Bhalf_round.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        AaddB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        AaddB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.add(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        AsubB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        AsubB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.sub(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        AmulB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        AmulB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.mul(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        AmodB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        AmodB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.modulo(_NUMBERS.b,AmodB_type.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        ApowB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        ApowB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.pow(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        AdivB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        AdivB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.div(_NUMBERS.b,AdivB_round.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitAls.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitAls.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitShiftL(Number(bitAls_x.value)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitArs.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitArs.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitShiftR(Number(bitArs_x.value)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        gcdAB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        gcdAB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.setEqualTo(BigIntType.GCD(_NUMBERS.a,_NUMBERS.b)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitnoA.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitnoA.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitNOT().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitnoB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitnoB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.bitNOT().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_b.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitAanB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitAanB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitAND(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitAorB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitAorB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitOR(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        bitAxoB.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        bitAxoB.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitXOR(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Arandom.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Arandom.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.setEqualTo(BigIntType.randomInt(_NUMBERS.rand.min,_NUMBERS.rand.max)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        Amap.addEventListener("click",ev=>{
-            loader.style.display="";
-            _error_html("");
+        Amap.addEventListener("click",async ev=>{
+            loader.classList.remove("hid");_error_html("");
+            await _promise_delay(200);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.mapRange(_NUMBERS.map.min1,_NUMBERS.map.max1,_NUMBERS.map.min2,_NUMBERS.map.max2,Amap_round.value,Amaplimit.checked).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
-            }).then(
-                value=>{number_a.value=value;},
-                error=>{
-                    _error_html(`{${error.name}} : "${error.message}"`);
-                    console.error(error);
-                }
-            ).finally(()=>{
-                AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
-                loader.style.display="none";
-            });
+            }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
-        loader.style.display="none";
     </script>
 </body>
 </html>
