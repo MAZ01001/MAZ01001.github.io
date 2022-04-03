@@ -91,13 +91,13 @@
 
 ## [ASCII Snake](./site/snake.html)
 
-+ snake game in ascii style ([port from c++](../other-projects#snake_cmd-gamecpp))
++ snake game in ascii style ([port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp))
 + right-click for more options
 
 ## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html)
 
 + Calculator for arbitrary-length-integers
-+ see [Math-js/BigIntType.js](../Math-Js/README.md#BigIntType.js) for more description
++ see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js/README.md#BigIntType.js) for more description
 
 ----
 
