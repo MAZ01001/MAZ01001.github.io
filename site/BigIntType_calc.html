@@ -185,7 +185,7 @@
         div#loader.hid{
             opacity: 0;
             visibility: hidden;
-            transition: visibility 0s linear 500ms,
+            transition: visibility 0s linear 500ms,/* delays hiding after fade out */
                 opacity 500ms ease-in;/* fade out */
         }
         @keyframes pulseColor{50%{fill: #070f;}}
@@ -1523,7 +1523,7 @@
          * @returns {RegExp} regexp for `base` - if out of range only matches `+0` and `-0`
          */
         const _REGEXP_STRING=base=>{
-            // TODO add support for ignoring '_' after prefix and between digits (except comma separated list)
+            // TODO see BigIntType.js !!
             base=Math.abs(Number(base));if(Number.isNaN(base)){return/^([+-]?)(0)$/;}
             switch(Number(base)){
                 case 0:return/^([+-]?)(\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)$/;// unicode braille-pattern
@@ -1692,6 +1692,10 @@
             AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
             loader.classList.add("hid");
         }
+        // TODO _set_AtB() function !
+        // TODO load A B from url ~ see external notes
+        // TODO → window.location.hash;//~ Returns the Location object's URL's fragment (includes leading "#" if non-empty).
+        // TODO → window.location.search;//~ Returns the Location object's URL's query (includes leading "?" if non-empty).
         // TODO functions for _NUMBERS.mem;
     </script>
 </head>
@@ -1887,6 +1891,7 @@
             Amapmin2=document.getElementById("Amapmin2"),Amapmax2=document.getElementById("Amapmax2"),
             loader=document.getElementById("loader");
         _error_html("Errors may be displayed here...\ndouble click anywhere on the page (except here) to remove this message");
+        // TODO add case if +0/-0 "!=" because not == and not <
         AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
         try{//~ Test number to console
             console.log(
