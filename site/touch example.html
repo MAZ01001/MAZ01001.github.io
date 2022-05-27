@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <title>test mobile touch</title>
-        <meta name="description" content="[MAZ01001.github.io] example for recognizing different touch events"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="[MAZ01001.github.io] example for recognizing different touch events"/>
+    <title>test mobile touch</title>
     </head>
     <style>
         :root{--col:#000;}
@@ -45,7 +46,7 @@
              * @param {boolean} db - if dbclick should be captured (delay on click !) - _default `false`_
              * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `true`_
              */
-            constructor(el,clbk,db=false,pvdf=true){
+            constructor(el,clbk,db=false,pvdf=true){//TODO https://stackoverflow.com/a/27115070/13282166 !!!!
                 if(!(el instanceof HTMLElement)){throw new TypeError('[el] is not a html element.');}
                 if(typeof clbk!=="function"){throw new TypeError('[clbk] is not a function.');}
                 if(typeof pvdf!=="boolean"){throw new TypeError('[pvdf] is not a boolean.');}
