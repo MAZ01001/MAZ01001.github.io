@@ -57,41 +57,52 @@
             border-radius: 1em;
             text-align: center;
         }
-        div#box>h1,div#box label[for="base_chooser"]{user-select: text;}
+        div#box>h1{user-select: text;}
         div#border{
             display: grid;
-            grid-template-columns: 18.2rem auto calc(50% - 17rem) 17rem;
+            grid-template-columns: 50% 50%;
             min-width: 40em;
             padding: 1em;
-            width: max-content;
+            width: min-content;
             border-spacing: 0;
         }
-        div#border>div[data-content]{
+        div#border>div[data-content]:not(div[data-content="base_and_memory"]),
+        div#border>div[data-content="base_and_memory"]>div[data-content]{
             vertical-align: middle;
             border: .2em inset #444;
             padding: .3em .5em;
         }
-        div#border>div[data-content]:hover{border-color: #a70;}
-        div#border>div[data-content="base_chooser"]{grid-area: 1/1/2/2;}        div#border>div[data-content="memory_size"]{grid-area: 1/4/2/5;}
-        div#border>div[data-content="number_a"]{grid-area: 2/1/3/3;}            div#border>div[data-content="number_b"]{grid-area: 2/3/3/5;}
-        div#border>div[data-content="function-buttons"]{grid-area: 3/1/4/3;}    div#border>div[data-content="saved_numbers"]{grid-area: 3/3/6/5;}
-        div#border>div[data-content="Arandom"]{grid-area: 4/1/5/3;}
-        div#border>div[data-content="Amap"]{grid-area: 5/1/6/3;}
-        div#border>div[data-content="error_output"]{grid-area: 6/1/7/5;}
+        div#border>div[data-content]:not(div[data-content="base_and_memory"]):hover,
+        div#border>div[data-content="base_and_memory"]>div[data-content]:hover{border-color: #a70;}
+        div#border>div[data-content="base_and_memory"]{grid-area: 1/1/2/3;}
+        div#border>div[data-content="number_a"]{grid-area: 2/1/3/2;}            div#border>div[data-content="number_b"]{grid-area: 2/2/3/3;}
+        div#border>div[data-content="function_buttons"]{grid-area: 3/1/4/2;}    div#border>div[data-content="saved_numbers"]{grid-area: 3/2/6/3;}
+        div#border>div[data-content="a_random"]{grid-area: 4/1/5/2;}
+        div#border>div[data-content="a_map"]{grid-area: 5/1/6/2;}
+        div#border>div[data-content="error_output"]{grid-area: 6/1/7/3;}
+        div#border>div[data-content="base_and_memory"]{
+            display: grid;
+            column-gap: 1em;
+            border-spacing: 0;
+            justify-content: space-between;
+            width: 100%;
+        }
+        div#border>div[data-content="base_and_memory"]>div[data-content="base_chooser"]{grid-area: 1/1/2/2;}
+        div#border>div[data-content="base_and_memory"]>div[data-content="memory_size"]{grid-area: 1/2/2/3;}
         div.button{display: inline;white-space: nowrap;}
-        div[data-content="function-buttons"]{
+        div[data-content="function_buttons"]{
             display: grid;
             grid-auto-columns: 6;
             min-width: min-content;
             gap: .2em .1em;
         }
         #AaddB{grid-area: 1/1/2/2;}                     #AsubB{grid-area: 1/2/2/3;}     #AmulB{grid-area: 1/3/2/5;}     #ApowB{grid-area: 1/5/2/6;}     #switchAB{grid-area: 1/6/2/7;}
-        div[data-content="AdivB"]{grid-area: 2/1/3/4;}  div[data-content="AmodB"]{grid-area: 2/4/3/7;}
+        div[data-content="a_div_b"]{grid-area: 2/1/3/4;}  div[data-content="a_mod_b"]{grid-area: 2/4/3/7;}
         #bitAls{grid-area: 3/1/4/3;}                    #bitAls_x{grid-area: 3/3/4/6;}  #gcdAB{grid-area: 3/6/5/7;}
         #bitArs{grid-area: 4/1/5/3;}                    #bitArs_x{grid-area: 4/3/5/6;}
         #bitnoA{grid-area: 5/1/6/2;}                    #bitnoB{grid-area: 5/2/6/3;}    #bitAanB{grid-area: 5/3/6/5;}   #bitAorB{grid-area: 5/5/6/6;}   #bitAxoB{grid-area: 5/6/6/7;}
         #AtB{grid-area: 6/1/7/7;}
-        div[data-content="Arandom"]{
+        div[data-content="a_random"]{
             display: grid;
             grid-template-columns: auto auto 50%;
             min-width: min-content;
@@ -101,14 +112,14 @@
         #Arandom{grid-area: 1/1/2/2;}
         label[for="Arandommin"]{grid-area: 2/1/3/3;}    label[for="Arandommax"]{grid-area: 2/3/3/4;}
         #Arandommin{grid-area: 3/1/4/3;}                #Arandommax{grid-area: 3/3/4/4;}
-        div[data-content="Amap"]{
+        div[data-content="a_map"]{
             display: grid;
             grid-template-columns: auto auto 50%;
             min-width: min-content;
             gap: .2em .1em;
             text-align: left;
         }
-        #Amap{grid-area: 1/1/2/2;}                      div[data-content="Amaplimit"]{grid-area: 1/3/2/4;}
+        #Amap{grid-area: 1/1/2/2;}                      div[data-content="a_map_limit"]{grid-area: 1/3/2/4;}
         label[for="Amapmin1"]{grid-area: 2/1/3/3;}      label[for="Amapmax1"]{grid-area: 2/3/3/4;}
         #Amapmin1{grid-area: 3/1/4/3;}                  #Amapmax1{grid-area: 3/3/4/4;}
         label[for="Amapmin2"]{grid-area: 4/1/5/3;}      label[for="Amapmax2"]{grid-area: 4/3/5/4;}
@@ -205,7 +216,7 @@
             text-align: center;
         }
     </style>
-    <script data-info="2022-03-28 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js">
+    <script data-info="2022-03-28 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js by MAZ01001">
         class BigIntType{
             //~ property/method names starting with '#' are private - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields for details
             /*
@@ -1705,34 +1716,44 @@
     <div id="box">
         <h1>big integer calculator</h1>
         <div id="border">
-            <div data-content="base_chooser" title="base of the numbers for calculation (visually)">
-                <label for="base_chooser">Numerical Base:</label>
-                <select id="base_chooser">
-                    <option disabled>Select Base</option>
-                    <option value="2">binary (2)</option>
-                    <option value="4">quaternary (4)</option>
-                    <option value="8">octal (8)</option>
-                    <option value="10" selected>decimal (10)</option>
-                    <option value="16">hexadecimal (16)</option>
-                    <option value="36">bin-text (36)</option>
-                    <option value="256">byte (256)</option>
-                    <option value="braille">braille-pattern (256)</option>
-                </select>
-            </div>
-            <div data-content="memory_size" title="maximum length of each number in memory (! resets numbers if they are to large !)">
-                <label for="memory_size">max memory:</label>
-                <select id="memory_size">
-                    <option disabled>Select memory size</option>
-                    <option value="500" selected>500 Byte</option>
-                    <option value="1000">1 Kilo Byte</option>
-                    <option value="5000">5 Kilo Byte</option>
-                    <option value="10000">10 Kilo Byte</option>
-                    <option value="50000">50 Kilo Byte</option>
-                    <option value="100000">100 Kilo Byte</option>
-                    <option value="500000">500 Kilo Byte</option>
-                    <option value="1000000">1 Mega Byte</option>
-                    <option value="1048576">1 Mebi Byte</option>
-                </select>
+            <div data-content="base_and_memory">
+                <div data-content="base_chooser" title="base of the numbers for calculation (visually)">
+                    <label for="base_chooser">Numerical Base:</label>
+                    <select id="base_chooser">
+                        <option disabled>Select Base</option>
+                        <!-- TODO update to more after updating BigIntType.js copy here -->
+                        <option value="2">binary (2)</option>
+                        <option value="4">quaternary (4)</option>
+                        <option value="8">octal (8)</option>
+                        <option value="10" selected>decimal (10)</option>
+                        <option value="16">hexadecimal (16)</option>
+                        <option value="36">bin-text (36)</option>
+                        <option value="256">byte (256)</option>
+                        <option value="braille">braille-pattern (256)</option>
+                    </select>
+                </div>
+                <div data-content="memory_size" title="maximum length of each number in memory (! resets numbers if they are to large !)">
+                    <label for="memory_size">max memory:</label>
+                    <select id="memory_size">
+                        <option disabled>Select memory size</option>
+                        <option value="500" selected>500 Byte</option>
+                        <option value="1000">1 Kilo Byte</option>
+                        <option value="5000">5 Kilo Byte</option>
+                        <option value="10000">10 Kilo Byte</option>
+                        <option value="50000">50 Kilo Byte</option>
+                        <option value="100000">100 Kilo Byte</option>
+                        <option value="500000">500 Kilo Byte</option>
+                        <option value="1000000">1 Mega Byte</option>
+                        <option value="1048576">1 Mebi Byte</option>
+                        <!-- TODO enable after updating BigIntType.js copy here -->
+                        <!-- <option value="10000000">10 Mega Byte</option> -->
+                        <!-- <option value="16777216">16 Mebi Byte</option> -->
+                        <!-- <option value="20000000">20 Mega Byte</option> -->
+                        <!-- <option value="33554432">32 Mebi Byte</option> -->
+                        <!-- <option value="50000000">50 Mega Byte</option> -->
+                        <!-- <option value="67108864">64 Mebi Byte</option> -->
+                    </select>
+                </div>
             </div>
             <div data-content="number_a">
                 <label for="number_a" title="[A] input a number for calculation">A <small>(this)</small></label>
@@ -1743,7 +1764,7 @@
                 <button id="Ainc" title="increments A once">++</button>
                 <button id="Adec" title="decrements A once">--</button>
                 <button id="Adouble" title="doubles A">*2</button>
-                <div class="button" data-content="Ahalf">
+                <div class="button" data-content="a_half">
                     <button id="Ahalf" title="halfes A">/2</button>
                     <select class="rounding" title="rounding for [/2]">
                         <option disabled>rounding</option>
@@ -1761,7 +1782,7 @@
                 <button id="Binc" title="increments B once">++</button>
                 <button id="Bdec" title="decrements B once">--</button>
                 <button id="Bdouble" title="doubles B">*2</button>
-                <div class="button" data-content="Bhalf">
+                <div class="button" data-content="b_half">
                     <button id="Bhalf" title="halfes B">/2</button>
                     <select class="rounding" title="rounding for [/2]">
                         <option disabled>rounding</option>
@@ -1770,13 +1791,13 @@
                     </select>
                 </div>
             </div>
-            <div data-content="function-buttons">
+            <div data-content="function_buttons">
                 <button id="AaddB" title="set A to: A plus B">A + = B</button>
                 <button id="AsubB" title="set A to: A minus B">A - = B</button>
                 <button id="AmulB" title="set A to: A times B">A * = B</button>
                 <button id="ApowB" title="set A to: A to the power of B">A ** = B</button>
                 <button id="switchAB" title="switches A and B">A &LeftArrowRightArrow; B</button>
-                <div class="button" data-content="AdivB">
+                <div class="button" data-content="a_div_b">
                     <button id="AdivB" title="set A to: A divided by B">A / = B</button>
                     <select class="rounding" title="rounding for [A / = B]">
                         <option disabled>rounding</option>
@@ -1785,7 +1806,7 @@
                         <option value="r" selected>rounded</option>
                     </select>
                 </div>
-                <div class="button" data-content="AmodB">
+                <div class="button" data-content="a_mod_b">
                     <button id="AmodB" title="set A to: A modulo B">A % = B</button>
                     <select class="type" title="type for [A % = B]">
                         <option disabled>type</option>
@@ -1808,16 +1829,16 @@
                 <button id="bitAxoB" title="applies logical XOR to A and B">A ^ B</button>
                 <div id="AtB" title="shows if A and B are even or odd and if one is greater than the other one and vice versa">A (even) == B (even)</div>
             </div>
-            <div data-content="Arandom">
+            <div data-content="a_random">
                 <button id="Arandom" title="set A to a random number in set bounds">random number</button>
                 <label for="Arandommin" title="set minimum number for random generator">minimum:</label>
                 <textarea id="Arandommin" maxlength="2147483648" class="number" title="set minimum number for random generator">0</textarea>
                 <label for="Arandommax" title="set maximum number for random generator">maximum:</label>
                 <textarea id="Arandommax" maxlength="2147483648" class="number" title="set maximum number for random generator">1000000</textarea>
             </div>
-            <div data-content="Amap">
+            <div data-content="a_map">
                 <button id="Amap" title="map A from set initial bounds to set final bounds">map range</button>
-                <div class="button" data-content="Amaplimit">
+                <div class="button" data-content="a_map_limit">
                     <input type="checkbox" id="Amaplimit">
                     <label for="Amaplimit" title="limits the mapping from A to its final bounds (toggle)">limit</label>
                     &verbar;
