@@ -74,9 +74,9 @@
             padding: 20px;
             border: 20px solid black;
             border-image: repeating-linear-gradient(-45deg,
-            var(--barsc1) calc(0px + var(--barsplus)),var(--barsc1) calc(18px + var(--barsplus)),
-            var(--barsc2) 0,var(--barsc2) calc(39px + var(--barsplus))
-            ) 2.84%;
+                var(--barsc1) calc(0px + var(--barsplus)),var(--barsc1) calc(18px + var(--barsplus)),
+                var(--barsc2) 0,var(--barsc2) calc(39px + var(--barsplus))
+            ) 20;/* same as border width (px only !) */
             animation: bars 1.84s linear infinite reverse running;
             box-shadow: 4px 4px 8px 8px #ff01,
                 inset 4px 4px 8px 8px #ff02;
@@ -234,12 +234,33 @@
             background-color: #222;
             font-size: large;
         }
-        ::-webkit-scrollbar {width: 10px;height: 10px;}
-        ::-webkit-scrollbar-thumb {background: #080;border-radius: 10px;}
-        ::-webkit-scrollbar-thumb:hover {background: #0F0F;}
-        ::-webkit-scrollbar-track {background: #000;}
-        ::-webkit-scrollbar-track-piece {background: #000;}
-        ::-webkit-scrollbar-corner {background-color: #000;}
+        ::-webkit-scrollbar{width: 1.2rem;height: 1.2rem;}
+        ::-webkit-scrollbar-thumb:window-inactive{border-color: #040F !important;}
+        ::-webkit-scrollbar-thumb:vertical{
+            background-color: #0000;
+            border-right: .5rem solid #080F;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:vertical:hover{
+            background-color: #0F0F;
+            border: none;
+            border-top-left-radius: 1rem;
+            border-bottom-left-radius: 1rem;
+        }
+        ::-webkit-scrollbar-thumb:horizontal{
+            background-color: #0000;
+            border-bottom: .5rem solid #080F;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:horizontal:hover{
+            background-color: #0F0F;
+            border: none;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+        ::-webkit-scrollbar-track{display: none;background-color: #0000;}
+        ::-webkit-scrollbar-track-piece{display: none;background-color: #0000;}
+        ::-webkit-scrollbar-corner{display: none;background-color: #0000;}
     </style>
 </head>
 <body>
