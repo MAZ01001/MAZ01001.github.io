@@ -153,7 +153,7 @@
         }
         #Amaplimit:not(:checked)+label[for="Amaplimit"]{background-color: #000;}
         #Amaplimit:checked+label[for="Amaplimit"]{background-color: #040;}
-        select,button,.number,#error_output{
+        #base_chooser,select,button,.number,#error_output{
             background-color: #000;
             color: #0f0;
             border-radius: 0;
@@ -161,9 +161,10 @@
             border-style: outset;
             outline: none !important;
         }
-        select:hover,button:hover,.number:hover,#error_output:hover,label[for="Amaplimit"]:hover{border-color: #080;}
-        select:focus,button:focus,.number:focus,#error_output:focus,#Amaplimit:focus+label[for="Amaplimit"]{border-color: #0a0;}
-        select:active,button:active,.number:active,#error_output:active,label[for="Amaplimit"]:active{border-color: #0f0 !important;}
+        #base_chooser:hover,select:hover,button:hover,.number:hover,#error_output:hover,label[for="Amaplimit"]:hover{border-color: #080;}
+        #base_chooser:focus,select:focus,button:focus,.number:focus,#error_output:focus,#Amaplimit:focus+label[for="Amaplimit"]{border-color: #0a0;}
+        #base_chooser:active,select:active,button:active,.number:active,#error_output:active,label[for="Amaplimit"]:active{border-color: #0f0 !important;}
+        #base_chooser:invalid,.number:invalid{border-color: #f00;}
         #AtB{
             background-color: #000;
             color: #0f0;
@@ -192,15 +193,15 @@
             z-index: 9999;
             user-select: none;
             pointer-events: visible;
-            transition: opacity 500ms ease-out;/* fade in */
+            transition: opacity 1000ms ease-out;/* fade in */
             backdrop-filter: blur(6px);
             background-image: radial-gradient(transparent,transparent,black,black);
         }
         div#loader.hid{
             opacity: 0;
             visibility: hidden;
-            transition: visibility 0s linear 500ms,/* delays hiding after fade out */
-                opacity 500ms ease-in;/* fade out */
+            transition: visibility 0s linear 50ms,/* delays hiding after fade out */
+                opacity 50ms ease-in;/* fade out */
         }
         @keyframes pulseColor{50%{fill: #070f;}}
         text#loaderText{animation: pulseColor 3s infinite;}
@@ -217,7 +218,7 @@
             text-align: center;
         }
     </style>
-    <script data-info="2022-06-17 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js by MAZ01001">
+    <script data-info="2022-06-18 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js by MAZ01001">
         class BigIntType{
             //~ property/method names starting with '#' are private - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields for details
             /*
@@ -258,137 +259,6 @@
                 if(!Number.isInteger(n)||n<0x1||n>0x4000000){throw new RangeError("[MAX_SIZE] must be an integer in range [1-67108864]");}
                 return BigIntType.#MAX_SIZE=n;
             }
-            /**
-             * __constructs a RegExp to match a number string in base `base`__ \
-             * _min 1 digit_ \
-             * allows prefixes for bases 2, 8, and 16 \
-             * allows '_' between digits \
-             * __supports bases 1 to 36 (incl.)__ \
-             * __base 0 is braille pattern__ \
-             * match-groups:
-             * 1. sign / null
-             * 2. number
-             * @param {number} base - the base for the RegExp wich checks against a number-string - save integer
-             * + base "braille" (0) [digits `⠀`-`⣿`]
-             * + base 1-10 [digits `0`-`9`]
-             * + base 11-36 [digits `0`-`9` and `A`-`F`]
-             * @returns {RegExp} the regexp for number-strings with base `base`
-             * @throws {RangeError} if `base` is not a save integer or bigger than `36`
-             */
-            static #REGEXP_STRING(base){
-                base=Math.abs(Number(base));if(!Number.isSafeInteger(base)||base>0x10){throw RangeError("[REGEXP_STRING] base is out of range");}
-                switch(Number(base)){//~ special cases
-                    case 0x0:return/^([+-]?)((?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+(?:_(?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+)*)$/; //~ base 256 in braille-patterns
-                    case 0x1:return/^([+-]?)(0+(?:_0+)*)$/;//~ length is the number value -1, so "0" is 0, "00" is 1, "000" is 2, etc.
-                    case 0x2:return/^([+-]?)(?:0b)?((?:0|1[01]*)+(?:_(?:0|1[01]*)+)*)$/i;
-                    case 0x8:return/^([+-]?)(?:0o)?((?:0|[1-7][0-7]*)+(?:_(?:0|[1-7][0-7]*)+)*)$/i;
-                    case 0x10:return/^([+-]?)(?:0x)?((?:0|[1-9A-F][0-9A-F]*)+(?:_(?:0|[1-9A-F][0-9A-F]*)+)*)$/i;
-                }
-                const add_char_seperator=characters=>`(?:${characters})+(?:_(?:${characters})+)*`,
-                    construct_regexp=(number_regexp,flag='')=>new RegExp(`^([+-]?)(${number_regexp})$`,flag);
-                if(base<=0xA){//~ base 2-10
-                    const characters=`0|[1-${base-1}][0-${base-1}]*`;
-                    return construct_regexp(add_char_seperator(characters));
-                }else if(base<=0x10){//~ base 11-36
-                    const characters=`0|[1-9A-${String.fromCharCode(0x36+base)}][0-9A-${String.fromCharCode(0x36+base)}]*`;
-                    return construct_regexp(add_char_seperator(characters),'i');
-                }
-            }
-            /**
-             * __checking if the comma separated list matches format and numbers are below `base`__
-             * @param {string} cSNumStr - string of comma separated numbers
-             * @param {number} base - base of `cSNumStr` - save integer
-             * @returns {boolean} `true` if the comma separated list matches format and numbers are below `base` - `false` otherwise
-             * @throws {TypeError} if `base` is not a safe integer
-             */
-            static #CheckCSNum(cSNumStr,base){
-                cSNumStr=String(cSNumStr);
-                base=Math.abs(Number(base));if(!Number.isSafeInteger(base)){throw new TypeError("[CheckCSNum] base is not a safe integer");}
-                const baseStr=String(base);
-                if(!/^(?:0|(?:[1-9][0-9]*)(?:\,(?:0|[1-9][0-9]*))*)$/.test(cSNumStr)){return false;}
-                for(let i=0,lastNum="";i<cSNumStr.length;i++){
-                    if(cSNumStr[i]!=','){
-                        lastNum+=cSNumStr[i];
-                        if(i<cSNumStr.length-1){continue;}
-                    }
-                    //~ check lastNum < baseStr
-                    if(lastNum.length>baseStr.length){return false;}
-                    if(lastNum.length===baseStr.length){
-                        for(let j=0;j<baseStr.length;j++){
-                            if(lastNum.charCodeAt(j)>baseStr.charCodeAt(j)){return false;}
-                            if(lastNum.charCodeAt(j)<baseStr.charCodeAt(j)){break;}
-                        }
-                    }
-                    lastNum="";
-                }
-                return true;
-            }
-            /**@type {boolean} - sign of the number - `true` = positive */
-            #sign=true;
-            /**@returns {boolean} sign of the number - `true` = positive */
-            get sign(){return this.#sign;}
-            /**@type {Uint8Array} - the number as unsigned 8bit integer array (base 256) - index 0 is the 0st-digit of the number */
-            #digits=new Uint8Array(1);
-            /**
-             * @returns {Uint8Array} a copy of the digits as an unsigned 8bit integer array (base 256) - index 0 is the 0st-digit of the number
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            get digits(){return this.#digits.slice();}
-            /**@returns {number} number of digits (base 256)*/
-            get length(){return this.#digits.length;}
-            /**
-             * @returns {BigIntType} biggest possible number according to `MAX_SIZE`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get MAX_VALUE(){return new BigIntType(new Uint8Array(BigIntType.MAX_SIZE).fill(255),"256");}
-            /**
-             * @returns {BigIntType} "Hello There" in Braille - see `this.toString("braille")`
-             * @throws {RangeError} - if current `MAX_SIZE` is to small - requires 22B
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get HelloThere(){
-                if(BigIntType.MAX_SIZE<22){throw new RangeError("[HelloThere] MAX_SIZE is to small");}
-                return new BigIntType(new Uint8Array([65,239,133,95,65,239,71,103,1,185,0,0,71,207,64,199,64,199,65,239,71,103]),"256");
-            }
-            /**
-             * @returns {BigIntType} Infinity - `2**1024` ~ 1.79e308
-             * @throws {RangeError} - if current `MAX_SIZE` is to small - requires 129B
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get Infinity(){
-                if(BigIntType.MAX_SIZE<129){throw new RangeError("[Infinity] MAX_SIZE is to small");}
-                return new BigIntType(new Uint8Array([...new Uint8Array(128),1]),"256");
-            }
-            /**
-             * @returns {BigIntType} `0`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get Zero(){return new BigIntType(new Uint8Array([0]),"256");}
-            /**
-             * @returns {BigIntType} `1`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get One(){return new BigIntType(new Uint8Array([1]),"256");}
-            /**
-             * @returns {BigIntType} `2`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get Two(){return new BigIntType(new Uint8Array([2]),"256");}
-            /**
-             * @returns {BigIntType} `-0`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get NZero(){return new BigIntType.Zero.neg();}
-            /**
-             * @returns {BigIntType} `-1`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get NOne(){return new BigIntType.One.neg();}
-            /**
-             * @returns {BigIntType} `-2`
-             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
-             */
-            static get NTwo(){return new BigIntType.Two.neg();}
             /**
              * __converts base names to the corresponding number__ \
              * _( supports numbers from `1` to `4294967296` (incl.) )_
@@ -622,6 +492,137 @@
                 }
                 return NaN;
             }
+            /**
+             * __constructs a RegExp to match a number string in base `base`__ \
+             * _min 1 digit_ \
+             * allows prefixes for bases 2, 8, and 16 \
+             * allows '_' between digits \
+             * __supports bases 1 to 36 (incl.)__ \
+             * __base 0 is braille pattern__ \
+             * match-groups:
+             * 1. sign / null
+             * 2. number
+             * @param {number} base - the base for the RegExp wich checks against a number-string - save integer
+             * + base "braille" (0) [digits `⠀`-`⣿`]
+             * + base 1-10 [digits `0`-`9`]
+             * + base 11-36 [digits `0`-`9` and `A`-`F`]
+             * @returns {RegExp} the regexp for number-strings with base `base`
+             * @throws {RangeError} if `base` is not a save integer or bigger than `36`
+             */
+            static #REGEXP_STRING(base){
+                base=Math.abs(Number(base));if(!Number.isSafeInteger(base)||base>0x10){throw RangeError("[REGEXP_STRING] base is out of range");}
+                switch(Number(base)){//~ special cases
+                    case 0x0:return/^([+-]?)((?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+(?:_(?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+)*)$/; //~ base 256 in braille-patterns
+                    case 0x1:return/^([+-]?)(0+(?:_0+)*)$/;//~ length is the number value -1, so "0" is 0, "00" is 1, "000" is 2, etc.
+                    case 0x2:return/^([+-]?)(?:0b)?((?:0|1[01]*)+(?:_(?:0|1[01]*)+)*)$/i;
+                    case 0x8:return/^([+-]?)(?:0o)?((?:0|[1-7][0-7]*)+(?:_(?:0|[1-7][0-7]*)+)*)$/i;
+                    case 0x10:return/^([+-]?)(?:0x)?((?:0|[1-9A-F][0-9A-F]*)+(?:_(?:0|[1-9A-F][0-9A-F]*)+)*)$/i;
+                }
+                const add_char_seperator=characters=>`(?:${characters})+(?:_(?:${characters})+)*`,
+                    construct_regexp=(number_regexp,flag='')=>new RegExp(`^([+-]?)(${number_regexp})$`,flag);
+                if(base<=0xA){//~ base 2-10
+                    const characters=`0|[1-${base-1}][0-${base-1}]*`;
+                    return construct_regexp(add_char_seperator(characters));
+                }else if(base<=0x10){//~ base 11-36
+                    const characters=`0|[1-9A-${String.fromCharCode(0x36+base)}][0-9A-${String.fromCharCode(0x36+base)}]*`;
+                    return construct_regexp(add_char_seperator(characters),'i');
+                }
+            }
+            /**
+             * __checking if the comma separated list matches format and numbers are below `base`__
+             * @param {string} cSNumStr - string of comma separated numbers
+             * @param {number} base - base of `cSNumStr` - save integer
+             * @returns {boolean} `true` if the comma separated list matches format and numbers are below `base` - `false` otherwise
+             * @throws {TypeError} if `base` is not a safe integer
+             */
+            static #CheckCSNum(cSNumStr,base){
+                cSNumStr=String(cSNumStr);
+                base=Math.abs(Number(base));if(!Number.isSafeInteger(base)){throw new TypeError("[CheckCSNum] base is not a safe integer");}
+                const baseStr=String(base);
+                if(!/^(?:0|(?:[1-9][0-9]*)(?:\,(?:0|[1-9][0-9]*))*)$/.test(cSNumStr)){return false;}
+                for(let i=0,lastNum="";i<cSNumStr.length;i++){
+                    if(cSNumStr[i]!=','){
+                        lastNum+=cSNumStr[i];
+                        if(i<cSNumStr.length-1){continue;}
+                    }
+                    //~ check lastNum < baseStr
+                    if(lastNum.length>baseStr.length){return false;}
+                    if(lastNum.length===baseStr.length){
+                        for(let j=0;j<baseStr.length;j++){
+                            if(lastNum.charCodeAt(j)>baseStr.charCodeAt(j)){return false;}
+                            if(lastNum.charCodeAt(j)<baseStr.charCodeAt(j)){break;}
+                        }
+                    }
+                    lastNum="";
+                }
+                return true;
+            }
+            /**@type {boolean} - sign of the number - `true` = positive */
+            #sign=true;
+            /**@returns {boolean} sign of the number - `true` = positive */
+            get sign(){return this.#sign;}
+            /**@type {Uint8Array} - the number as unsigned 8bit integer array (base 256) - index 0 is the 0st-digit of the number */
+            #digits=new Uint8Array(1);
+            /**
+             * @returns {Uint8Array} a copy of the digits as an unsigned 8bit integer array (base 256) - index 0 is the 0st-digit of the number
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            get digits(){return this.#digits.slice();}
+            /**@returns {number} number of digits (base 256)*/
+            get length(){return this.#digits.length;}
+            /**
+             * @returns {BigIntType} biggest possible number according to `MAX_SIZE`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get MAX_VALUE(){return new BigIntType(new Uint8Array(BigIntType.MAX_SIZE).fill(0xFF),"256");}
+            /**
+             * @returns {BigIntType} "Hello There" in Braille - see `this.toString("braille")`
+             * @throws {RangeError} - if current `MAX_SIZE` is to small - requires 22B
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get HelloThere(){
+                if(BigIntType.MAX_SIZE<22){throw new RangeError("[HelloThere] MAX_SIZE is to small");}
+                return new BigIntType(new Uint8Array([0x41,0xEF,0x85,0x5F,0x41,0xEF,0x47,0x67,0x1,0xB9,0x0,0x0,0x47,0xCF,0x40,0xC7,0x40,0xC7,0x41,0xEF,0x47,0x67]),"256");
+            }
+            /**
+             * @returns {BigIntType} Infinity - `2**1024` ~ 1.79e308
+             * @throws {RangeError} - if current `MAX_SIZE` is to small - requires 129B
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get Infinity(){
+                if(BigIntType.MAX_SIZE<129){throw new RangeError("[Infinity] MAX_SIZE is to small");}
+                return new BigIntType(new Uint8Array([...new Uint8Array(128),0x1]),"256");
+            }
+            /**
+             * @returns {BigIntType} `0`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get Zero(){return new BigIntType(new Uint8Array(1),"256");}
+            /**
+             * @returns {BigIntType} `1`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get One(){return new BigIntType(new Uint8Array([0x1]),"256");}
+            /**
+             * @returns {BigIntType} `2`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get Two(){return new BigIntType(new Uint8Array([0x2]),"256");}
+            /**
+             * @returns {BigIntType} `-0`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get NZero(){return new BigIntType.Zero.neg();}
+            /**
+             * @returns {BigIntType} `-1`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get NOne(){return new BigIntType.One.neg();}
+            /**
+             * @returns {BigIntType} `-2`
+             * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
+             */
+            static get NTwo(){return new BigIntType.Two.neg();}
             /**
              * __constructs a BigIntType number__
              * @param {string|boolean[]|Uint8Array} num
@@ -920,19 +921,25 @@
              * @returns {{next():{value:number;done:boolean;}}} iterator to get the next element in a loop
              */
             [Symbol.iterator](){
-                const list=this.#digits;
-                let i=this.length-1;
+                const list=this.#digits.slice();
+                let i=list.length;
                 return{
                     /**
                      * __get the next element in a loop__
-                     * @returns {{value:number;done:boolean;}} value of next element and set `done` `true` if it's the last element
+                     * @returns {{value:number;done:boolean;}} value of next element and sets `done` `true` if it's the last element
                      */
                     next(){
                         i--;
-                        return{value:list[i],done:i<=0};
+                        return{value:list[i],done:i>0};
                     }
                 };
             };
+            /**
+             * __converts `this` number to `Number` type__ \
+             * _may be +/- `Infinity`_
+             * @returns {Number} `this` number as a `Number` type
+             */
+            toNumber(){return this.isFinite()?Number.parseInt(this.toString("16"),16):(this.#sign?Infinity:-Infinity);}
             /**
              * __convert `this` number to string__
              * @description
@@ -1089,34 +1096,31 @@
                         for(let i=this.length-1;i>=0;i--){out+=String(this.#digits[i])+(i!==0?',':'');}
                         break;
                     case 0x10000://~ [65536] each digit is two 8bit digits (2**(2*8) = 65_536)
-                        for(let i=this.length-1;i>=0;i--){
-                            out+=String(
+                        for(let i=0;i<this.length;i+=2){
+                            out=String(
                                 this.#digits[2*i]+
                                 (this.#digits[2*i+1]<<8)
-                            );
-                            if(i!==0){out+=',';}
+                            )+(i!==0?',':'')+out;
                         }
                         break;
                     case 0x1000000://~ [16777216] each digit is three 8bit digits (2**(3*8) = 16_777_216)
-                        for(let i=this.length-1;i>=0;i--){
-                            out+=String(
+                        for(let i=0;i<this.length;i+=3){
+                            out=String(
                                 this.#digits[3*i]+
                                 (this.#digits[3*i+1]<<8)+
                                 (this.#digits[3*i+2]<<16)
-                            );
-                            if(i!==0){out+=',';}
+                            )+(i!==0?',':'')+out;
                         }
                         break;
                     case 0x100000000://~ [4294967296] each digit is four 8bit digits (2**(4*8) = 4_294_967_296)
-                        for(let i=this.length-1;i>=0;i--){
-                            out+=String(
+                        for(let i=0;i<this.length;i+=4){
+                            out=String(
                                 //~ ()>>>0 to make the 32bit number unsigned (it is 32bit because of the use of bitwise operations - but also default signed so realy only 31bit)
                                 (this.#digits[4*i]>>>0)+
                                 ((this.#digits[4*i+1]<<8)>>>0)+
                                 ((this.#digits[4*i+2]<<16)>>>0)+
                                 ((this.#digits[4*i+3]<<24)>>>0)
-                            );
-                            if(i!==0){out+=',';}
+                            )+(i!==0?',':'')+out;
                         }
                         break;
                     default:
@@ -1613,6 +1617,18 @@
                 return !(this.isAbsGreaterThanAbs(n));
             }
             /**
+             * __determines if `this` number is finite (`Number`)__ \
+             * i.e. smaller than `BigIntType.Infinity` (`2**1024`)
+             * @returns {boolean} `true` if `this` number is finite (`Number`)
+             */
+            isFinite(){return this.isSmallerThan(BigIntType.Infinity);}
+            /**
+             * __determines if `this` number is a safe integer (`Number`)__ \
+             * i.e. smaller or equal to `9007199254740991` (`2**53−1`)
+             * @returns {boolean} `true` if `this` number is a safe integer (`Number`)
+             */
+            isSafeInteger(){return this.isSmallerOrEqualTo(new BigIntType(new Uint8Array([0x100,0x100,0x100,0x100,0x100,0x100,0x1F]),"256"));}
+            /**
              * __removes (unnecessary) leading zeros from `digits`__
              * @param {Uint8Array|string[]} digits - digits-array (if `string[]` original will be altered)
              * @returns {Uint8Array|string[]} `digits` after removing all leading zeros (output type matches input type)
@@ -1941,7 +1957,7 @@
                 /**@type {Uint8Array} - temporary/new digit-array */
                 let tmp=new Uint8Array(this.length+1);
                 tmp.set(this.#digits,0);
-                for(let i=this.length-1;i>=0;i--){
+                for(let i=tmp.length-1;i>=0;i--){
                     tmp[i]<<=x;
                     tmp[i]|=((tmp[i-1]??0)&(((1<<x)-1)<<(8-x)))>>>(8-x);//~ add the left x bits from [i-1] to the right of [i] (8bits)
                 }
@@ -2396,55 +2412,177 @@
     </script>
     <script>
         /**
-         * __constructs a RegExp to match `base`__ \
-         * _min 1 digit_ \
-         * match-groups:
-         * 1. sign / null
-         * 2. number / comma-separated list of numbers
-         * @param {number} base - base 0=braille, 2-10 [0-9], 11-36 [0-9A-F], 37-256 [0-9](comma-separated list of numbers)
-         * @returns {RegExp} regexp for `base` - if out of range only matches `+0` and `-0`
+         * __converts base names to the corresponding number__ \
+         * _( supports numbers from `1` to `4294967296` (incl.) )_
+         * @param {string|number} str - see `#strBase()` in BigIntType class for list of all aliases
+         * @returns {number} the base or `NaN` if not supported
          */
-        const _REGEXP_STRING=base=>{// TODO update - more base !!
-            base=Math.abs(Number(base));if(Number.isNaN(base)){return/^([+-]?)(0)$/;}
-            switch(Number(base)){
-                case 0:return/^([+-]?)(\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)$/;// unicode braille-pattern
-                case 1:return/^([+-]?)(0)$/;//~ base 1 does not exist
-                case 2:return/^([+-]?)(?:0b)?(0|1[01]*)$/i;
-                case 8:return/^([+-]?)(?:0o)?(0|[1-7][0-7]*)$/i;
-                case 16:return/^([+-]?)(?:0x)?(0|[1-9A-F][0-9A-F]*)$/i;
-                default:// all bases up to 256
-                    if(base<=10){return new RegExp(`^([+-]?)(0|[1-${base-1}][0-${base-1}]*)$`);}
-                    else if(base<=36){return new RegExp(`^([+-]?)(0|[1-9A-${String.fromCharCode(54+base)}][0-9A-${String.fromCharCode(54+base)}]*)$`,'i');}
-                    else if(base<=256){// 37-256 (comma-separated list of numbers)
-                        const _base=String(base);
-                        if(_base.length===2){// "37"-"99" (~"10"-"99")
-                            return new RegExp(
-                                `^([+-]?)((?:[0-9]${
-                                    (_base[0]!=='1'?`|[1-${Number(_base[0])-1}][0-9]`:'')
-                                    +(_base[1]!=='0'?`|${_base[0]}[0-${Number(_base[1])-1}]`:'')
-                                })(?:\,(?:[0-9]${
-                                    (_base[0]!=='1'?`|[1-${Number(_base[0])-1}][0-9]`:'')
-                                    +(_base[1]!=='0'?`|${_base[0]}[0-${Number(_base[1])-1}]`:'')
-                                }))*)$`
-                            );
-                        }else if(_base.length===3){// "100"-"256" (~"100"-"999")
-                            return new RegExp(
-                                `^([+-]?)((?:[1-9]?[0-9]${
-                                    (_base[0]!=='1'?`|[1-${Number(_base[0])-1}][0-9][0-9]`:'')
-                                    +(_base[1]!=='0'?`|${_base[0]}[0-${Number(_base[1])-1}][0-9]`:'')
-                                    +(_base[2]!=='0'?`|${_base[0]}${_base[1]}[0-${Number(_base[2])-1}]`:'')
-                                })(?:\,(?:[1-9]?[0-9]${
-                                    (_base[0]!=='1'?`|[1-${Number(_base[0])-1}][0-9][0-9]`:'')
-                                    +(_base[1]!=='0'?`|${_base[0]}[0-${Number(_base[1])-1}][0-9]`:'')
-                                    +(_base[2]!=='0'?`|${_base[0]}${_base[1]}[0-${Number(_base[2])-1}]`:'')
-                                }))*)$`
-                            );
+        function _string_to_base(str){
+            //~ ( https://en.wikipedia.org/wiki/list_of_numeral_systems#standard_positional_numeral_systems )
+            switch(String(str).toLowerCase()){
+                //~ ALL YOUR BASE ARE BELONG TO US
+                case'b':case"bin":case"bits":case"binary":case"1bit":return 2;
+                case"ternary":case"trinary":return 3;
+                case'q':case"quaternary":case"2bit":return 4;
+                case"quinary":case"pental":return 5;
+                case"senary":case"heximal":case"seximal":return 6;
+                case"septenary":return 7;
+                case'o':case"oct":case"octal":case"3bit":return 8;
+                case"nonary":return 9;
+                case'd':case"dec":case"decimal":case"decimal":case"denary":return 10;
+                case"undecimal":return 11;
+                case"duodecimal":case"dozenal":case"uncial":return 12;
+                case"tridecimal":return 13;
+                case"tetradecimal":return 14;
+                case"pentadecimal":return 15;
+                case'h':case"hex":case"hexadecimal":case"sexadecimal":case"4bit":return 16;
+                case"heptadecimal":return 17;
+                case"octodecimal":return 18;
+                case"enneadecimal":return 19;
+                case"vigesimal":return 20;
+                case"unvigesimal":return 21;
+                case"duovigesimal":return 22;
+                case"trivigesimal":return 23;
+                case"tetravigesimal":return 24;
+                case"pentavigesimal":return 25;
+                case"hexavigesimal":return 26;
+                case"heptavigesimal":case"septemvigesimal":return 27;
+                case"octovigesimal":return 28;
+                case"enneavigesimal":return 29;
+                case"trigesimal":return 30;
+                case"untrigesimal":return 31;
+                case"duotrigesimal":case"5bit":return 32;
+                case"tritrigesimal":return 33;
+                case"tetratrigesimal":return 34;
+                case"pentatrigesimal":return 35;
+                case't':case"txt":case"text":case"hexatrigesimal":return 36;
+                case"heptatrigesimal":return 37;
+                case"octotrigesimal":return 38;
+                case"enneatrigesimal":return 39;
+                case"quadragesimal":return 40;
+                case"duoquadragesimal":return 42;
+                case"pentaquadragesimal":return 45;
+                case"septaquadragesimal":return 47;
+                case"octoquadragesimal":return 48;
+                case"enneaquadragesimal":return 49;
+                case"quinquagesimal":return 50;
+                case"duoquinquagesimal":return 52;
+                case"tetraquinquagesimal":return 54;
+                case"hexaquinquagesimal":return 56;
+                case"heptaquinquagesimal":return 57;
+                case"octoquinquagesimal":return 58;
+                case"sexagesimal":case"sexagenary":return 60;
+                case"duosexagesimal":return 62;
+                case"tetrasexagesimal":case"6bit":return 64;
+                case"duoseptuagesimal":return 72;
+                case"octogesimal":return 80;
+                case"unoctogesimal":return 81;
+                case"pentoctogesimal":return 85;
+                case"enneaoctogesimal":return 89;
+                case"nonagesimal":return 90;
+                case"unnonagesimal":return 91;
+                case"duononagesimal":return 92;
+                case"trinonagesimal":return 93;
+                case"tetranonagesimal":return 94;
+                case"pentanonagesimal":return 95;
+                case"hexanonagesimal":return 96;
+                case"septanonagesimal":return 97;
+                case"centesimal":return 100;
+                case"centevigesimal":return 120;
+                case"centeunvigesimal":return 121;
+                case"centepentavigesimal":return 125;
+                case"centeoctovigesimal":case"7bit":return 128;
+                case"centetetraquadragesimal":return 144;
+                case"centenovemsexagesimal":return 169;
+                case"centepentoctogesimal":return 185;
+                case"centehexanonagesimal":return 196;
+                case"duocentesimal":return 200;
+                case"duocentedecimal":return 210;
+                case"duocentehexidecimal":return 216;
+                case"duocentepentavigesimal":return 225;
+                case"duocentehexaquinquagesimal":case"byte":case"8bit":return 256;
+                case"braille":return 0;//~ braille-pattern (unicode)
+                case"trecentesimal":return 300;
+                case"trecentosexagesimal":return 360;
+                case"9bit":return 512;
+                case"10bit":return 1024;
+                case"11bit":return 2048;
+                case"12bit":return 4096;
+                case"13bit":return 8192;
+                case"14bit":return 16384;
+                case"15bit":return 32768;
+                case"16bit":return 65536;
+                case"17bit":return 131072;
+                case"18bit":return 262144;
+                case"19bit":return 524288;
+                case"20bit":return 1048576;
+                case"21bit":return 2097152;
+                case"22bit":return 4194304;
+                case"23bit":return 8388608;
+                case"24bit":return 16777216;
+                case"25bit":return 33554432;
+                case"26bit":return 67108864;
+                case"27bit":return 134217728;
+                case"28bit":return 268435456;
+                case"29bit":return 536870912;
+                case"30bit":return 1073741824;
+                case"31bit":return 2147483648;
+                case"32bit":return 4294967296;
+                //~ for just numbers:
+                default:
+                    str=Number(str);
+                    if(Number.isNaN(str)){return NaN;}
+                    if(str>=1&&str<=0x100000000){return str;}
+            }
+            return NaN;
+        }
+        /**
+         * __check if the given string `num` matches base `base`__
+         * @param {number} base - the numerical base _( 0=braille, 2-10 [0-9], 11-36 [0-9A-F], 37-4294967296 [0-9](comma-separated list of numbers) )_
+         * @param {string} num - the number string
+         * @returns {boolean} `true` if valid `false` otherwise
+         */
+        function _test_num(base,num){
+            base=Math.abs(Number(base));if(!Number.isSafeInteger(base)){return false;}
+            num=String(num);
+            if(base<=0x24){
+                switch(base){
+                    case 0x0:return/^([+-]?)((?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+(?:_(?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+)*)$/.test(num); //~ base 256 in braille-patterns
+                    case 0x2:return/^([+-]?)(?:0b)?((?:0|1[01]*)+(?:_(?:0|1[01]*)+)*)$/i.test(num);
+                    case 0x8:return/^([+-]?)(?:0o)?((?:0|[1-7][0-7]*)+(?:_(?:0|[1-7][0-7]*)+)*)$/i.test(num);
+                    case 0x10:return/^([+-]?)(?:0x)?((?:0|[1-9A-F][0-9A-F]*)+(?:_(?:0|[1-9A-F][0-9A-F]*)+)*)$/i.test(num);
+                    default:
+                        if(base<=0xA){//~ base 2-10
+                            const characters=`0|[1-${base-1}][0-${base-1}]*`;
+                            return new RegExp(`^([+-]?)((?:${characters})+(?:_(?:${characters})+)*)$`,'').test(num);
+                        }else if(base<=0x10){//~ base 11-36
+                            const characters=`0|[1-9A-${String.fromCharCode(0x36+base)}][0-9A-${String.fromCharCode(0x36+base)}]*`;
+                            return new RegExp(`^([+-]?)((?:${characters})+(?:_(?:${characters})+)*)$`,'i').test(num);
+                        }
+                }
+            }else if(base<=0x100000000){
+                const baseStr=String(base);
+                if(!/^(?:0|(?:[1-9][0-9]*)(?:\,(?:0|[1-9][0-9]*))*)$/.test(num)){return false;}
+                for(let i=0,lastNum="";i<num.length;i++){
+                    if(num[i]!=','){
+                        lastNum+=num[i];
+                        if(i<num.length-1){continue;}
+                    }
+                    //~ check lastNum < baseStr
+                    if(lastNum.length>baseStr.length){return false;}
+                    if(lastNum.length===baseStr.length){
+                        for(let j=0;j<baseStr.length;j++){
+                            if(lastNum.charCodeAt(j)>baseStr.charCodeAt(j)){return false;}
+                            if(lastNum.charCodeAt(j)<baseStr.charCodeAt(j)){break;}
                         }
                     }
-                    break;
+                    lastNum="";
+                }
+                return true;
             }
-            return/^([+-]?)(0)$/;//~ no more bases implemented
-        };
+            return false;
+        }
+        function _stats_AtB_(){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':(_NUMBERS.a.isEqualTo(_NUMBERS.b)?"==":"!="))} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
         /**__numbers as BigIntType objects stored in this convenient object__*/
         let _NUMBERS=Object.freeze({
                 /**@type {BigIntType[]}*/
@@ -2490,9 +2628,9 @@
          * _and reports if not valid_
          * @param {HTMLElement} element - html element
          */
-        function _numberInput(element){//TODO change input-number check to something like the `#REGEXP_STRING` and `#CheckCSNum` methods ~ or try with constructor and catch error (check type of error)
-            if(!(_REGEXP_STRING(_CURRENT_BASE==="braille"?0:Number(_CURRENT_BASE)).test(element.value))){_error_css(element,"not in correct format for base "+(_CURRENT_BASE===0?"256(braille)":_CURRENT_BASE));}
-            else{_error_css(element,"");}
+        function _numberInput(element){
+            if(_test_num(_string_to_base(_CURRENT_BASE),element.value)){_error_css(element,"");}
+            else{_error_css(element,`not in correct format for base ${_CURRENT_BASE}`);}
         }
         /**
          * __checks if number entered is in correct base format__ \
@@ -2501,10 +2639,10 @@
          * and sets the A to B comparison field
          * @param {HTMLElement} element - html element
          */
-        function _numberChange(element){//TODO change input-number check to something like the `#REGEXP_STRING` and `#CheckCSNum` methods ~ or try with constructor and catch error (check type of error)
+        function _numberChange(element){
             _error_html("");
             _error_css(element,"");
-            if(_REGEXP_STRING(_CURRENT_BASE==="braille"?0:Number(_CURRENT_BASE)).test(element.value)){
+            if(_test_num(_string_to_base(_CURRENT_BASE),element.value)){
                 try{
                     switch(element.id){
                         case"number_a":_NUMBERS.a.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
@@ -2516,7 +2654,7 @@
                         case"Amapmin2":_NUMBERS.map.min2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
                         case"Amapmax2":_NUMBERS.map.max2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
                     }
-                    if(element.id==="number_a"||element.id==="number_b"){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
+                    if(element.id==="number_a"||element.id==="number_b"){_stats_AtB_();}
                 }catch(error){
                     console.error(error);
                     _error_html(`{InputError} reseted number entered because it was to large\ninput:\n${element.value}`);
@@ -2532,7 +2670,7 @@
                     }
                 }
             }else{
-                _error_html(`{InputError} reseted number entered because it was not in correct format for base ${_CURRENT_BASE==="braille"?"256(braille)":_CURRENT_BASE}`);
+                _error_html(`{InputError} reseted number entered because it was not in correct format for base ${_CURRENT_BASE}`);
                 switch(element.id){
                     case"number_a":element.value=_NUMBERS.a.toString(_CURRENT_BASE);break;
                     case"number_b":element.value=_NUMBERS.b.toString(_CURRENT_BASE);break;
@@ -2570,10 +2708,9 @@
          * @discription set the value of `AtB` and hides the loader
          */
         function _promise_finally(){
-            AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+            _stats_AtB_();
             loader.classList.add("hid");
         }
-        // TODO _set_AtB() function !
         // TODO load A B from url ~ see external notes
         // TODO → window.location.hash;//~ Returns the Location object's URL's fragment (includes leading "#" if non-empty).
         // TODO → window.location.search;//~ Returns the Location object's URL's query (includes leading "?" if non-empty).
@@ -2585,20 +2722,9 @@
         <h1>big integer calculator</h1>
         <div id="border">
             <div data-content="base_and_memory">
-                <div data-content="base_chooser" title="base of the numbers for calculation (visually)">
+                <div data-content="base_chooser" title="base used by all number fields (auto converts all existing numbers) | 2 - 4294967296 incl.">
                     <label for="base_chooser">Numerical Base:</label>
-                    <select id="base_chooser">
-                        <option disabled>Select Base</option>
-                        <!-- TODO update to more after updating BigIntType.js copy here -->
-                        <option value="2">binary (2)</option>
-                        <option value="4">quaternary (4)</option>
-                        <option value="8">octal (8)</option>
-                        <option value="10" selected>decimal (10)</option>
-                        <option value="16">hexadecimal (16)</option>
-                        <option value="36">bin-text (36)</option>
-                        <option value="256">byte (256)</option>
-                        <option value="braille">braille-pattern (256)</option>
-                    </select>
+                    <input type="text" id="base_chooser" value="10" placeholder="Numeric base"/>
                 </div>
                 <div data-content="memory_size" title="maximum length of each number in memory (! resets numbers if they are to large !)">
                     <label for="memory_size">max memory:</label>
@@ -2613,13 +2739,12 @@
                         <option value="500000">500 Kilo Byte</option>
                         <option value="1000000">1 Mega Byte</option>
                         <option value="1048576">1 Mebi Byte</option>
-                        <!-- TODO enable after updating BigIntType.js copy here -->
-                        <!-- <option value="10000000">10 Mega Byte</option> -->
-                        <!-- <option value="16777216">16 Mebi Byte</option> -->
-                        <!-- <option value="20000000">20 Mega Byte</option> -->
-                        <!-- <option value="33554432">32 Mebi Byte</option> -->
-                        <!-- <option value="50000000">50 Mega Byte</option> -->
-                        <!-- <option value="67108864">64 Mebi Byte</option> -->
+                        <option value="10000000">10 Mega Byte</option>
+                        <option value="16777216">16 Mebi Byte</option>
+                        <option value="20000000">20 Mega Byte</option>
+                        <option value="33554432">32 Mebi Byte</option>
+                        <option value="50000000">50 Mega Byte</option>
+                        <option value="67108864">64 Mebi Byte</option>
                     </select>
                 </div>
             </div>
@@ -2634,8 +2759,8 @@
                 <button id="Adouble" title="doubles A">*2</button>
                 <div class="button" data-content="a_half">
                     <button id="Ahalf" title="halfes A">/2</button>
-                    <select class="rounding" title="rounding for [/2]">
-                        <option disabled>rounding</option>
+                    <select class="rounding" title="rounding for [/2]"><!-- TODO more rounding types and description in title (on each option) | see modulo types -->
+                        <option disabled title="select rounding type below">rounding</option>
                         <option value="f">floored</option>
                         <option value="c" selected>ceiled</option>
                     </select>
@@ -2652,8 +2777,8 @@
                 <button id="Bdouble" title="doubles B">*2</button>
                 <div class="button" data-content="b_half">
                     <button id="Bhalf" title="halfes B">/2</button>
-                    <select class="rounding" title="rounding for [/2]">
-                        <option disabled>rounding</option>
+                    <select class="rounding" title="rounding for [/2]"><!-- TODO more rounding types and description in title (on each option) | see modulo types -->
+                        <option disabled title="select rounding type below">rounding</option>
                         <option value="f">floored</option>
                         <option value="c" selected>ceiled</option>
                     </select>
@@ -2667,8 +2792,8 @@
                 <button id="switchAB" title="switches A and B">A &LeftArrowRightArrow; B</button>
                 <div class="button" data-content="a_div_b">
                     <button id="AdivB" title="set A to: A divided by B">A / = B</button>
-                    <select class="rounding" title="rounding for [A / = B]">
-                        <option disabled>rounding</option>
+                    <select class="rounding" title="rounding for [A / = B]"><!-- TODO more rounding types and description in title (on each option) | see modulo types -->
+                        <option disabled title="select rounding type below">rounding</option>
                         <option value="f">floored</option>
                         <option value="c">ceiled</option>
                         <option value="r" selected>rounded</option>
@@ -2677,12 +2802,12 @@
                 <div class="button" data-content="a_mod_b">
                     <button id="AmodB" title="set A to: A modulo B">A % = B</button>
                     <select class="type" title="type for [A % = B]">
-                        <option disabled>type</option>
-                        <option value="e" selected>euclidean</option>
-                        <option value="t">truncated</option>
-                        <option value="f">floored</option>
-                        <option value="c">ceiled</option>
-                        <option value="r">rounded</option>
+                        <option disabled title="select modulo type below">type</option>
+                        <option value="e" title="rounds like floored but only positive | default" selected>euclidean</option>
+                        <option value="t" title="rounds towards zero">truncated</option>
+                        <option value="f" title="rounds towards negative infinity">floored</option>
+                        <option value="c" title="rounds towards positive infinity">ceiled</option>
+                        <option value="r" title="rounds towards nearest integer | default">rounded</option>
                     </select>
                 </div>
                 <button id="bitAls" title="shifts the bits of A by set amount to the left">A &lt;&lt; = x</button>
@@ -2710,8 +2835,8 @@
                     <input type="checkbox" id="Amaplimit">
                     <label for="Amaplimit" title="limits the mapping from A to its final bounds (toggle)">limit</label>
                     &verbar;
-                    <select class="rounding" title="rounding for [map range]">
-                        <option disabled>rounding</option>
+                    <select class="rounding" title="rounding for [map range]"><!-- TODO more rounding types and description in title (on each option) | see modulo types -->
+                        <option disabled title="select rounding type below">rounding</option>
                         <option value="f">floored</option>
                         <option value="c">ceiled</option>
                         <option value="r" selected>rounded</option>
@@ -2782,8 +2907,7 @@
             Amapmin2=document.getElementById("Amapmin2"),Amapmax2=document.getElementById("Amapmax2"),
             loader=document.getElementById("loader");
         _error_html("Errors may be displayed here...\ndouble click anywhere on the page (except here) to remove this message");
-        // TODO add case if +0/-0 "!=" because not == and not <
-        AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':"==")} B (${_NUMBERS.b.isEven()?"even":"odd"})`;
+        _stats_AtB_();
         try{//~ Test number to console
             console.log(
                 "TEST NUMBER: %c %s",
@@ -2797,7 +2921,17 @@
         // ## event listeners
         document.addEventListener("dblclick",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
         switchAB.addEventListener("click",ev=>{[number_a.value,number_b.value]=[number_b.value,number_a.value];},{passive:true});
+        base_chooser.addEventListener("input",ev=>{
+            if(Number.isNaN(_string_to_base(base_chooser.value))){_error_css(base_chooser,"current input is not a valid base");}
+            else{_error_css(base_chooser,"");}
+        });
         base_chooser.addEventListener("change",ev=>{
+            if(Number.isNaN(_string_to_base(base_chooser.value))){
+                base_chooser.value=_CURRENT_BASE;
+                _error_css(base_chooser,"");
+                _error_html(`{InputError} reseted base entered because it was not a valid base`);
+                return;
+            }
             _CURRENT_BASE=base_chooser.value;
             number_a.value=_NUMBERS.a.toString(_CURRENT_BASE);
             number_b.value=_NUMBERS.b.toString(_CURRENT_BASE);
@@ -2884,240 +3018,240 @@
         }
         // ## buttons
         AseqB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.setEqualTo(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         BseqA.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.setEqualTo(_NUMBERS.a).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Aabs.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.abs().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Babs.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.abs().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Aneg.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.neg().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Bneg.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.neg().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Ainc.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.inc().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Binc.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.inc().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Adec.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.dec().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Bdec.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.dec().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Adouble.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.double().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Bdouble.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.double().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Ahalf.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.half(Ahalf_round.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Bhalf.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.half(Bhalf_round.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         AaddB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.add(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         AsubB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.sub(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         AmulB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.mul(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         AmodB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.modulo(_NUMBERS.b,AmodB_type.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         ApowB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.pow(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         AdivB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.div(_NUMBERS.b,AdivB_round.value).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitAls.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitShiftL(Number(bitAls_x.value)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitArs.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitShiftR(Number(bitArs_x.value)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         gcdAB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.setEqualTo(BigIntType.GCD(_NUMBERS.a,_NUMBERS.b)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitnoA.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitNOT().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitnoB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.b.bitNOT().toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_b.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitAanB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitAND(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitAorB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitOR(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         bitAxoB.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.bitXOR(_NUMBERS.b).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Arandom.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.setEqualTo(BigIntType.randomInt(_NUMBERS.rand.min,_NUMBERS.rand.max)).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
             }).then(value=>{number_a.value=value;},_promise_error).finally(_promise_finally);
         },{passive:true});
         Amap.addEventListener("click",async ev=>{
-            loader.classList.remove("hid");_error_html("");
-            await _promise_delay(200);
+            loader.classList.remove("hid");
+            await _promise_delay(10);
             new Promise((resolve,reject)=>{
                 try{resolve(_NUMBERS.a.mapRange(_NUMBERS.map.min1,_NUMBERS.map.max1,_NUMBERS.map.min2,_NUMBERS.map.max2,Amap_round.value,Amaplimit.checked).toString(_CURRENT_BASE));}
                 catch(error){reject(error);}
