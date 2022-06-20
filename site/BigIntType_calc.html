@@ -2194,16 +2194,6 @@
                 if(!(n instanceof BigIntType)){throw new TypeError("[modulo] n is not an instance of BigIntType");}
                 type=String(type);if(!/^(e|euclid|t|trunc|f|floor|c|ceil|r|round)$/.test(type)){throw new SyntaxError("[modulo] type is not a valid option");}
                 if(n.isZero()){throw new RangeError("[modulo] cannot divide by 0");}
-                if(this.isZero()||n.isOne){
-                    switch(type){
-                        case'e':case"euclid":return Object.freeze({quotient:this.#sign^n.sign?this.copy().abs().neg():this.copy().abs(),remainder:BigIntType.Zero});
-                        case'f':case"floor":return Object.freeze({quotient:this.#sign^n.sign?this.copy().abs().neg():this.copy().abs(),remainder:n.#sign?BigIntType.Zero:BigIntType.NZero});
-                        case't':case"trunc":return Object.freeze({quotient:this.#sign^n.sign?this.copy().abs().neg():this.copy().abs(),remainder:this.copy()});
-                        case'r':case"round":return Object.freeze({quotient:this.#sign^n.sign?this.copy().abs().neg():this.copy().abs(),remainder:this.copy()});//~ sign pattern changes with rounding direction (here it's down - arbitrarily)
-                        case'a':case"raise":return Object.freeze({quotient:this.#sign^n.sign?this.copy().abs().neg():this.copy().abs(),remainder:this.copy().neg()});
-                        case'c':case"ceil":return Object.freeze({quotient:this.#sign^n.sign?this.copy().abs().neg():this.copy().abs(),remainder:n.#sign?BigIntType.NZero:BigIntType.Zero});
-                    }
-                }
                 if(this.isZero()||n.isOne()){
                     this.#digits=new Uint8Array([0]);
                     return this;
