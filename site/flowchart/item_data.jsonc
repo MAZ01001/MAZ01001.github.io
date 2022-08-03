@@ -1,0 +1,49 @@
+{
+    "type_flags":{
+        "resource"              : 1,  //~ available in the world (not produced)
+        "ore"                   : 2,
+        "liquid"                : 4,
+        "plant"                 : 8,  //~ biomass
+        "animal"                : 16, //~ biomass
+        "machine"               : 32, //~ buildings
+        "ammo"                  : 64, //~ consumables
+        "wip"                   : 128
+    },
+    "TEMPLATE":{
+        "id":"example_part",
+        "name":"Example Part",
+        "wiki":"https://satisfactory.fandom.com/wiki/Satisfactory_Wiki",
+        "info":"this is text.\tthis is a tab.\nthis is a new line.",
+        "type_flag":128,
+        "recipe":{ //~ can be null
+            "machine_id":"constructor",
+            "speed":0, //~ x sec for one cycle
+            "num":0, //~ num produced per cycle (fluid is m^3)
+            //~ x items per min consumed = ((item).num/(baseObject).speed)*60
+            //~ for fluids num per cycle is m^3 per cycle
+            "energie":0, //~ x MW used to operate
+            "by_product":{"id":"example_part","num":0}, //~ can be null
+            "items":[ //~ array can be empty
+                {"id":"example_part","num":0}
+                // ~ ...
+            ]
+        },
+        "packing":{ //~ can be null
+            "speed":0,
+            "energie":0,
+            "canister_num":2, //~ empty canisters needed
+            "package":{"id":"","num":2},
+            "fluid":{"id":"","num":2}
+        },
+        "unpacking":{ //~ can be null
+            "speed":0,
+            "energie":0,
+            "canister_num":2, //~ empty canisters returned
+            "package":{"id":"","num":2},
+            "fluid":{"id":"","num":2}
+        }
+    },
+    "machines":[],
+    "resurces":[],
+    "materials":[]
+}
