@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="[MAZ01001.github.io] Unofficial crafting flowchart for the third Satisfactory update"/>
     <meta name="author" content="MAZ01001"/>
-    <link rel="shortcut icon" href="../../img/icon.svg"/>
+    <link rel="shortcut icon" href="../img/icon.svg"/>
     <title>Unofficial U3 Flow Chart for Satisfactory (Interactive)</title>
     <style>
         body{
@@ -540,7 +540,7 @@
                 <br/>
                 <br/><b>
                     I decided that I'll not update this to <i>[current satisfactory version]</i>,
-                    <br/>&nbsp; &nbsp; but since it's <a href="https://github.com/MAZ01001/MAZ01001.github.io/blob/master/LICENSE">free & open source</a> <i>someone</i> could <a href="https://github.com/MAZ01001/MAZ01001.github.io/blob/master/site/flowchart/index.html">use this code</a> to make a new version :P
+                    <br/>&nbsp; &nbsp; but since it's <a href="https://github.com/MAZ01001/MAZ01001.github.io/blob/master/LICENSE">free & open source</a> <i>someone</i> could <a href="https://github.com/MAZ01001/MAZ01001.github.io/blob/master/site/satisfactory_u3_flowchart.html">use this code</a> to make a new version :P
                 </b>
             </div>
         </div>
@@ -555,9 +555,6 @@
             menuBoxLimit.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
             if(!menuBoxLimit.hidden)menuBoxLimit.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
         },{passive:true});
-        // TODO document click hides context menu but keeps selection
-        // TODO dblclick same as click but also remove selection
-        // TODO update element click ~ json
         document.body.addEventListener('click',event=>{
             if(event.target===info)return;
             if(event.target===infoMenu)return;
