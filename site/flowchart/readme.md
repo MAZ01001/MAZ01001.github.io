@@ -1,3 +1,0 @@
-# UNOFFICIAL - SATISFACTORY (U3) Flowchart
-
-## _WIP_
