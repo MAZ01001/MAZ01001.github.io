@@ -6,597 +6,575 @@
     <meta name="description" content="[MAZ01001.github.io] Unofficial crafting flowchart for the third Satisfactory update"/>
     <meta name="author" content="MAZ01001"/>
     <link rel="shortcut icon" href="../../img/icon.svg"/>
-    <title>unofficial U3 Flow Chart for Satisfactory in HTML</title>
+    <title>Unofficial U3 Flow Chart for Satisfactory (Interactive)</title>
     <style>
-        body {background-color: #2b2b2bff;color: #0f0f;margin: 0;}
-        @keyframes banner {
-            0% {
-                background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 40px);
-                background-size: calc(100% + 57px) 100%;
-                background-position: 0px 0;
-            }
-            100% {
-                background-image: repeating-linear-gradient(-45deg, #ff0, #ff0 18px, #000 18px, #000 40px);
-                background-size: calc(100% + 57px) 100%;
-                background-position: -57px 0;
-            }
+        body{
+            background-color:#000;
+            color:#0f0;
+            margin:0;
+            user-select:none;
         }
-        .contentbox{
-            margin: 0;
-            padding: 0;
-            overflow: auto;
-            width: 100%;
-            height: 100%;
-            --shadow: 10px;
-            filter: url(#drop-shadow);
-            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#000')";
-            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #000);
-            filter: drop-shadow(0px 0px var(--shadow,10px) #000);
+        #content{
+            margin:0;
+            padding:0;
+            overflow:auto;
+            width:100%;
+            height:100%;
+            filter:drop-shadow(0 0 10px #000);
         }
-        .contentbox>*:not(.header):not(hr){margin: 8px;}
+        #content>hr.solid{border:2px solid #040;}
+        #content>hr:not(.solid){border:1px dashed #040;}
+        #content>*:not(.header):not(hr){margin: 8px;}
+        @keyframes banner{100%{background-position:-57px 0;}}
         .header{
-            text-shadow: -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, 1px 1px 0 #000;
-            animation: banner 2s linear 0s infinite reverse backwards running;
-            width: 100%;
-            height: 15em;
-            margin: 0;
-            overflow: hidden;
-            white-space: nowrap;
+            background-image:repeating-linear-gradient(-45deg,#ff0,#ff0 18px,#000 18px,#000 40px);
+            background-size:calc(100% + 57px) 100%;
+            animation:banner 2s linear 0s infinite reverse backwards running;
+            width:100%;
+            height:15rem;
+            margin:0;
+            overflow:hidden;
+            white-space:nowrap;
         }
-        .header>div>div{text-align: center;}
+        .header>div>div{text-align:center;}
+        .header>div>div>span,
         .header>div>div>a{
-            display: inline;
-            font-size: 5em;
-            color: #000;
-            text-decoration: none;
-            text-align: center;
-            margin-block-start: 0.4em;
-            margin-block-end: 0.1em;
-            font-family: 'Times New Roman', Times, serif;
-            text-shadow: 0.013em 0.013em #000,
-                -0.013em 0.013em #000,
-                -0.013em -0.013em #000,
-                0.013em -0.01em #000,
-                0em 0.013em #000,
-                0em -0.013em #000,
-                0.013em 0em #000,
-                -0.013em 0em #000,
-                5px 3px 10px #0a0;
-            --shadow: 10px;
-            filter: url(#drop-shadow);
-            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
-            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
-            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            font-family:'Times New Roman',Times,serif;
+            text-shadow:0.13rem 0.13rem #000,
+                -0.13rem 0.13rem #000,
+                5px 3px 10px #0a0a;
+            filter:drop-shadow(0 0 10px #070);
+        }
+        .header>div>div>a{
+            display:inline;
+            font-size:5rem;
+            color:#000;
+            text-align:center;
+            margin-block-start:0.4rem;
+            margin-block-end:0.1rem;
         }
         .header>div>div>span{
-            display: inline;
-            font-size: 3em;
-            text-align: center;
-            margin: 0;
-            font-family: 'Times New Roman', Times, serif;
-            text-shadow: 0.013em 0.013em #000,
-                -0.013em 0.013em #000,
-                -0.013em -0.013em #000,
-                0.013em -0.01em #000,
-                0em 0.013em #000,
-                0em -0.013em #000,
-                0.013em 0em #000,
-                -0.013em 0em #000,
-                5px 3px 10px #0a0a;
-            --shadow: 10px;
-            filter: url(#drop-shadow);
-            filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#070')";
-            -webkit-filter: drop-shadow(0px 0px var(--shadow,10px) #070);
-            filter: drop-shadow(0px 0px var(--shadow,10px) #070);
+            display:inline;
+            font-size:3rem;
+            text-align:center;
+            margin:0;
         }
         .header>div:not(#info){
             width:fit-content;
-            padding: 0px;
-            outline: 40px solid #000e;
+            padding:0;
+            outline:2rem solid #000e;
             background-color:#000e;
-            display: block;
-            margin: auto;
-            height: 100%;
+            display:block;
+            margin:auto;
+            height:100%;
         }
         .header>div#info{
-            position: fixed;
-            text-align: center;
-            font-weight: bold;
-            font-family: sans-serif;
-            text-shadow: none;
-            top: 0;
-            left: 0;
-            color: #0f0;
-            background-image: radial-gradient(#000,#000,#000, #fff0,#fff0);
-            padding: 0.5em 1em;
-            border-radius: 2em;
+            position:absolute;
+            text-align:center;
+            font-weight:bold;
+            font-family:sans-serif;
+            text-shadow:none;
+            top:0;left:0;
+            color:#0f0;
+            background-image:radial-gradient(#000,#000,#000,#fff0,#fff0);
+            padding:0.5rem 1rem;
+            border-radius:2rem;
         }
         .header>div#info:hover{
-            color: #ff0;
-            background-image: radial-gradient(#00f,#00f,#00f, #fff0,#fff0);
-            cursor: help;
+            color:#ff0;
+            background-image:radial-gradient(#00f,#00f,#00f,#fff0,#fff0);
+            cursor:help;
         }
-        info#InFObOxiD{
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-            background-color: #000;
-            outline: 1000px solid #000e;
-            text-align: left;
-            height: auto;
-            padding: 1.8em;
-            cursor: pointer;
-            z-index: 100;
-            font-family: consolas,serif;
-            font-weight: normal;
-            color: #fff;
-            font-size: medium;
-            border: 1px solid white;
-            white-space: nowrap;
+        div#infoMenu{
+            position:fixed;
+            left:-1rem;right:-1rem;
+            top:-1rem;bottom:-1rem;
+            background-color: #000c;
         }
-        .header a[href]:not(.header>div>a) {display: inline;color: #0af;font-style: italic;}
-        ::-webkit-scrollbar {width: 10px;height: 10px;}
-        ::-webkit-scrollbar-thumb {background: #008000;border-radius: 10px;}
-        ::-webkit-scrollbar-thumb:hover {background: #0F0F;}
-        ::-webkit-scrollbar-track {background: #000;}
-        ::-webkit-scrollbar-track-piece {background: #000;}
-        ::-webkit-scrollbar-corner {background-color: #000;}
-        a[href] {color: #0af;}
-        h2{
-            display: inline;
-            font-size: 2em;
-            margin-block-start: 0.8em;
-            margin-block-end: 0.4em;
-            font-family: serif;
-            text-shadow: 1px 2px 3px black;
+        div#infoMenu>div{
+            position:fixed;
+            top:50%;left:50%;
+            transform:translate(-50%,-50%);
+            height:auto;
+            padding:1.8rem;
+            z-index:100;
+            background-color:#000;
+            color:#fff;
+            border:1px solid #fff;
+            white-space:nowrap;
+            text-align:left;
+            font-family:consolas,serif;
+            font-weight:normal;
+            font-size:medium;
         }
+        .header a[href]:not(.header>div>a){display:inline;color:#0af;font-style:italic;}
+        ::-webkit-scrollbar{width:.7rem;height:.7rem;}
+        ::-webkit-scrollbar-thumb{background:#080;border-radius:.3rem;}
+        ::-webkit-scrollbar-thumb:hover{background:#0F0;}
+        ::-webkit-scrollbar-track{background:#000;}
+        ::-webkit-scrollbar-track-piece{background:#000;}
+        ::-webkit-scrollbar-corner{background-color:#000;}
+        a[href]{color:#0af;}
+        h2,h3{
+            display:inline;
+            margin-block-start:0.8rem;
+            margin-block-end:0.4rem;
+            font-family:serif;
+            text-shadow:1px 2px 3px black;
+        }
+        h2{font-size:2rem;}
         h3{
-            display: inline;
-            font-size: 1em;
-            padding-left: 0.5em;
-            padding-right: 0.5em;
-            margin-block-start: 0.8em;
-            margin-block-end: 0.4em;
-            font-family: serif;
-            text-shadow: 1px 2px 3px black;
+            font-size:1rem;
+            padding-left:0.5rem;
+            padding-right:0.5rem;
         }
-        span {font-size: large;font-family: consolas;}
+        span{font-size:large;font-family:consolas;}
         .element{
-            background-color: black;
-            border: 3px solid black;
-            border-radius: 18px;
-            display: inline-block;
-            padding: 1px 4px;
-            margin: 1px auto;
+            display:inline-block;
+            padding:1px 4px;
+            margin:1px auto;
+            background-color:black;
+            border:3px solid black;
+            border-radius:18px;
         }
-        machine.element {border-color: #444;}
-        machine.element.hlght,machine.element.hlghtslf {border-color: #aaa;}
-        .hlghtcrf:not(.hlghtslf){background-color: #0af;border-color: #ef0;color: #000; font-style: italic;}
-        .hlght:not(.hlghtslf){background-color: #f30;border-color: #777;color: #ff0;}
-        .hlghtslf{background-color: #ff0;border-color: #060;color: #000; font-weight: bold;}
-        .hlghtcrf.hlghtslf{font-style: italic;}
-        item[data-type*="product"] {border-color: #555;}
-        .element:hover {border-color: #0f0;cursor: pointer;}
-        .noselect {
-            /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
-            -webkit-touch-callout: none; /* iOS Safari */
-              -webkit-user-select: none; /* Safari */
-               -khtml-user-select: none; /* Konqueror HTML */
-                 -moz-user-select: none; /* Old versions of Firefox */
-                  -ms-user-select: none; /* Internet Explorer/Edge */
-                      user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
-        }
-        .topic{white-space: nowrap;}
-        .inline{display: inline-table;white-space: normal;width: calc(100% - 150px);}
-        :root{ /*variables*/
-            --click-x:0px;
-            --click-y:0px;
-            --menu-height:0px;
-            --max-height:0px;
-        }
+        .machine{border-color:#444;}
+        .machine.hlght,.machine.hlghtslf{border-color:#aaa;}
+        .hlghtcrf:not(.hlghtslf){background-color:#0af;border-color:#ef0;color:#000;font-style:italic;}
+        .hlght:not(.hlghtslf){background-color:#f30;border-color:#777;color:#ff0;}
+        .hlghtslf{background-color:#ff0;border-color:#060;color:#000;font-weight:bold;}
+        .hlghtcrf.hlghtslf{font-style:italic;}
+        .item[data-type*="product"]{border-color:#555;}
+        .element:hover{border-color:#0f0;cursor:cell;}
+        .topic{filter:drop-shadow(0 0 8px #444);white-space:nowrap;}
+        .inline_base{display:inline-table;white-space:normal;width:calc(100% - 150px);}
         #menuBoxLimit{
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: var(--click-x);
-            height: var(--max-height);
-            overflow: visible;
-            pointer-events: none;
+            --click-x:0px;
+            --max-height:0px;
+            position:fixed;
+            top:0;bottom:0;
+            left:var(--click-x);
+            height:var(--max-height);
+            overflow:visible;
+            pointer-events:none;
         }
         #menuBox{
-            position: fixed;
-            z-index: 50;
-            width: max(10vw,250px);
-            height: fit-content;
-            overflow-y: overlay;
-            border-radius: 10px;
-            background-color: #000d;
-            pointer-events: auto;
-            user-select: text;
-            padding: 20px;
-            transform: translate(-0%,-100%);
-            top: min(calc(var(--click-y) + var(--menu-height)),100%);
+            --click-y:0px;
+            --menu-height:0px;
+            position:fixed;
+            transform:translate(-0%,-100%);
+            top:min(calc(var(--click-y) + var(--menu-height)),100%);
+            z-index:50;
+            width:max(10vw,250px);
+            height:fit-content;
+            padding:20px;
+            background-color:#000d;
+            overflow-y:overlay;
+            border-radius:10px;
+            pointer-events:auto;
+            user-select:text;
         }
     </style>
     <script>
-        function clickElement(element,event) {
-            if (element == document.body && event.type=="dblclick") {
-                let exit = false;
-                event.path.forEach(e=>{if(e==document.getElementById('menuBox'))exit=true;});
-                if (exit) return false;
-                for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
-                document.getElementById('menuBoxLimit').hidden=true;
-                return false;
+        function openInfoMenu(){
+            infoMenu.style.visibility="visible";
+            const remove_infoBox_click=()=>{
+                    infoMenu.style.visibility="hidden";
+                    document.body.removeEventListener('keypress',remove_infoBox_keypress,{passive:true,once:true});
+                },
+                remove_infoBox_keypress=()=>{
+                    infoMenu.style.visibility="hidden";
+                    document.body.removeEventListener('click',remove_infoBox_click,{passive:true,once:true});
+                };
+            document.body.addEventListener('click',remove_infoBox_click,{passive:true,once:true});
+            document.body.addEventListener('keypress',remove_infoBox_keypress,{passive:true,once:true});
+        }
+        function clearAllSelections(){
+            for(const e of document.body.querySelectorAll(".element.hlght,.element.hlghtslf,.element.hlghtcrf")){
+                e.classList.remove("hlght");
+                e.classList.remove("hlghtslf");
+                e.classList.remove("hlghtcrf");
             }
-            if (element == document.body && event.type=="click") {
-                let exit = false;
-                for (let i = event.path.length-5; i >= 0; i--) {const element = event.path[i];if(/element/.test(element.classList.value)||element==document.getElementById('menuBox')){exit=true;break;}}
-                if (exit||event.ctrlKey) return false;
-                for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
-                document.getElementById('menuBoxLimit').hidden=true;
-                return false;
-            }
-            //event.button left=0 middle=1 right=2
-            if(!event.ctrlKey && event.button != 2)for (const e of document.getElementsByClassName('element')) {e.classList.remove("hlght");e.classList.remove("hlghtslf");e.classList.remove("hlghtcrf")}
-            document.getElementById('menuBoxLimit').hidden=true;
-            if (event.button == 0) {
-                // left mouse click
-                switch (element.tagName.toLowerCase()) {
-                    case "machine":
+        }
+        /** @param {HTMLElement} element @param {MouseEvent} event */
+        function clickElement(element,event){
+            //~ event.button → left=0 middle=1 right=2
+            if(!event.ctrlKey&&event.button!==2)clearAllSelections();
+            menuBoxLimit.style.visibility="hidden";
+            switch(event.button){
+                case 0: //~ left mouse button click / click
+                    if(element.classList.contains('item')){
                         element.classList.add('hlghtslf');
-                        switch (element.dataset.name) {
-                            case 'c':
-                                for (const e of document.getElementsByClassName('element')) {if (e.dataset.machine=='c') {e.classList.add("hlght")}}
-                                break;
-                            case 'a':
-                                for (const e of document.getElementsByClassName('element')) {if (e.dataset.machine=='a') {e.classList.add("hlght")}}
-                                break;
-                            case 'm':
-                                for (const e of document.getElementsByClassName('element')) {if (e.dataset.machine=='m') {e.classList.add("hlght")}}
-                                break;
-                            case 's':
-                                for (const e of document.getElementsByClassName('element')) {if (e.dataset.machine=='s') {e.classList.add("hlght")}}
-                                break;
-                            case 'f':
-                                for (const e of document.getElementsByClassName('element')) {if (e.dataset.machine=='f') {e.classList.add("hlght")}}
-                                break;
-                            case 'r':
-                                for (const e of document.getElementsByClassName('element')) {if (e.dataset.machine=='r') {e.classList.add("hlght")}}
-                                break;
-                                
-                            default:
-                                break;
-                        }
-                        break;
-                    case "item":
-                        element.classList.add('hlghtslf');
-                        if (element.dataset.machine) document.querySelector('[data-name="'+element.dataset.machine+'"]').classList.add("hlght");
-                        for (const e of document.getElementsByTagName('item')) {
-                            for (const sDName of element.dataset.name.split(' ')) {if (RegExp(sDName,'g').test(e.dataset.recipe)) {e.classList.add("hlghtcrf")}}
-                            for (const dName of e.dataset.name.split(' ')) {if (RegExp(dName,'g').test(element.dataset.recipe)) {e.classList.add("hlght");e.classList.remove("hlghtcrf")}}
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (event.button == 1) {
-                // middle mouse click
-                if (element.tagName.toLowerCase() == "item" && !(/resource/.test(element.dataset.type))) {
-                    element.classList.add('hlghtslf');
-                    event.preventDefault();
-                    let recipeNames = element.dataset.recipe.split(' '),
-                        recipeGone = element.dataset.name.split(' '),
-                        machineSelect = element.dataset.machine?[element.dataset.machine]:[];
-                    while (recipeNames.length > 0) {
-                        for (const e of document.getElementsByTagName('item')) {
-                            for (const singleRecipe of recipeNames) {
-                                if (RegExp(singleRecipe,'g').test(e.dataset.name)) {
+                        if(element.dataset.machine)document.querySelector(`[data-name="${element.dataset.machine}"]`).classList.add("hlght");
+                        for(const e of document.getElementsByClassName('item')){
+                            for(const sDName of element.dataset.name.split(' ')){
+                                if(RegExp(sDName,'g').test(e.dataset.recipe))e.classList.add("hlghtcrf");
+                            }
+                            for(const dName of e.dataset.name.split(' ')){
+                                if(RegExp(dName,'g').test(element.dataset.recipe)){
                                     e.classList.add("hlght");
-                                    if (singleRecipe == "biom") {for (const htele of document.querySelectorAll('[data-name="biom"]')) {
-                                        htele.classList.add("hlght");
-                                        recipeNames = recipeNames.concat(htele.dataset.recipe.split(' '));
-                                    }}
-                                    recipeGone = recipeGone.concat(e.dataset.name.split(' '));
-                                    if (e.dataset.machine) machineSelect.push(e.dataset.machine);
-                                    if (e.dataset.recipe) recipeNames = recipeNames.concat(e.dataset.recipe.split(' '));
-                                    for (const gones of recipeGone) {while (recipeNames.indexOf(gones) != -1) {recipeNames.splice(recipeNames.indexOf(gones),1)}}
+                                    e.classList.remove("hlghtcrf");
                                 }
                             }
                         }
+                    }else if(element.classList.contains('machine')){
+                        element.classList.add('hlghtslf');
+                        for(const e of document.body.querySelectorAll(`.element[data-machine="${element.dataset.name}"]`)){e.classList.add("hlght");}
                     }
-                    // console.log(recipeGone,machineSelect);
-                    for (const machine of document.getElementsByTagName('machine')) {for (const selectingM of machineSelect) {if (machine.dataset.name==selectingM) {machine.classList.add("hlght")}}}
-                }
+                break;
+                case 1: //~ middle mouse button click (wheel)
+                    if(element.classList.contains("item")&&!(/resource/.test(element.dataset.type))){
+                        element.classList.add('hlghtslf');
+                        event.preventDefault();
+                        let recipeNames=element.dataset.recipe.split(' '),
+                            recipeGone=element.dataset.name.split(' '),
+                            machineSelect=element.dataset.machine?[element.dataset.machine]:[];
+                        while(recipeNames.length>0){
+                            for(const e of document.getElementsByClassName('item')){
+                                for(const singleRecipe of recipeNames){
+                                    if(RegExp(singleRecipe,'g').test(e.dataset.name)){
+                                        e.classList.add("hlght");
+                                        if(singleRecipe==="biom")
+                                            for(const htele of document.querySelectorAll('[data-name="biom"]')){
+                                                htele.classList.add("hlght");
+                                                recipeNames=recipeNames.concat(htele.dataset.recipe.split(' '));
+                                            }
+                                        recipeGone=recipeGone.concat(e.dataset.name.split(' '));
+                                        if(e.dataset.machine)machineSelect.push(e.dataset.machine);
+                                        if(e.dataset.recipe)recipeNames=recipeNames.concat(e.dataset.recipe.split(' '));
+                                        for(const gones of recipeGone)while(recipeNames.indexOf(gones)!==-1)recipeNames.splice(recipeNames.indexOf(gones),1);
+                                    }
+                                }
+                            }
+                        }
+                        //// console.log(recipeGone,machineSelect);
+                        for(const machine of document.getElementsByClassName('machine'))for(const selectingM of machineSelect)if(machine.dataset.name===selectingM)machine.classList.add("hlght");
+                    }
+                break;
+                case 2: //~ right mouse button click / context menu
+                    event.preventDefault();
+                    let placeMenuNoRight=(event.clientX+Math.max(200,document.documentElement.clientWidth*0.1))>document.documentElement.clientWidth,
+                        placeMenuNoLeft=(event.clientX-Math.max(200,document.documentElement.clientWidth*0.1))<0,
+                        placeMenuSpaceRight=event.clientX>(document.documentElement.clientWidth-event.clientX);
+                    let toLeft=placeMenuNoRight?(placeMenuNoLeft?(placeMenuSpaceRight?false:true):true):false;
+                    menuBoxLimit.style.visibility='visible';
+                    menuBoxLimit.style.transform=`translate(${toLeft?'-100%':'0'},0)`;
+                    menuBox.style.setProperty('--click-y',event.clientY+"px");
+                    menuBox.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
+                    menuBoxLimit.style.setProperty('--click-x',(toLeft?event.clientX-3:event.clientX+3)+"px");
+                    menuBoxLimit.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
+                    //~ custom context menu content
+                    menuBox.innerHTML=`<h2>${element.innerText}</h2>`;
+                    menuBox.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
+                break;
             }
-            if (event.button == 2) {
-                // context menu
-                event.preventDefault();
-                let placeMenuNoRight = (event.clientX+Math.max(200,document.documentElement.clientWidth*0.1))>document.documentElement.clientWidth,
-                    placeMenuNoLeft = (event.clientX-Math.max(200,document.documentElement.clientWidth*0.1))<0,
-                    placeMenuSpaceRight = event.clientX>(document.documentElement.clientWidth-event.clientX),
-                    menuBox = document.getElementById('menuBox'),
-                    menuBoxLimit = document.getElementById('menuBoxLimit');
-                let toLeft = placeMenuNoRight?(placeMenuNoLeft?(placeMenuSpaceRight?false:true):true):false;
-                menuBoxLimit.hidden=false;
-                menuBoxLimit.style.transform = toLeft?'translate(-100%,0)':'translate(0,0)';
-                document.documentElement.style.setProperty('--click-x',(toLeft?event.clientX-3:event.clientX+3)+"px");
-                document.documentElement.style.setProperty('--click-y',event.clientY+"px");
-                document.documentElement.style.setProperty('--max-height',document.documentElement.clientHeight+"px"); // site height all (clientHeight for visible)
-                document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px"); // update as much as possible
-                //ho__↓ todo! ↓
-                menuBox.innerHTML=`<h2>${element.innerText}</h2>`;
-                //ho__↑ todo! ↑
-                document.documentElement.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
-            }
-            return false;
-        }
-        function infoMenu() {
-            //HR__UPDATE MESSAGE__NO ALERT
-            const message="\u2588hilighting:<br>│<br>├─\u2588leftclick:<br>│   │<br>│   ├─on item: select required materials and materials that require self.<br>│   │<br>│   └─on machine: select all materials using self.<br>│<br>├─\u2588middleclick:<br>│   │<br>│   └─on crafting: select all materials and machines recuired.<br>│<br>└─\u2588rightclick:<br>&nbsp;   │<br>&nbsp;   └─on selection: clear all selections (doubleclick too).<br><br><i>[materials are ordered in manufacturing order and products are highlighted]</i><br><br><b>2020-07-03 NEW: hold ctrl while clicking on stuff, also the contextmenu is here (WIP).</b>";
-            let infoBox = document.createElement('info');
-            infoBox.id='InFObOxiD'
-            infoBox.innerHTML="<h2>The Unofficial U3 Flow Chart For Satisfactory</h2><br><br>"+message;
-            infoBox.onclick=e=>{document.body.removeChild(document.getElementById('InFObOxiD'))};
-            document.body.appendChild(infoBox);
+            return;
         }
     </script>
     </head>
-    <body onload="infoMenu()" ondblclick="clickElement(this,event)" onclick="clickElement(this,event)" class="noselect">
-        <script>
-            document.body.addEventListener('resize', event => {
-                document.documentElement.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
-                if(!document.getElementById('menuBoxLimit').hidden)document.documentElement.style.setProperty('--menu-height',document.getElementById('menuBox').offsetHeight+"px");
-            });
-        </script>
-        <div class="contentbox">
+    <body class="">
+        <div id="content">
             <div class="header">
-                <div id="info" onclick="infoMenu()">Info</div>
+                <div id="info">Info</div>
                 <div>
                     <div>
                         <span>unofficial</span>
-                        <br><a href="https://www.satisfactorygame.com/" target="_blank" rel="noopener noreferrer" title="official game-site">SATISFACTORY</a><br>
-                        <span>U3 Flow Chart</span>
+                        <br/><a href="https://www.satisfactorygame.com/" target="_blank" rel="noopener noreferrer" title="official game-site">SATISFACTORY</a><br/>
+                        <span><b title="Update 3 (2020-02-11 to 2021-04-13)">U3</b> Flow Chart</span>
                     </div>
-                    <br><a href="https://satisfactory.gamepedia.com/Template:ItemNav" target="_blank" rel="noopener noreferrer" title="official game-wiki">satisfactory wiki</a>
+                    <br/><a href="https://satisfactory.fandom.com/wiki/Satisfactory_Wiki" target="_blank" rel="noopener noreferrer" title="official wiki (fandom.com)">official satisfactory wiki</a>
                 </div>
             </div>
             <div class="topic" data-name="Machines">
                 <h2>Machines</h2>
-                <div class="inline">
-                    <machine class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-name="s"><span>Smelter</span></machine>
-                    <machine class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-name="f"><span>Foundry</span></machine>
-                    <machine class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-name="r"><span>Refinery</span></machine>
-                    <machine class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-name="c"><span>Constructor</span></machine>
-                    <machine class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-name="a"><span>Assembler</span></machine>
-                    <machine class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-name="m"><span>Manufacturer</span></machine>
+                <div class="inline_base">
+                    <span class="element machine" data-name="s">Smelter</span>
+                    <span class="element machine" data-name="f">Foundry</span>
+                    <span class="element machine" data-name="r">Refinery</span>
+                    <span class="element machine" data-name="c">Constructor</span>
+                    <span class="element machine" data-name="a">Assembler</span>
+                    <span class="element machine" data-name="m">Manufacturer</span>
                 </div>
             </div>
-            <hr style="border-radius: 2px;border: 2px solid black;">
+            <hr class="solid"/>
             <div class="topic" data-name="Resources">
                 <h2>Resources</h2>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="alca"><span>Alien Carapace</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="alor"><span>Alien Organs</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="resource" data-name="alca">Alien Carapace</span>
+                    <span class="element item" data-type="resource" data-name="alor">Alien Organs</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="leav"><span>Leaves</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="wood"><span>Wood</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="myce"><span>Mycelia</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="flpe"><span>Flower Petals</span></item>
+                    <span class="element item" data-type="resource" data-name="leav">Leaves</span>
+                    <span class="element item" data-type="resource" data-name="wood">Wood</span>
+                    <span class="element item" data-type="resource" data-name="myce">Mycelia</span>
+                    <span class="element item" data-type="resource" data-name="flpe">Flower Petals</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="gpsl"><span>Green Power Slug</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="ypsl"><span>Yellow Power Slug</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource" data-name="ppsl"><span>Purple Power Slug</span></item>
+                    <span class="element item" data-type="resource" data-name="gpsl">Green Power Slug</span>
+                    <span class="element item" data-type="resource" data-name="ypsl">Yellow Power Slug</span>
+                    <span class="element item" data-type="resource" data-name="ppsl">Purple Power Slug</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="coal"><span>Coal</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="iror"><span>Iron Ore</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="coor"><span>Copper Ore</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="caor"><span>Catherium Ore</span></item>
+                    <span class="element item" data-type="resource ore" data-name="coal">Coal</span>
+                    <span class="element item" data-type="resource ore" data-name="iror">Iron Ore</span>
+                    <span class="element item" data-type="resource ore" data-name="coor">Copper Ore</span>
+                    <span class="element item" data-type="resource ore" data-name="caor">Catherium Ore</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid resource" data-name="wate"><span>Water</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid resource" data-name="croi"><span>Crude Oil</span></item>
+                    <span class="element item" data-type="liquid resource" data-name="wate">Water</span>
+                    <span class="element item" data-type="liquid resource" data-name="croi">Crude Oil</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="lime"><span>Limestone</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="baux"><span>Bauxite</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="sulf"><span>Sulfur</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="raqu"><span>Raw Quartz</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="uran"><span>Uranium</span></item>
+                    <span class="element item" data-type="resource ore" data-name="lime">Limestone</span>
+                    <span class="element item" data-type="resource ore" data-name="baux">Bauxite</span>
+                    <span class="element item" data-type="resource ore" data-name="sulf">Sulfur</span>
+                    <span class="element item" data-type="resource ore" data-name="raqu">Raw Quartz</span>
+                    <span class="element item" data-type="resource ore" data-name="uran">Uranium</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="resource ore" data-name="saor"><span>S.A.M. Ore</span></item>
+                    <span class="element item" data-type="resource ore" data-name="saor">S.A.M. Ore</span>
                 </div>
             </div>
-            <hr style="border-radius: 2px;border: 2px solid black;">
+            <hr class="solid"/>
             <div class="topic" data-name="CraftingOne">
                 <h2>Crafting</h2><h3>#1</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="ingot" data-name="irin" data-recipe="iror" data-machine="s"><span>Iron Ingot</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="ingot" data-name="coin" data-recipe="coor" data-machine="s"><span>Copper Ingot</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="ingot" data-name="cain" data-recipe="caor" data-machine="s"><span>Catherium Ingot</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="ingot" data-name="stin" data-recipe="coal iror" data-machine="f"><span>Steel Ingot</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="ingot" data-name="irin" data-recipe="iror" data-machine="s">Iron Ingot</span>
+                    <span class="element item" data-type="ingot" data-name="coin" data-recipe="coor" data-machine="s">Copper Ingot</span>
+                    <span class="element item" data-type="ingot" data-name="cain" data-recipe="caor" data-machine="s">Catherium Ingot</span>
+                    <span class="element item" data-type="ingot" data-name="stin" data-recipe="coal iror" data-machine="f">Steel Ingot</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="conc" data-recipe="lime" data-machine="c"><span>Concrete</span></item>
+                    <span class="element item" data-type="material" data-name="conc" data-recipe="lime" data-machine="c">Concrete</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="biom" data-recipe="leav" data-machine="c"><span>Biomass (Leaves)</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="biom" data-recipe="wood" data-machine="c"><span>Biomass (Wood)</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="biom" data-recipe="myce" data-machine="c"><span>Biomass (Mycelia)</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="biom" data-recipe="alca" data-machine="c"><span>Biomass (Alien Carapace)</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="biom" data-recipe="alor" data-machine="c"><span>Biomass (Alien Organs)</span></item>
+                    <span class="element item" data-type="material" data-name="biom" data-recipe="leav" data-machine="c">Biomass (Leaves)</span>
+                    <span class="element item" data-type="material" data-name="biom" data-recipe="wood" data-machine="c">Biomass (Wood)</span>
+                    <span class="element item" data-type="material" data-name="biom" data-recipe="myce" data-machine="c">Biomass (Mycelia)</span>
+                    <span class="element item" data-type="material" data-name="biom" data-recipe="alca" data-machine="c">Biomass (Alien Carapace)</span>
+                    <span class="element item" data-type="material" data-name="biom" data-recipe="alor" data-machine="c">Biomass (Alien Organs)</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="sili" data-recipe="raqu" data-machine="c"><span>Silica</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="qucr" data-recipe="raqu" data-machine="c"><span>Quartz Crystal</span></item>
+                    <span class="element item" data-type="material" data-name="sili" data-recipe="raqu" data-machine="c">Silica</span>
+                    <span class="element item" data-type="material" data-name="qucr" data-recipe="raqu" data-machine="c">Quartz Crystal</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="blpo" data-recipe="coal sulf" data-machine="a"><span>Black Powder</span></item>
+                    <span class="element item" data-type="material" data-name="blpo" data-recipe="coal sulf" data-machine="a">Black Powder</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid material" data-name="suac" data-recipe="sulf wate" data-machine="r"><span>Sulfuric Acid</span></item>
+                    <span class="element item" data-type="liquid material" data-name="suac" data-recipe="sulf wate" data-machine="r">Sulfuric Acid</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid materials" data-name="also sili" data-recipe="baux wate" data-machine="r"><span>Aluminum Solution & Silica</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid materials" data-name="fuel pore" data-recipe="croi" data-machine="r"><span>Fuel & Polymer Resin</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid materials" data-name="rubb hore" data-recipe="croi" data-machine="r"><span>Rubber & Heavy Oil Residue</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid materials" data-name="plas hore" data-recipe="croi" data-machine="r"><span>Plasitc & Heavy Oil Residue</span></item>
+                    <span class="element item" data-type="liquid materials" data-name="also sili" data-recipe="baux wate" data-machine="r">Aluminum Solution & Silica</span>
+                    <span class="element item" data-type="liquid materials" data-name="fuel pore" data-recipe="croi" data-machine="r">Fuel & Polymer Resin</span>
+                    <span class="element item" data-type="liquid materials" data-name="rubb hore" data-recipe="croi" data-machine="r">Rubber & Heavy Oil Residue</span>
+                    <span class="element item" data-type="liquid materials" data-name="plas hore" data-recipe="croi" data-machine="r">Plasitc & Heavy Oil Residue</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="posh" data-recipe="gpsl" data-machine="c"><span>Power Shard (Green Power Slug)</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="posh" data-recipe="ypsl" data-machine="c"><span>Power Shard (Yellow Power Slug)</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="posh" data-recipe="ppsl" data-machine="c"><span>Power Shard (Purple Power Slug)</span></item>
+                    <span class="element item" data-type="product" data-name="posh" data-recipe="gpsl" data-machine="c">Power Shard (Green Power Slug)</span>
+                    <span class="element item" data-type="product" data-name="posh" data-recipe="ypsl" data-machine="c">Power Shard (Yellow Power Slug)</span>
+                    <span class="element item" data-type="product" data-name="posh" data-recipe="ppsl" data-machine="c">Power Shard (Purple Power Slug)</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="coca" data-recipe="flpe" data-machine="c"><span>Color Cartridge</span></item>
+                    <span class="element item" data-type="product" data-name="coca" data-recipe="flpe" data-machine="c">Color Cartridge</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingTwo">
+            <hr/><div class="topic" data-name="CraftingTwo">
                 <h2>Crafting</h2><h3>#2</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="irpl" data-recipe="irin" data-machine="c"><span>Iron Plate</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="irro" data-recipe="irin" data-machine="c"><span>Iron Rod</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="material" data-name="irpl" data-recipe="irin" data-machine="c">Iron Plate</span>
+                    <span class="element item" data-type="material" data-name="irro" data-recipe="irin" data-machine="c">Iron Rod</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="cosh" data-recipe="coin" data-machine="c"><span>Copper Sheet</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="wire" data-recipe="coin" data-machine="c"><span>Wire</span></item>
+                    <span class="element item" data-type="material" data-name="cosh" data-recipe="coin" data-machine="c">Copper Sheet</span>
+                    <span class="element item" data-type="material" data-name="wire" data-recipe="coin" data-machine="c">Wire</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="quic" data-recipe="cain" data-machine="c"><span>Quickwire</span></item>
+                    <span class="element item" data-type="material" data-name="quic" data-recipe="cain" data-machine="c">Quickwire</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="stbe" data-recipe="stin" data-machine="c"><span>Steel Beam</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="stpi" data-recipe="stin" data-machine="c"><span>Steel Pipe</span></item>
+                    <span class="element item" data-type="material" data-name="stbe" data-recipe="stin" data-machine="c">Steel Beam</span>
+                    <span class="element item" data-type="material" data-name="stpi" data-recipe="stin" data-machine="c">Steel Pipe</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="plas" data-recipe="pore wate" data-machine="r"><span>Plastic</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="rubb" data-recipe="pore wate" data-machine="r"><span>Rubber</span></item>
+                    <span class="element item" data-type="material" data-name="plas" data-recipe="pore wate" data-machine="r">Plastic</span>
+                    <span class="element item" data-type="material" data-name="rubb" data-recipe="pore wate" data-machine="r">Rubber</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="fabr" data-recipe="myce biom" data-machine="a"><span>Fabric</span></item>
+                    <span class="element item" data-type="material" data-name="fabr" data-recipe="myce biom" data-machine="a">Fabric</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="peco" data-recipe="hore" data-machine="r"><span>Petroleum Coke</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="sobi" data-recipe="biom" data-machine="c"><span>Solid Biofuel</span></item>
+                    <span class="element item" data-type="material" data-name="peco" data-recipe="hore" data-machine="r">Petroleum Coke</span>
+                    <span class="element item" data-type="material" data-name="sobi" data-recipe="biom" data-machine="c">Solid Biofuel</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="emca" data-recipe="plas" data-machine="c"><span>Empty Canister</span></item>
+                    <span class="element item" data-type="material" data-name="emca" data-recipe="plas" data-machine="c">Empty Canister</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid materials" data-name="urpe suac" data-recipe="uran suac" data-machine="r"><span>Uranium Pellet & Sulfuric Acid</span></item>
+                    <span class="element item" data-type="liquid materials" data-name="urpe suac" data-recipe="uran suac" data-machine="r">Uranium Pellet & Sulfuric Acid</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid product" data-name="fuel" data-recipe="hore" data-machine="r"><span>Fuel</span></item>
+                    <span class="element item" data-type="liquid product" data-name="fuel" data-recipe="hore" data-machine="r">Fuel</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingThree">
+            <hr/><div class="topic" data-name="CraftingThree">
                 <h2>Crafting</h2><h3>#3</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="scre" data-recipe="irro" data-machine="c"><span>Screw</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="material" data-name="scre" data-recipe="irro" data-machine="c">Screw</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="cabl" data-recipe="wire" data-machine="c"><span>Cable</span></item>
+                    <span class="element item" data-type="material" data-name="cabl" data-recipe="wire" data-machine="c">Cable</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="eibe" data-recipe="stbe conc" data-machine="a"><span>Encased Industrial Beam</span></item>
+                    <span class="element item" data-type="material" data-name="eibe" data-recipe="stbe conc" data-machine="a">Encased Industrial Beam</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="stat" data-recipe="stpi wire" data-machine="a"><span>Stator</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="cibo" data-recipe="cosh plas" data-machine="a"><span>Circuit Board</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="aili" data-recipe="cosh quic" data-machine="a"><span>A.I. Limiter</span></item>
+                    <span class="element item" data-type="material" data-name="stat" data-recipe="stpi wire" data-machine="a">Stator</span>
+                    <span class="element item" data-type="material" data-name="cibo" data-recipe="cosh plas" data-machine="a">Circuit Board</span>
+                    <span class="element item" data-type="material" data-name="aili" data-recipe="cosh quic" data-machine="a">A.I. Limiter</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="euce" data-recipe="urpe conc" data-machine="a"><span>Encased Uranium Cell</span></item>
+                    <span class="element item" data-type="material" data-name="euce" data-recipe="urpe conc" data-machine="a">Encased Uranium Cell</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid materials" data-name="alsc wate" data-recipe="also peco" data-machine="r"><span>Aluminum Scrap & Water</span></item>
+                    <span class="element item" data-type="liquid materials" data-name="alsc wate" data-recipe="also peco" data-machine="r">Aluminum Scrap & Water</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="liquid product" data-name="libi" data-recipe="sobi wate" data-machine="r"><span>Liquid Biofuel</span></item>
+                    <span class="element item" data-type="liquid product" data-name="libi" data-recipe="sobi wate" data-machine="r">Liquid Biofuel</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="filt" data-recipe="coal rubb fabr" data-machine="m"><span>Filter</span></item>
+                    <span class="element item" data-type="material" data-name="filt" data-recipe="coal rubb fabr" data-machine="m">Filter</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="nobe" data-recipe="blpo stpi" data-machine="a"><span>Nobelisk</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="spre" data-recipe="irro" data-machine="c"><span>Spiked Rebar</span></item>
+                    <span class="element item" data-type="product" data-name="nobe" data-recipe="blpo stpi" data-machine="a">Nobelisk</span>
+                    <span class="element item" data-type="product" data-name="spre" data-recipe="irro" data-machine="c">Spiked Rebar</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingFor">
+            <hr/><div class="topic" data-name="CraftingFor">
                 <h2>Crafting</h2><h3>#4</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="ingot" data-name="alin" data-recipe="alsc sili" data-machine="f"><span>Aluminum Ingot</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="ingot" data-name="alin" data-recipe="alsc sili" data-machine="f">Aluminum Ingot</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="ripl" data-recipe="irpl scre" data-machine="a"><span>Reinforced Iron Plate</span></item>
+                    <span class="element item" data-type="material" data-name="ripl" data-recipe="irpl scre" data-machine="a">Reinforced Iron Plate</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="roto" data-recipe="irro scre" data-machine="a"><span>Rotor</span></item>
+                    <span class="element item" data-type="material" data-name="roto" data-recipe="irro scre" data-machine="a">Rotor</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="hsco" data-recipe="quic cabl cibo" data-machine="m"><span>High-Speed Connector</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="comp" data-recipe="cibo cabl plas scre" data-machine="m"><span>Computer</span></item>
+                    <span class="element item" data-type="material" data-name="hsco" data-recipe="quic cabl cibo" data-machine="m">High-Speed Connector</span>
+                    <span class="element item" data-type="material" data-name="comp" data-recipe="cibo cabl plas scre" data-machine="m">Computer</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="ecro" data-recipe="stat aili" data-machine="a"><span>Electromagnetic Control Rod</span></item>
+                    <span class="element item" data-type="material" data-name="ecro" data-recipe="stat aili" data-machine="a">Electromagnetic Control Rod</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="beac" data-recipe="irpl irro wire cabl" data-machine="m"><span>Beacon</span></item>
+                    <span class="element item" data-type="material" data-name="beac" data-recipe="irpl irro wire cabl" data-machine="m">Beacon</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material spaceelevator" data-name="auwi" data-recipe="stat cabl" data-machine="a"><span>Automated Wiring</span></item>
+                    <span class="element item" data-type="material spaceelevator" data-name="auwi" data-recipe="stat cabl" data-machine="a">Automated Wiring</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="iifi" data-recipe="filt quic rubb" data-machine="m"><span>Iodine Infused Filter</span></item>
+                    <span class="element item" data-type="product" data-name="iifi" data-recipe="filt quic rubb" data-machine="m">Iodine Infused Filter</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingFive">
+            <hr/><div class="topic" data-name="CraftingFive">
                 <h2>Crafting</h2><h3>#5</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="aash" data-recipe="alin coin" data-machine="a"><span>Alclad Aluminum Sheet</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="material" data-name="aash" data-recipe="alin coin" data-machine="a">Alclad Aluminum Sheet</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="mofr" data-recipe="ripl irro" data-machine="a"><span>Modular Frame</span></item>
+                    <span class="element item" data-type="material" data-name="mofr" data-recipe="ripl irro" data-machine="a">Modular Frame</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="moto" data-recipe="roto stat" data-machine="a"><span>Motor</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="cros" data-recipe="qucr cabl ripl" data-machine="m"><span>Crystal Oscillator</span></item>
+                    <span class="element item" data-type="material" data-name="moto" data-recipe="roto stat" data-machine="a">Motor</span>
+                    <span class="element item" data-type="material" data-name="cros" data-recipe="qucr cabl ripl" data-machine="m">Crystal Oscillator</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material spaceelevator" data-name="smpl" data-recipe="ripl roto" data-machine="a"><span>Smart Plating</span></item>
+                    <span class="element item" data-type="material spaceelevator" data-name="smpl" data-recipe="ripl roto" data-machine="a">Smart Plating</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="nfro" data-recipe="euce eibe ecro" data-machine="m"><span>Nuclear Fuel Rod</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="rica" data-recipe="beac stpi blpo rubb" data-machine="m"><span>Rifle Cartridge</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="supe" data-recipe="comp aili hsco plas" data-machine="m"><span>Supercomputer</span></item>
+                    <span class="element item" data-type="product" data-name="nfro" data-recipe="euce eibe ecro" data-machine="m">Nuclear Fuel Rod</span>
+                    <span class="element item" data-type="product" data-name="rica" data-recipe="beac stpi blpo rubb" data-machine="m">Rifle Cartridge</span>
+                    <span class="element item" data-type="product" data-name="supe" data-recipe="comp aili hsco plas" data-machine="m">Supercomputer</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingSix">
+            <hr/><div class="topic" data-name="CraftingSix">
                 <h2>Crafting</h2><h3>#6</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="hmfr" data-recipe="mofr stpi eibe scre" data-machine="m"><span>Heavy Modular Frame</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="material" data-name="hmfr" data-recipe="mofr stpi eibe scre" data-machine="m">Heavy Modular Frame</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="hesi" data-recipe="aash rubb" data-machine="a"><span>Heat Sink</span></item>
+                    <span class="element item" data-type="material" data-name="hesi" data-recipe="aash rubb" data-machine="a">Heat Sink</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="batt" data-recipe="aash wire sulf plas" data-machine="m"><span>Battery</span></item>
+                    <span class="element item" data-type="product" data-name="batt" data-recipe="aash wire sulf plas" data-machine="m">Battery</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product spaceelevator" data-name="vefr" data-recipe="mofr stbe" data-machine="a"><span>Versatile Framework</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product spaceelevator" data-name="moen" data-recipe="moto rubb smpl" data-machine="m"><span>Modular Engine</span></item>
+                    <span class="element item" data-type="product spaceelevator" data-name="vefr" data-recipe="mofr stbe" data-machine="a">Versatile Framework</span>
+                    <span class="element item" data-type="product spaceelevator" data-name="moen" data-recipe="moto rubb smpl" data-machine="m">Modular Engine</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingSeven">
+            <hr/><div class="topic" data-name="CraftingSeven">
                 <h2>Crafting</h2><h3>#7</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="material" data-name="rcun" data-recipe="hesi rubb cros comp" data-machine="m"><span>Radio Control Unit</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="material" data-name="rcun" data-recipe="hesi rubb cros comp" data-machine="m">Radio Control Unit</span>
                     <span>&verbar;</span>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product spaceelevator" data-name="acun" data-recipe="auwi cibo hmfr comp" data-machine="m"><span>Adaptive Control Unit</span></item>
+                    <span class="element item" data-type="product spaceelevator" data-name="acun" data-recipe="auwi cibo hmfr comp" data-machine="m">Adaptive Control Unit</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
-            <div class="topic" data-name="CraftingEight">
+            <hr/><div class="topic" data-name="CraftingEight">
                 <h2>Crafting</h2><h3>#8</h3>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="product" data-name="tumo" data-recipe="hesi rcun moto rubb" data-machine="m"><span>Turbo Motor</span></item>
+                <div class="inline_base">
+                    <span class="element item" data-type="product" data-name="tumo" data-recipe="hesi rcun moto rubb" data-machine="m">Turbo Motor</span>
                 </div>
             </div>
-            <hr style="border-radius: 1px;border: 1px dashed black;">
+            <hr class="solid"/>
             <div class="topic" data-name="CraftingPackingUnpacking">
-                <div style="display: inline-table;"><h2>Crafting</h2><br><h3>(Liquid Packing)</h3></div>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="packaged material" data-name="pawa" data-recipe="wate emca" data-machine="r"><span>Packaged Water</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="packaged material" data-name="paoi" data-recipe="croi emca" data-machine="r"><span>Packaged Crude Oil</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="packaged material" data-name="phor" data-recipe="hore emca" data-machine="r"><span>Packaged Heavy Oil Residue</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="packaged material" data-name="pafu" data-recipe="fuel emca" data-machine="r"><span>Packaged Fuel</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="packaged material" data-name="plbi" data-recipe="libi emca" data-machine="r"><span>Packaged Liquid Biofuel</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="packaged material" data-name="patu" data-recipe="turb emca" data-machine="r"><span>Packaged Turbofuel</span></item>
+                <div style="display: inline-table;"><h2>Crafting</h2><br/><h3>(Liquid Packing)</h3></div>
+                <div class="inline_base">
+                    <span class="element item" data-type="packaged material" data-name="pawa" data-recipe="wate emca" data-machine="r">Packaged Water</span>
+                    <span class="element item" data-type="packaged material" data-name="paoi" data-recipe="croi emca" data-machine="r">Packaged Crude Oil</span>
+                    <span class="element item" data-type="packaged material" data-name="phor" data-recipe="hore emca" data-machine="r">Packaged Heavy Oil Residue</span>
+                    <span class="element item" data-type="packaged material" data-name="pafu" data-recipe="fuel emca" data-machine="r">Packaged Fuel</span>
+                    <span class="element item" data-type="packaged material" data-name="plbi" data-recipe="libi emca" data-machine="r">Packaged Liquid Biofuel</span>
+                    <span class="element item" data-type="packaged material" data-name="patu" data-recipe="turb emca" data-machine="r">Packaged Turbofuel</span>
                 </div>
-                <hr style="border-radius: 1px;border: 1px dashed black;">
-                <div style="display: inline-table;"><h2>Crafting</h2><br><h3>(Liquid Unpacking)</h3></div>
-                <div class="inline">
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="unpackaged materials" data-name="wate emca" data-recipe="pawa" data-machine="r"><span>Water & Empty Canister</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="unpackaged materials" data-name="croi emca" data-recipe="paoi" data-machine="r"><span>Crude Oil & Empty Canister</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="unpackaged materials" data-name="hore emca" data-recipe="phor" data-machine="r"><span>Heavy Oil Residue & Empty Canister</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="unpackaged materials" data-name="fuel emca" data-recipe="pafu" data-machine="r"><span>Fuel & Empty Canister</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="unpackaged materials" data-name="libi emca" data-recipe="plbi" data-machine="r"><span>Liquid Biofuel & Empty Canister</span></item>
-                    <item class="element" onmousedown="clickElement(this,event)" oncontextmenu="event.preventDefault()" data-type="unpackaged materials" data-name="turb emca" data-recipe="patu" data-machine="r"><span>Turbofuel & Empty Canister</span></item>
+                <hr style="border-radius: 1px;border: 1px dashed #040;"/>
+                <div style="display: inline-table;"><h2>Crafting</h2><br/><h3>(Liquid Unpacking)</h3></div>
+                <div class="inline_base">
+                    <span class="element item" data-type="unpackaged materials" data-name="wate emca" data-recipe="pawa" data-machine="r">Water & Empty Canister</span>
+                    <span class="element item" data-type="unpackaged materials" data-name="croi emca" data-recipe="paoi" data-machine="r">Crude Oil & Empty Canister</span>
+                    <span class="element item" data-type="unpackaged materials" data-name="hore emca" data-recipe="phor" data-machine="r">Heavy Oil Residue & Empty Canister</span>
+                    <span class="element item" data-type="unpackaged materials" data-name="fuel emca" data-recipe="pafu" data-machine="r">Fuel & Empty Canister</span>
+                    <span class="element item" data-type="unpackaged materials" data-name="libi emca" data-recipe="plbi" data-machine="r">Liquid Biofuel & Empty Canister</span>
+                    <span class="element item" data-type="unpackaged materials" data-name="turb emca" data-recipe="patu" data-machine="r">Turbofuel & Empty Canister</span>
                 </div>
             </div>
-            <hr style="border-radius: 2px;border: 2px solid black;">
-            <div name="Alternate recipes">
+            <hr class="solid"/><div name="Alternate recipes">
                 <h2>Alternate recipes</h2><h3>[WIP]</h3>
                 <i><a href="https://satisfactory.gamepedia.com/Hard_Drive#Alternate_Recipes" target="_blank" rel="noopener noreferrer" title="W I P">list of alternate recipes.</a></i>
-                <br><small>(<u>"Turbofuel" and "Compacted Coal" are unlocked exclusively as Alternate Recipes by researching Hard Drives.</u>)</small>
+                <br/><small>(<u>"Turbofuel" and "Compacted Coal" are unlocked exclusively as Alternate Recipes by researching Hard Drives.</u>)</small>
             </div>
         </div>
-        <div id="menuBoxLimit" hidden><div id="menuBox"><p>Hello, World!</p></div></div>
+        <div id="infoMenu" style="visibility:hidden;">
+            <div>
+                <h2>The Unofficial <b title="Update 3 (2020-02-11 to 2021-04-13)">U3</b> Crafting Flow Chart For Satisfactory</h2>
+                <br/>
+                <br/>
+                <br/>┍ Highlighting (w/ Computer Mouse)
+                <br/>│
+                <br/>├─┮ Left-Click
+                <br/>│ │
+                <br/>│ ├─ On item: Select required materials and materials that require self.
+                <br/>│ │
+                <br/>│ └─ On machine: Select all materials using self.
+                <br/>│
+                <br/>├─┮ Middle-Click
+                <br/>│ │
+                <br/>│ └─ On crafting: Select all materials and machines required.
+                <br/>│
+                <br/>└─┮ Right-Click
+                <br/>&nbsp; │
+                <br/>&nbsp; └─ on selection: clear all selections (doubleclick too).
+                <br/>
+                <br/><i>(hold [ctrl] while clicking, to add to the current selection)</i>
+                <br/>
+                <br/>selection colors: <span class="hlghtslf">[self]</span> <span class="hlght">[items/machines needed]</span> <span class="hlghtcrf">[items that need self]</span>
+                <br/>
+                <br/><i>materials are ordered in manufacturing order and end-products have a brighter border color.</i>
+                <br/>
+                <br/><b>
+                    I decided that I'll not update this to <i>[current satisfactory version]</i>,
+                    <br/>&nbsp; &nbsp; but since it's <a href="https://github.com/MAZ01001/MAZ01001.github.io/blob/master/LICENSE">free & open source</a> <i>someone</i> could <a href="https://github.com/MAZ01001/MAZ01001.github.io/blob/master/site/flowchart/index.html">use this code</a> to make a new version :P
+                </b>
+            </div>
+        </div>
+        <div id="menuBoxLimit" style="visibility:hidden;"><div id="menuBox"><p>Hello, World!</p></div></div>
     </body>
+    <script>
+        const info=document.getElementById("info"),
+            infoMenu=document.getElementById("infoMenu"),
+            menuBoxLimit=document.getElementById("menuBoxLimit"),
+            menuBox=document.getElementById("menuBox");
+        document.body.addEventListener('resize',event=>{
+            menuBoxLimit.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
+            if(!menuBoxLimit.hidden)menuBoxLimit.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
+        },{passive:true});
+        // TODO document click hides context menu but keeps selection
+        // TODO dblclick same as click but also remove selection
+        // TODO update element click ~ json
+        document.body.addEventListener('click',event=>{
+            if(event.target===info)return;
+            if(event.target===infoMenu)return;
+            if(event.path.includes(menuBox))return;
+            if(event.ctrlKey)return;
+            if(event.target.classList.contains("element"))return;
+            clearAllSelections();
+            menuBoxLimit.style.visibility="hidden";
+        },{passive:true});
+        document.body.addEventListener('dblclick',event=>{
+            if(event.path.includes(menuBox))return;
+            clearAllSelections();
+            menuBoxLimit.style.visibility="hidden";
+        },{passive:true});
+        for(const element of document.body.querySelectorAll("span.element.machine,span.element.item"))
+            element.addEventListener('mousedown',event=>clickElement(element,event),{passive:false});
+        info.addEventListener('click',event=>{openInfoMenu();event.stopPropagation();},{passive:true});
+        openInfoMenu();
+    </script>
 </html>
