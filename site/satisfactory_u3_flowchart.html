@@ -147,32 +147,6 @@
         .element:hover{border-color:#0f0;cursor:cell;}
         .topic{filter:drop-shadow(0 0 8px #444);white-space:nowrap;}
         .inline_base{display:inline-table;white-space:normal;width:calc(100% - 150px);}
-        #menuBoxLimit{
-            --click-x:0px;
-            --max-height:0px;
-            position:fixed;
-            top:0;bottom:0;
-            left:var(--click-x);
-            height:var(--max-height);
-            overflow:visible;
-            pointer-events:none;
-        }
-        #menuBox{
-            --click-y:0px;
-            --menu-height:0px;
-            position:fixed;
-            transform:translate(-0%,-100%);
-            top:min(calc(var(--click-y) + var(--menu-height)),100%);
-            z-index:50;
-            width:max(10vw,250px);
-            height:fit-content;
-            padding:20px;
-            background-color:#000d;
-            overflow-y:overlay;
-            border-radius:10px;
-            pointer-events:auto;
-            user-select:text;
-        }
     </style>
     <script>
         function openInfoMenu(){
@@ -198,8 +172,7 @@
         /** @param {HTMLElement} element @param {MouseEvent} event */
         function clickElement(element,event){
             //~ event.button → left=0 middle=1 right=2
-            if(!event.ctrlKey&&event.button!==2)clearAllSelections();
-            menuBoxLimit.style.visibility="hidden";
+            if(!(event.ctrlKey||event.button===2))clearAllSelections();
             switch(event.button){
                 case 0: //~ left mouse button click / click
                     if(element.classList.contains('item')){
@@ -249,22 +222,6 @@
                         //// console.log(recipeGone,machineSelect);
                         for(const machine of document.getElementsByClassName('machine'))for(const selectingM of machineSelect)if(machine.dataset.name===selectingM)machine.classList.add("hlght");
                     }
-                break;
-                case 2: //~ right mouse button click / context menu
-                    event.preventDefault();
-                    let placeMenuNoRight=(event.clientX+Math.max(200,document.documentElement.clientWidth*0.1))>document.documentElement.clientWidth,
-                        placeMenuNoLeft=(event.clientX-Math.max(200,document.documentElement.clientWidth*0.1))<0,
-                        placeMenuSpaceRight=event.clientX>(document.documentElement.clientWidth-event.clientX);
-                    let toLeft=placeMenuNoRight?(placeMenuNoLeft?(placeMenuSpaceRight?false:true):true):false;
-                    menuBoxLimit.style.visibility='visible';
-                    menuBoxLimit.style.transform=`translate(${toLeft?'-100%':'0'},0)`;
-                    menuBox.style.setProperty('--click-y',event.clientY+"px");
-                    menuBox.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
-                    menuBoxLimit.style.setProperty('--click-x',(toLeft?event.clientX-3:event.clientX+3)+"px");
-                    menuBoxLimit.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
-                    //~ custom context menu content
-                    menuBox.innerHTML=`<h2>${element.innerText}</h2>`;
-                    menuBox.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
                 break;
             }
             return;
@@ -544,31 +501,18 @@
                 </b>
             </div>
         </div>
-        <div id="menuBoxLimit" style="visibility:hidden;"><div id="menuBox"><p>Hello, World!</p></div></div>
     </body>
     <script>
         const info=document.getElementById("info"),
-            infoMenu=document.getElementById("infoMenu"),
-            menuBoxLimit=document.getElementById("menuBoxLimit"),
-            menuBox=document.getElementById("menuBox");
-        document.body.addEventListener('resize',event=>{
-            menuBoxLimit.style.setProperty('--max-height',document.documentElement.clientHeight+"px");
-            if(!menuBoxLimit.hidden)menuBoxLimit.style.setProperty('--menu-height',menuBox.offsetHeight+"px");
-        },{passive:true});
+            infoMenu=document.getElementById("infoMenu");
         document.body.addEventListener('click',event=>{
             if(event.target===info)return;
             if(event.target===infoMenu)return;
-            if(event.path.includes(menuBox))return;
             if(event.ctrlKey)return;
             if(event.target.classList.contains("element"))return;
             clearAllSelections();
-            menuBoxLimit.style.visibility="hidden";
         },{passive:true});
-        document.body.addEventListener('dblclick',event=>{
-            if(event.path.includes(menuBox))return;
-            clearAllSelections();
-            menuBoxLimit.style.visibility="hidden";
-        },{passive:true});
+        document.body.addEventListener('dblclick',clearAllSelections,{passive:true});
         for(const element of document.body.querySelectorAll("span.element.machine,span.element.item"))
             element.addEventListener('mousedown',event=>clickElement(element,event),{passive:false});
         info.addEventListener('click',event=>{openInfoMenu();event.stopPropagation();},{passive:true});
