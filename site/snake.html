@@ -1117,7 +1117,7 @@
         },{passive:false,bubbles:false});
         //# context menu
         contextAll.forEach(function(value,key,parent){value.addEventListener('contextmenu',event=>{
-            if(event.path.includes(rmenu)){return;}
+            if(event.composedPath().includes(rmenu)){return;}
             event.preventDefault();
             rmenu.classList.add('visible');
             rmenu.dataset.top=event.pageY+'px';

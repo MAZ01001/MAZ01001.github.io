@@ -86,7 +86,7 @@
             document.body.addEventListener('resize',()=>rmenu.classList.remove('visible'),{passive:true});
             document.body.addEventListener('contextmenu',event=>{
                 if(!event.target.classList.contains('contextmenu_rmenu'))return;
-                if(event.path.includes(rmenu))return;
+                if(event.composedPath().includes(rmenu))return;
                 event.preventDefault();
                 rmenu_position(event.clientX,event.clientY);
                 //// rmenu_position(event.pageX-window.pageXOffset,event.pageY-window.pageYOffset);

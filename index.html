@@ -305,7 +305,7 @@
             let remenudelay=0;
         document.getElementById('box').addEventListener('contextmenu',event=>{
             clearTimeout(remenudelay);
-            if(event.path.includes(rmenu)){return;}
+            if(event.composedPath().includes(rmenu)){return;}
             if(rmenu.classList.contains('visible')){return;}
             event.preventDefault();
             rmenu.style.setProperty('display','');
@@ -347,7 +347,7 @@
         });
         document.body.addEventListener('click',event=>{
             clearTimeout(remenudelay);
-            if(event.path.includes(rmenu)){return;}
+            if(event.composedPath().includes(rmenu)){return;}
             rmenu.style.setProperty('display','none');
             rmenu.classList.remove('visible');
             rmenu.style.setProperty('top','-2em');
