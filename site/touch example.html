@@ -31,6 +31,10 @@
     </style>
     <script>
         class _touch_det{
+            // TODO !! formatting (variable usage/names, js-doc, etc ...
+            // TODO make individual min/max for each swipe axis (tollerance)
+            // TODO change timing for dbl-click (click→click) and hold (click→release) - fire click anyways or wait ? extra mode / param to fire click / wait for potential dbl-click
+            // TODO test: click, dbl-click, swipe-NESW, hold, hold-release, and hold-swipe-NESW
             static detect=Object.freeze({
                 1:'UP',     'UP':1,
                 2:'RIGHT',  'RIGHT':2,
@@ -48,7 +52,7 @@
              * @param {boolean} db - if dbclick should be captured (delay on click !) - _default `false`_
              * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `true`_
              */
-            constructor(el,clbk,db=false,pvdf=true){//TODO https://stackoverflow.com/a/27115070/13282166 !!!!
+            constructor(el,clbk,db=false,pvdf=true){
                 if(!(el instanceof HTMLElement)){throw new TypeError('[el] is not a html element.');}
                 if(typeof clbk!=="function"){throw new TypeError('[clbk] is not a function.');}
                 if(typeof pvdf!=="boolean"){throw new TypeError('[pvdf] is not a boolean.');}
