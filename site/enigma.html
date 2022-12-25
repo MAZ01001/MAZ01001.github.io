@@ -236,8 +236,8 @@
             color: #0F0F;
             border-radius: 10px;
         }
-        input#edit_encode_weels_num,input#edit_encode_plugs_num{
-            z-index: 25;
+        input#edit_encode_weels_num,
+        input#edit_encode_plugs_num{
             background-color: #000F;
             color: #0F0F;
             font-family: monospace;
@@ -250,7 +250,8 @@
             border-radius: 15px;
             text-align: center;
         }
-        label[for=edit_encode_weels_num],label[for=edit_encode_plugs_num],
+        label[for=edit_encode_weels_num],
+        label[for=edit_encode_plugs_num],
         div#edit_encode_machine>div[name=create_new]>div{font-size: 1.3em;}
         div#edit_encode_machine>div[name=create_new] br{
             display: block;
@@ -258,9 +259,17 @@
             line-height: 10px;
             content: "";
         }
-        input#edit_encode_weels_num:valid,input#edit_encode_plugs_num:valid{border-color: #0f0;}
-        input#edit_encode_weels_num:invalid,input#edit_encode_plugs_num:invalid{border-color: #f00;}
-        input#edit_encode_weels_num:placeholder-shown,input#edit_encode_plugs_num:placeholder-shown{border-color: currentColor;border-style: dashed;}
+        input#edit_encode_weels_num:focus,
+        input#edit_encode_plugs_num:focus{border-color: #0f0;}
+        input#edit_encode_weels_num:invalid,
+        input#edit_encode_plugs_num:invalid{border-color: #a00;}
+        input#edit_encode_weels_num:invalid:focus,
+        input#edit_encode_plugs_num:invalid:focus{border-color: #f00;}
+        input#edit_encode_weels_num:placeholder-shown,
+        input#edit_encode_plugs_num:placeholder-shown{
+            border-color: currentColor;
+            border-style: dashed;
+        }
         input[type=button]#edit_decode_copy_button,
         input[type=button]#edit_encode_create_button,
         input[type=button]#edit_encode_save_file,
@@ -271,7 +280,25 @@
             font-family: 'Times New Roman', Times, serif;
             font-size: larger;
             border-radius: 10px;
+            border: 2px outset #0a0;
         }
+        input[type=button]#edit_decode_copy_button:hover,
+        input[type=button]#edit_encode_create_button:hover,
+        input[type=button]#edit_encode_save_file:hover,
+        input[type=button]#edit_encode_abort:hover,
+        input[type=button]#edit_decode_abort:hover{background-color: #222;}
+        input[type=button]#edit_decode_copy_button:focus,
+        input[type=button]#edit_encode_create_button:focus,
+        input[type=button]#edit_encode_save_file:focus,
+        input[type=button]#edit_encode_abort:focus,
+        input[type=button]#edit_decode_abort:focus{border-color: #0f0;}
+        input[type=button]#edit_decode_copy_button:active,
+        input[type=button]#edit_encode_create_button:active,
+        input[type=button]#edit_encode_save_file:active,
+        input[type=button]#edit_encode_abort:active,
+        input[type=button]#edit_decode_abort:active{border-style: inset;}
+        input[type=file]#edit_encode_load_file:focus,
+        input[type=file]#edit_decode_load_file:focus{outline: 1px solid #f90;}
         div#loader{
             position: fixed;
             top: 0;
@@ -725,6 +752,8 @@
         function decode_unicode_2b64(str){return decodeURIComponent(atob(atob(str)).split('').map(c=>{return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join(''));}
         function event_convert_encode(){
             if (input_text.value.length<=0){return;}
+            const focusEl=document.activeElement;
+            focusEl?.blur();
             loader.style.display='';
             output_counter.innerText='('+enigma_counter.value+')';
             const prev_out = output_text.value;
@@ -737,6 +766,7 @@
                 alert('[ERROR]encoding');
                 console.log('[ERROR]encoding');
                 loader.style.display='none';
+                focusEl?.focus();
                 return false;
             }else{
                 input_text.value='';
@@ -744,11 +774,14 @@
                 output_text.select();
                 console.log('encoded ['+num_now+'->'+get_counter(enigma_system.encode_enigma.weels)+']');
                 loader.style.display='none';
+                focusEl?.focus();
                 return true;
             }
         }
         function event_convert_decode(){
             if (input_text.value.length<=0){return;}
+            const focusEl=document.activeElement;
+            focusEl?.blur();
             loader.style.display='';
             output_counter.innerText='('+enigma_counter.value+')';
             const prev_out = output_text.value;
@@ -761,6 +794,7 @@
                 alert('[ERROR]decoding');
                 console.log('[ERROR]decoding');
                 loader.style.display='none';
+                focusEl?.focus();
                 return false;
             }else{
                 input_text.value='';
@@ -768,6 +802,7 @@
                 output_text.select();
                 console.log('decoded ['+num_now+'->'+get_counter(enigma_system.decode_enigma.weels)+']');
                 loader.style.display='none';
+                focusEl?.focus();
                 return true;
             }
         }
@@ -854,6 +889,7 @@
             edit_encode_abort = document.getElementById('edit_encode_abort');
             loader = document.getElementById('loader');
             //____some menuing____
+            document.activeElement?.blur();
             loader.style.display='';
             enigma_counter.value='0';
             blurer.style.display='';
@@ -881,6 +917,7 @@
                 edit_decode_section_copy_encoding.style.display='';
                 edit_decode_section_load_file.style.display='';
                 edit_decode_section_abort.style.display='none';
+                edit_decode_copy_button.focus();
             },{once:true});
             edit_decode_abort.addEventListener('click',event=>{edit_decode_machine.style.display='none';blurer.style.display='none';});
             edit_encode_abort.addEventListener('click',event=>{edit_encode_machine.style.display='none';blurer.style.display='none';});
@@ -889,17 +926,16 @@
                 else{input_text.value=input_text.value.replace(enigma_system.decode_regexp,'');}
                 input_counter.innerText='('+input_text.value.length+')';
             });
-            output_text.addEventListener('click',event=>{output_text.select();});
             output_text.addEventListener('dblclick',event=>{
                 if(output_text.value.length>0){
                     output_text.select();
                     document.execCommand('copy');
-                    output_text.blur();
                     console.log(`copied ${toggle_en_decode.checked?'en':'de'}coding output`);
                 }
             });
             enigma_convert_button.addEventListener('click',event_convert_encode);
             toggle_en_decode.addEventListener('change',event=>{
+                document.activeElement?.blur();
                 loader.style.display='';
                 if(toggle_en_decode.checked){
                     txt_decode.style.color="#000F";txt_encode.style.color="#0F0F";
@@ -930,6 +966,7 @@
                 }
                 console.log(`switched to ${toggle_en_decode.checked?'en':'de'}coding`);
                 loader.style.display='none';
+                toggle_en_decode.focus();
             });
             switch_area.addEventListener('click',event=>{
                 if(event.target==toggle_en_decode||event.target==switch_label||event.target==switch_slider){return;}
@@ -952,17 +989,20 @@
                         edit_encode_input_chars.dispatchEvent(new Event('change',{bubbles:false}));
                         edit_encode_weels_num.dispatchEvent(new Event('input',{bubbles:false}));
                         edit_encode_plugs_num.dispatchEvent(new Event('input',{bubbles:false}));
+                        edit_encode_abort.focus();
                     }else{
                         blurer.style.display='';
                         edit_decode_machine.style.display='';
                         edit_decode_section_copy_encoding.style.display='';
                         edit_decode_section_load_file.style.display='';
                         edit_decode_section_abort.style.display='';
+                        edit_decode_abort.focus();
                     }
                 }
             });
             enigma_counter.addEventListener('click',event=>{
                 if(window.getSelection().toString().length==0){
+                    document.activeElement?.blur();
                     loader.style.display='';
                     if(toggle_en_decode.checked){
                         const old_num=get_counter(enigma_system.encode_enigma.weels);
@@ -994,9 +1034,11 @@
                         }
                     }
                     loader.style.display='none';
+                    input_text.focus();
                 }
             });
             edit_decode_copy_button.addEventListener('click',event=>{
+                document.activeElement?.blur();
                 loader.style.display='';
                 edit_decode_machine.style.display='none';
                 blurer.style.display='none';
@@ -1010,8 +1052,10 @@
                 output_counter.innerText='(0)';
                 enigma_counter.value='0';
                 loader.style.display='none';
+                input_text.focus();
             });
             edit_decode_load_file.addEventListener('change',event=>{
+                document.activeElement?.blur();
                 loader.style.display='';
                 const deode_file_reader = new FileReader();
                 deode_file_reader.addEventListener('loadend',event=>{
@@ -1027,6 +1071,7 @@
                     output_counter.innerText='(0)';
                     enigma_counter.value='0';
                     loader.style.display='none';
+                    input_text.focus();
                 });
                 if(/\.enigma$/.test(edit_decode_load_file.files[0].name)){deode_file_reader.readAsText(edit_decode_load_file.files[0],'UTF-8');}
                 else{alert("!select an enigma-machine file!");}
@@ -1058,6 +1103,7 @@
             edit_encode_plugs_num.addEventListener('blur',event=>{if(edit_encode_plugs_num.value.length<=0||+edit_encode_plugs_num.value===NaN){edit_encode_plugs_num.value='';return;}});
             edit_encode_create_button.addEventListener('click',event=>{
                 if(edit_encode_weels_num.value.length>0&&edit_encode_plugs_num.value.length>0&&edit_encode_input_chars.value.length>0){
+                    document.activeElement?.blur();
                     loader.style.display='';
                     edit_encode_machine.style.display='none';
                     blurer.style.display='none';
@@ -1070,9 +1116,11 @@
                     output_counter.innerText='(0)';
                     enigma_counter.value='0';
                     loader.style.display='none';
+                    input_text.focus();
                 }
             });
             edit_encode_load_file.addEventListener('change',event=>{
+                document.activeElement?.blur();
                 loader.style.display='';
                 const encode_file_reader = new FileReader();
                 encode_file_reader.addEventListener('loadend',event=>{
@@ -1088,22 +1136,27 @@
                     output_counter.innerText='(0)';
                     enigma_counter.value='0';
                     loader.style.display='none';
+                    input_text.focus();
                 });
                 if(/\.enigma$/.test(edit_encode_load_file.files[0].name)){encode_file_reader.readAsText(edit_encode_load_file.files[0],'UTF-8');}
                 else{alert("!select an enigma-machine file!");}
             });
             edit_encode_save_file.addEventListener('click',event=>{
+                document.activeElement?.blur();
                 loader.style.display='';
                 edit_encode_machine.style.display='none';
                 blurer.style.display='none';
                 download(encode_unicode_2b64(JSON.stringify(enigma_system.encode_enigma)),new Date().toJSON().substr(0,23).replaceAll('-','_').replace('T','-').replaceAll(':','_').replace(/\.[0-9]{3}/,'')+'-encode.enigma');
-                console.log('encoding-enigma saved');
+                console.log('encoding-enigma saved to file');
                 alert('keep it somewhere save!')
                 loader.style.display='none';
+                input_text.focus();
             });
             alert('hello there\n\nnote: this site is only client-side so take notes and save,\nbecause just a refresh and everything is gone!')
             loader.style.display='none';
+            edit_encode_create_button.focus();
         }
+        window.onbeforeunload=()=>"Are you sure? Any unsaved changes will be lost!";
     </script>
 </head>
 <body onload="start();">
@@ -1140,8 +1193,8 @@
             </div>
             <div name="load_file" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
-                <label for="edit_decode_load_file">Select save file:</label>
-                <input type="file" id="edit_decode_load_file" accept=".enigma">
+                <label for="edit_decode_load_file" title="load a previously saved enigma">Select save file:</label>
+                <input type="file" id="edit_decode_load_file" accept=".enigma" title="load a previously saved enigma">
             </div>
             <div name="abort" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
@@ -1150,26 +1203,26 @@
         </div>
         <div id="edit_encode_machine">
             <div name="save_file">
-                <label for="edit_encode_save_file">Save current to file:</label>
-                <input type="button" value="save" id="edit_encode_save_file">
+                <label for="edit_encode_save_file" title="save current enigma to a file">Save current to file:</label>
+                <input type="button" value="save" id="edit_encode_save_file" title="save current enigma to a file">
                 <hr size="2px" style="border-color:#0F0F;">
             </div>
             <div name="create_new" style="all: unset;">
-                <div>Characters:</div>
+                <div title="input any characters you whant the machine to support (no seperator - can be unicode)">Characters:</div>
                 <textarea id="edit_encode_input_chars" spellcheck="false" placeholder="new caracters - no seperator - can be unicode" title="input any characters you whant the machine to support (no seperator - can be unicode)"></textarea>
                 <br><br>
-                <label for="edit_encode_weels_num">Weels:</label>
+                <label for="edit_encode_weels_num" title="the number of weels the machine should have (used only in one direction) [1~500]">Weels:</label>
                 <input type="number" id="edit_encode_weels_num" min="0" step="1" max="500" placeholder="Weels" title="the number of weels the machine should have (used only in one direction) [1~500]">
                 <br><br>
-                <label for="edit_encode_plugs_num">Plugs:</label>
+                <label for="edit_encode_plugs_num" title="the number of plugs the machine should have [0~500]">Plugs:</label>
                 <input type="number" id="edit_encode_plugs_num" min="0" step="1" max="500" placeholder="Plugs" title="the number of plugs the machine should have [0~500]">
                 <br><br>
-                <input type="button" id="edit_encode_create_button" value="done" title="create new enigma with values above">
+                <input type="button" id="edit_encode_create_button" value="create" title="create new enigma with values above">
             </div>
             <div name="load_file" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
-                <label for="edit_encode_load_file">Select save file:</label>
-                <input type="file" id="edit_encode_load_file" accept=".enigma">
+                <label for="edit_encode_load_file" title="load a previously saved enigma">Select save file:</label>
+                <input type="file" id="edit_encode_load_file" accept=".enigma" title="load a previously saved enigma">
             </div>
             <div name="abort" style="all: unset;">
                 <hr size="2px" style="border-color:#0F0F;">
