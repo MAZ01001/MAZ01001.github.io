@@ -100,7 +100,6 @@
         div.button{display: inline;white-space: nowrap;}
         div[data-content="function_buttons"]{
             display: grid;
-            grid-auto-columns: 6;
             min-width: min-content;
             gap: .2em .1em;
         }
@@ -2888,9 +2887,9 @@
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur2"/>
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur3"/>
                             <feMerge result="blur">
-                                <feMergeNode in="blur" mode="normal"/>
-                                <feMergeNode in="blu2" mode="normal"/>
-                                <feMergeNode in="blur3" mode="normal"/>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="blu2"/>
+                                <feMergeNode in="blur3"/>
                             </feMerge>
                             <feOffset in="blur" dx="0.7" dy="0.7"/>
                         </filter>
