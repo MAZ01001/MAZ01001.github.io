@@ -64,7 +64,7 @@
         #min {left: calc(50% - 50px);}
         #max {left: calc(50% + 50px);}
     </style>
-    <script lang="javascript">
+    <script>
         let swcb = 1,
             logz = "",
             min,max;
@@ -181,7 +181,7 @@
         </tr>
     </table><br>
     <input id="min" max="9" min="0" placeholder="min" type="number" value="1"> <input id="max" max="9" min="0" placeholder="max" type="number" value="6"><br>
-    <input autofocus="true" id="b" onclick="wuerfeln(document.getElementById('min').value,document.getElementById('max').value);swcolor();" type="button" value="0">
+    <input autofocus id="b" onclick="wuerfeln(document.getElementById('min').value,document.getElementById('max').value);swcolor();" type="button" value="0">
     <!--/ #b → onblur="this.focus()" -->
 </body>
 

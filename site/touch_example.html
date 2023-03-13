@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="[MAZ01001.github.io] example for recognizing different touch events">
     <meta name="author" content="MAZ01001">
     <link rel="shortcut icon" href="../img/icon.svg">
     <title>test mobile touch</title>
-    </head>
     <style>
         :root{--col:#000;}
         body{
@@ -47,11 +46,11 @@
             static dbclick_delay=400;//// ~200-500 ms ; or faster (two short touches) "visible delay" because it waits a bit for possible dbclick !
             static hold_delay=650;//// ~650-700 ms ; or longer (one long touch)
             /**
-             * @param {HTMLElement} el - html element
-             * @param {(this:_touch_det,type:number,timeStamp:number)=>void} clbk - callback function - use `_touch_det.detect[type]` to get the string equivalent
-             * @param {boolean} db - if dbclick should be captured (delay on click !) - _default `false`_
-             * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `true`_
-             */
+            * @param {HTMLElement} el - html element
+            * @param {(this:_touch_det,type:number,timeStamp:number)=>void} clbk - callback function - use `_touch_det.detect[type]` to get the string equivalent
+            * @param {boolean} db - if dbclick should be captured (delay on click !) - _default `false`_
+            * @param {boolean} pvdf - if `true` prevents default behavior on touch event listeners - _default `true`_
+            */
             constructor(el,clbk,db=false,pvdf=true){
                 if(!(el instanceof HTMLElement)){throw new TypeError('[el] is not a html element.');}
                 if(typeof clbk!=="function"){throw new TypeError('[clbk] is not a function.');}
@@ -160,21 +159,22 @@
             }
         };
     </script>
-    <body>
-        <div id="t">TOUCH<br>HERE</div>
-        <script>
-            let i=0,last=0;
-            const _t=document.getElementById("t"),
-                getColor=x=>{switch(x){case 1:return'#f90';case 2:return'#0f0';default:i=1;return getColor(i);}};
-                fnk=(type,time)=>{
-                    document.querySelector(':root').style.setProperty('--col',getColor(last===type?++i:i));
-                    _t.innerHTML=_touch_det.detect[type]+'<br><small>(@'+(time^0)/1000+'sec)</small>';
-                    console.log(_touch_det.detect[type],time);
-                    last=type;
-                };
-            let _t_touch=new _touch_det(_t,fnk,true);////dbclick now optional
-            // _t_touch.remove_det();delete _t_touch;
-            alert('there is a small delay for "click"\n    because it waits for a potential "dbclick"!\nno multi-touch!');
-        </script>
-    </body>
+</head>
+<body>
+    <div id="t">TOUCH<br>HERE</div>
+    <script>
+        let i=0,last=0;
+        const _t=document.getElementById("t"),
+            getColor=x=>{switch(x){case 1:return'#f90';case 2:return'#0f0';default:i=1;return getColor(i);}};
+            fnk=(type,time)=>{
+                document.querySelector(':root').style.setProperty('--col',getColor(last===type?++i:i));
+                _t.innerHTML=_touch_det.detect[type]+'<br><small>(@'+(time^0)/1000+'sec)</small>';
+                console.log(_touch_det.detect[type],time);
+                last=type;
+            };
+        let _t_touch=new _touch_det(_t,fnk,true);////dbclick now optional
+        // _t_touch.remove_det();delete _t_touch;
+        alert('there is a small delay for "click"\n    because it waits for a potential "dbclick"!\nno multi-touch!');
+    </script>
+</body>
 </html>

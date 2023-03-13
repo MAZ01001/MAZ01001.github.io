@@ -58,8 +58,6 @@
         color[type="debug"],tr#sbug input[type="text"]{color:var(--cdebug);}
         div#rmenu table tr td>table{border-collapse:collapse;}
         div#rmenu table tr td{vertical-align:top;}
-        div#rmenu table h1,
-        div#rmenu table h2{margin:0;text-decoration:underline;}
         .bleft{border-left:1px solid #000}
         .bright{border-right:1px solid #000;}
         .btop{border-top:1px solid #000;}
@@ -818,11 +816,11 @@
     <div id="play" class="addContext">Loading...</div>
     <div id="rmenu">
         <table title="Set game settings">
-            <tr><th colspan="2"><h1>&nbsp;&nbsp;&nbsp;&nbsp;Settings&nbsp;&nbsp;&nbsp;&nbsp;</h1></th></tr>
+            <tr><th colspan="2" style="margin:0;text-decoration:underline;font-size:xx-large;">&nbsp;&nbsp;&nbsp;&nbsp;Settings&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>
             <tr>
                 <td>
                     <table title="Set extra game settings and modes">
-                        <tr><th colspan="2"><h2>&nbsp;Extras:&nbsp;</h2></th></tr>
+                        <tr><th colspan="2" style="margin:0;text-decoration:underline;font-size:x-large;">&nbsp;Extras:&nbsp;</th></tr>
                         <tr title="Set speed in milliseconds between each frame/tick. (! resets !)">
                             <td class="bleft btop"><label for="exs">Speed:</label></td>
                             <td class="bright btop"><input type="number" id="exs" min="0.00" max="1000.00" step="0.01"></td>
@@ -854,7 +852,7 @@
                             <td class="bleft bbottom"><label for="exb">Debug:</label></td>
                             <td class="bright bbottom"><input type="checkbox" id="exb"></td>
                         </tr>
-                        <tr title="Enables god mode. (! resets !)" id="exgodmode" hidden="true">
+                        <tr title="Enables god mode. (! resets !)" id="exgodmode" hidden>
                             <td class="bleft bbottom"><label for="exgm">God Mode:</label></td>
                             <td class="bright bbottom"><input type="checkbox" id="exgm"></td>
                         </tr>
@@ -862,7 +860,7 @@
                 </td>
                 <td>
                     <table id="ctbl" title="Set Color of symbols">
-                        <tr><th colspan="2"><h2>&nbsp;Colors:&nbsp;</h2></th></tr>
+                        <tr><th colspan="2" style="margin:0;text-decoration:underline;font-size:x-large;">&nbsp;Colors:&nbsp;</th></tr>
                         <tr title="Set the color of the snake head symbol.">
                             <td class="bleft btop"><label for="chead">Snake-Head:</label></td>
                             <td class="bright btop"><input type="color" id="chead"></td>
@@ -875,7 +873,7 @@
                             <td class="bleft"><label for="cfruit">Fruit:</label></td>
                             <td class="bright"><input type="color" id="cfruit"></td>
                         </tr>
-                        <tr title="Set the color of the border symbols." id="cborder">
+                        <tr title="Set the color of the border symbols." id="cborder_row">
                             <td class="bleft bbottom"><label for="cborder">Border:</label></td>
                             <td class="bright bbottom"><input type="color" id="cborder"></td>
                         </tr>
@@ -889,7 +887,7 @@
             <tr>
                 <td colspan="2">
                     <table style="width:100%;" title="Set symbols | can be unicode | use unique symbols in each row and for head/tail/fruit(/debug) to each other">
-                        <tr><th colspan="6"><h2>&nbsp;Symbols:&nbsp;</h2></th></tr>
+                        <tr><th colspan="6" style="margin:0;text-decoration:underline;font-size:x-large;">&nbsp;Symbols:&nbsp;</th></tr>
                         <tr id="shead">
                             <td class="btop bleft"><label>Snake head:</label></td>
                             <td class="btop"><input type="text" id="shs" title="STOP" maxlength="1" size="1"></td>
@@ -1051,8 +1049,8 @@
             +"document.getElementById('cbug').hidden=!this.checked;"
             +"document.getElementById('sbug').hidden=!this.checked;"
             +"document.getElementById('exgodmode').hidden=!this.checked;"
-            +"if(this.checked){Array.from(document.body.querySelectorAll('tr#cborder td,tr#sborder td,tr#exbug td')).forEach(v=>v.classList.remove('bbottom'));}"
-            +"else{Array.from(document.body.querySelectorAll('tr#cborder td,tr#sborder td,tr#exbug td')).forEach(v=>v.classList.add('bbottom'));}"
+            +"if(this.checked){Array.from(document.body.querySelectorAll('tr#cborder_row td,tr#sborder td,tr#exbug td')).forEach(v=>v.classList.remove('bbottom'));}"
+            +"else{Array.from(document.body.querySelectorAll('tr#cborder_row td,tr#sborder td,tr#exbug td')).forEach(v=>v.classList.add('bbottom'));}"
         );
         document.getElementById('exgm').checked=game.godMode;
         document.getElementById('exgm').setAttribute(

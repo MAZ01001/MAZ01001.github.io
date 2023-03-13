@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="../img/icon.svg">
     <title>Context menu example</title>
     <style>
+        /* test area styling */
         body{
             background-color: #aaa;
             height: 200vh;
@@ -24,6 +25,35 @@
             top: 100vh;
             left: 100vw;
         }
+        /* context menu styling */
+        div#rmenu{
+            --top: -2rem;
+            --left: -2rem;
+            --translate_ho: -100%;
+            --translate_ve: -100%;
+            opacity: 0;
+            visibility: hidden;
+            position: fixed;
+            top: var(--top);
+            left: var(--left);
+            transform: translate(var(--translate_ho),var(--translate_ve));
+            max-width: max-content;
+            max-height: 100vh;
+            overflow: overlay;
+            transition: opacity 500ms ease-in 500ms,
+                        visibility 0s linear 1s;
+            border: 10px solid black;
+            background: #000F;
+            color: #0F0F;
+            height: fit-content;
+            width: fit-content;
+        }
+        div#rmenu.visible{
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0s linear 0s,
+                        visibility 0s linear 0s;
+        }
     </style>
 </head>
 <body>
@@ -33,68 +63,39 @@
             <h1>test test test test test test</h1>
             <br><br><br><br><br><h2>big</h2>
         </div>
-        <style>
-            div#rmenu{
-                --top: -2rem;
-                --left: -2rem;
-                --translate_ho: -100%;
-                --translate_ve: -100%;
-                opacity: 0;
-                visibility: hidden;
-                position: fixed;
-                top: var(--top);
-                left: var(--left);
-                transform: translate(var(--translate_ho),var(--translate_ve));
-                max-width: max-content;
-                max-height: 100vh;
-                overflow: overlay;
-                transition: opacity 500ms ease-in 500ms,
-                    visibility 0s linear 1s;
-                border: 10px solid black;
-                background: #000F;
-                color: #0F0F;
-                height: fit-content;
-                width: fit-content;
-            }
-            div#rmenu.visible{
-                opacity: 1;
-                visibility: visible;
-                transition: opacity 0s linear 0s,
-                    visibility 0s linear 0s;
-            }
-        </style>
-        <script>
-            const rmenu=document.getElementById('rmenu'),
-                rmenu_position=
-                /** @param {number} screenX @param {number} screenY */
-                (screenX,screenY)=>{
-                    const top=screenY,
-                        left=screenX,
-                        {height,width}=rmenu.getBoundingClientRect();
-                    rmenu.style.setProperty('--top',top+'px');
-                    rmenu.style.setProperty('--left',left+'px');
-                    if(
-                        width>(window.innerWidth-left)
-                        &&left>(window.innerWidth-left)
-                    )rmenu.style.setProperty('--translate_ho','-100%');
-                    else rmenu.style.setProperty('--translate_ho','0');
-                    if(height>(window.innerHeight-top)){
-                        if(height>window.innerHeight)rmenu.style.setProperty('--translate_ve',`-${top}px`);
-                        else rmenu.style.setProperty('--translate_ve',`-${height-(window.innerHeight-top)}px`);
-                    }else rmenu.style.setProperty('--translate_ve','0');
-                };
-            document.body.addEventListener('resize',()=>rmenu.classList.remove('visible'),{passive:true});
-            document.body.addEventListener('contextmenu',event=>{
-                if(!event.target.classList.contains('contextmenu_rmenu'))return;
-                if(event.composedPath().includes(rmenu))return;
-                event.preventDefault();
-                rmenu_position(event.clientX,event.clientY);
-                //// rmenu_position(event.pageX-window.pageXOffset,event.pageY-window.pageYOffset);
-                rmenu.classList.add('visible');
-            },{passive:false});
-            rmenu.addEventListener('mouseleave',()=>rmenu.classList.remove('visible'),{passive:true});
-            rmenu.addEventListener('mouseover',()=>rmenu.classList.add('visible'),{passive:true});
-        </script>
     </div>
+    <script>
+        // context menu scripting
+        const rmenu=document.getElementById('rmenu'),
+            rmenu_position=
+            /** @param {number} screenX @param {number} screenY */
+            (screenX,screenY)=>{
+                const top=screenY,
+                    left=screenX,
+                    {height,width}=rmenu.getBoundingClientRect();
+                rmenu.style.setProperty('--top',top+'px');
+                rmenu.style.setProperty('--left',left+'px');
+                if(
+                    width>(window.innerWidth-left)
+                    &&left>(window.innerWidth-left)
+                )rmenu.style.setProperty('--translate_ho','-100%');
+                else rmenu.style.setProperty('--translate_ho','0');
+                if(height>(window.innerHeight-top)){
+                    if(height>window.innerHeight)rmenu.style.setProperty('--translate_ve',`-${top}px`);
+                    else rmenu.style.setProperty('--translate_ve',`-${height-(window.innerHeight-top)}px`);
+                }else rmenu.style.setProperty('--translate_ve','0');
+            };
+        document.body.addEventListener('resize',()=>rmenu.classList.remove('visible'),{passive:true});
+        document.body.addEventListener('contextmenu',event=>{
+            if(!event.target.classList.contains('contextmenu_rmenu'))return;
+            if(event.composedPath().includes(rmenu))return;
+            event.preventDefault();
+            rmenu_position(event.clientX,event.clientY);
+            //// rmenu_position(event.pageX-window.pageXOffset,event.pageY-window.pageYOffset);
+            rmenu.classList.add('visible');
+        },{passive:false});
+        rmenu.addEventListener('mouseleave',()=>rmenu.classList.remove('visible'),{passive:true});
+        rmenu.addEventListener('mouseover',()=>rmenu.classList.add('visible'),{passive:true});
+    </script>
 </body>
 </html>
