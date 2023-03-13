@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-16">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="[MAZ01001.github.io] Automatic error correction with Hamming codes - self-correcting text">
     <meta name="author" content="MAZ01001">
@@ -286,7 +286,7 @@
                         {
                             regByte.innerHTML="";
                             for (let i = 0; i < clog.length; i++) {
-                                if (i==0) regByte.innerHTML+=`\n<option selected="true" value="0">Byte[0]</option>`;
+                                if (i==0) regByte.innerHTML+=`\n<option selected value="0">Byte[0]</option>`;
                                 else regByte.innerHTML+=`\n<option value="${i}">Byte[${i}]</option>`;
                             }
                             let tmp4={"h_encode":clog[regByte.value].h_encode,"h_decode":clog[regByte.value].h_decode,"errFlip":clog[regByte.value].errFlip},
@@ -411,7 +411,7 @@
     <div id="content">
         <h1><select id="method">
             <option selected value="hamming">Hamming</option>
-            <option disabled value="">WIP</option>
+            <option disabled>WIP</option>
         </select> error correction codes</h1><br>
         <div id="useTxtBlock">use ASCII text<input type="checkbox" id="useTxt"></div>
         <div id="byteSizeBlock">byte size <select id="byteSize">
@@ -421,7 +421,7 @@
             <option value="16">16-bit</option>
             <option value="32">32-bit</option>
         </select></div>
-        <div id="txtInBlock" class="txt" hidden="true">
+        <div id="txtInBlock" class="txt" hidden>
             Text input (sender)<br>
             <input type="text" spellcheck="true" id="txtIn" placeholder="input ascii text"><br>
             &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;
@@ -437,12 +437,12 @@
         </div>
         <div id="rerunBlock"><input type="button" id="rerun" value="R U N"></div>
         <div id="bitErrNoteBlock">
-            <textarea rows="2" readonly="true" id="bitErrNote" placeholder="error note"></textarea>
+            <textarea rows="2" readonly id="bitErrNote" placeholder="error note"></textarea>
         </div>
         <!-- maybe add custom bit errors (in far future) -->
         <div id="regBlock">
             <select id="regByte">
-                <option selected="true" disabled="true" value="">Byte</option>
+                <option selected disabled>Byte</option>
             </select>
             <div id="reg"><div style="color: #555;">shows selected encoded byte and highlights errors</div></div>
         </div>
@@ -450,11 +450,11 @@
         <div id="bitOutBlock" class="bit">
             &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;<br>
             Binary Output (receiver)<br>
-            <textarea id="bitOut" readonly="true" placeholder="binary output"></textarea>
+            <textarea id="bitOut" readonly placeholder="binary output"></textarea>
         </div>
-        <div id="txtOutBlock" class="txt" hidden="true">
+        <div id="txtOutBlock" class="txt" hidden>
             &darr;&darr;&darr;&darr;&darr;&darr;&darr;&darr;<br>
-            <input type="text" id="txtOut" readonly="true" placeholder="output ascii text"><br>
+            <input type="text" id="txtOut" readonly placeholder="output ascii text"><br>
             Text output (receiver)
         </div>
     </div>
