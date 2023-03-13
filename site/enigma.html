@@ -9,7 +9,7 @@
 +   \_| |_/\____/\_____/\_____/\___/     \_/ \_| |_/\____/\_| \_\____/
 -->
 <head>
-    <meta charset="UTF-16">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="[MAZ01001.github.io] Enigma machine encoder and decoder in HTML, JavaScript, and CSS">
     <meta name="author" content="MAZ01001">
@@ -72,18 +72,17 @@
         input#enigma_counter:hover{background-color: #333F;color: #0F0F;}
         div#switch{
             display: flex;
-            flex-direction: row;
-            flex-flow: nowrap;
+            flex-flow: row nowrap;
             justify-content: space-between;
             align-items: center;
             width: 222px;
             margin: 5px auto auto;
             user-select: none;
         }
-        div#switch>txt#txt_decode{order: 1;transition: .4s;color: #000F;padding:0 8px}
+        div#switch>span#txt_decode{order: 1;transition: .4s;color: #000F;padding:0 8px}
         div#switch>label{order: 2;}
-        div#switch>txt#txt_encode{order: 3;transition: .4s;color: #0F0F;padding:0 8px}
-        div#switch txt{
+        div#switch>span#txt_encode{order: 3;transition: .4s;color: #0F0F;padding:0 8px}
+        div#switch span:not(.slider){
             cursor: default;
             border: 1px solid black;
             border-radius: 10px;
@@ -252,8 +251,8 @@
         }
         label[for=edit_encode_weels_num],
         label[for=edit_encode_plugs_num],
-        div#edit_encode_machine>div[name=create_new]>div{font-size: 1.3em;}
-        div#edit_encode_machine>div[name=create_new] br{
+        div#edit_encode_section_create_new>div{font-size: 1.3em;}
+        div#edit_encode_section_create_new br{
             display: block;
             margin-top: 10px;
             line-height: 10px;
@@ -869,23 +868,23 @@
             output_text = document.getElementById('output_text');
             blurer = document.getElementById('blurer');
             edit_decode_machine = document.getElementById('edit_decode_machine');
-            edit_decode_section_copy_encoding = document.getElementById('edit_decode_machine').querySelector('div[name=copy_encoding]');
+            edit_decode_section_copy_encoding = document.getElementById('edit_decode_section_copy_encoding');
             edit_decode_copy_button = document.getElementById('edit_decode_copy_button');
-            edit_decode_section_load_file = document.getElementById('edit_decode_machine').querySelector('div[name=load_file]');
+            edit_decode_section_load_file = document.getElementById('edit_decode_section_load_file');
             edit_decode_load_file = document.getElementById('edit_decode_load_file');
-            edit_decode_section_abort = document.getElementById('edit_decode_machine').querySelector('div[name=abort]');
+            edit_decode_section_abort = document.getElementById('edit_decode_section_abort');
             edit_decode_abort = document.getElementById('edit_decode_abort');
             edit_encode_machine = document.getElementById('edit_encode_machine');
-            edit_encode_section_save_file = document.getElementById('edit_encode_machine').querySelector('div[name=save_file]');
+            edit_encode_section_save_file = document.getElementById('edit_encode_section_save_file');
             edit_encode_save_file = document.getElementById('edit_encode_save_file');
-            edit_encode_section_create_new = document.getElementById('edit_encode_machine').querySelector('div[name=create_new]');
+            edit_encode_section_create_new = document.getElementById('edit_encode_section_create_new');
             edit_encode_input_chars = document.getElementById('edit_encode_input_chars');
             edit_encode_weels_num = document.getElementById('edit_encode_weels_num');
             edit_encode_plugs_num = document.getElementById('edit_encode_plugs_num');
             edit_encode_create_button = document.getElementById('edit_encode_create_button');
-            edit_encode_section_load_file = document.getElementById('edit_encode_machine').querySelector('div[name=load_file]');
+            edit_encode_section_load_file = document.getElementById('edit_encode_section_load_file');
             edit_encode_load_file = document.getElementById('edit_encode_load_file');
-            edit_encode_section_abort = document.getElementById('edit_encode_machine').querySelector('div[name=abort]');
+            edit_encode_section_abort = document.getElementById('edit_encode_section_abort');
             edit_encode_abort = document.getElementById('edit_encode_abort');
             loader = document.getElementById('loader');
             //____some menuing____
@@ -1165,12 +1164,12 @@
         <br><br>
         <div id="enigma_info">(1weels and 0plugs)</div>
         <br>
-        <input id="enigma_counter" type="number" min="0" step="1" readonly="true" title="turn counter of the enigma machine">
+        <input id="enigma_counter" type="number" min="0" step="1" readonly title="turn counter of the enigma machine">
         <br>
         <div id="switch">
-            <txt id="txt_decode">Decode</txt>
-            <label class="switch"><input type="checkbox" checked="true" id="toggle_en_decode"><span class="slider"></span></label>
-            <txt id="txt_encode">Encode</txt>
+            <span id="txt_decode">Decode</span>
+            <label class="switch"><input type="checkbox" checked id="toggle_en_decode"><span class="slider"></span></label>
+            <span id="txt_encode">Encode</span>
         </div>
         <br>
         <div id="conversion">
@@ -1181,33 +1180,33 @@
             <input type="button" id="enigma_convert_button" value="▶">
             <div id="output">
                 <div id="output_counter">(0)</div>
-                <textarea id="output_text" maxlength="1000" style="white-space: pre-wrap;" readonly="true" placeholder="output text" title="click to copy"></textarea>
+                <textarea id="output_text" maxlength="1000" style="white-space: pre-wrap;" readonly placeholder="output text" title="click to copy"></textarea>
             </div>
         </div>
     </div>
     <div id="blurer">
         <div id="edit_decode_machine">
-            <div name="copy_encoding" style="all: unset;">
+            <div id="edit_decode_section_copy_encoding" style="all:unset;">
                 <input type="button" id="edit_decode_copy_button" value="mirror encoding" title="copy the encoding-enigma">
-                <hr size="2px" style="border-color:#0F0F;">
+                <hr style="height:2px;border:none;background-color:#0F0F;">
             </div>
-            <div name="load_file" style="all: unset;">
-                <hr size="2px" style="border-color:#0F0F;">
+            <div id="edit_decode_section_load_file" style="all:unset;">
+                <hr style="height:2px;border:none;background-color:#0F0F;">
                 <label for="edit_decode_load_file" title="load a previously saved enigma">Select save file:</label>
                 <input type="file" id="edit_decode_load_file" accept=".enigma" title="load a previously saved enigma">
             </div>
-            <div name="abort" style="all: unset;">
-                <hr size="2px" style="border-color:#0F0F;">
+            <div id="edit_decode_section_abort" style="all:unset;">
+                <hr style="height:2px;border:none;background-color:#0F0F;">
                 <input type="button" value="abort" id="edit_decode_abort" title="go back without changes">
             </div>
         </div>
         <div id="edit_encode_machine">
-            <div name="save_file">
+            <div id="edit_encode_section_save_file">
                 <label for="edit_encode_save_file" title="save current enigma to a file">Save current to file:</label>
                 <input type="button" value="save" id="edit_encode_save_file" title="save current enigma to a file">
-                <hr size="2px" style="border-color:#0F0F;">
+                <hr style="height:2px;border:none;background-color:#0F0F;">
             </div>
-            <div name="create_new" style="all: unset;">
+            <div id="edit_encode_section_create_new" style="all:unset;">
                 <div title="input any characters you whant the machine to support (no seperator - can be unicode)">Characters:</div>
                 <textarea id="edit_encode_input_chars" spellcheck="false" placeholder="new caracters - no seperator - can be unicode" title="input any characters you whant the machine to support (no seperator - can be unicode)"></textarea>
                 <br><br>
@@ -1219,13 +1218,13 @@
                 <br><br>
                 <input type="button" id="edit_encode_create_button" value="create" title="create new enigma with values above">
             </div>
-            <div name="load_file" style="all: unset;">
-                <hr size="2px" style="border-color:#0F0F;">
+            <div id="edit_encode_section_load_file" style="all:unset;">
+                <hr style="height:2px;border:none;background-color:#0F0F;">
                 <label for="edit_encode_load_file" title="load a previously saved enigma">Select save file:</label>
                 <input type="file" id="edit_encode_load_file" accept=".enigma" title="load a previously saved enigma">
             </div>
-            <div name="abort" style="all: unset;">
-                <hr size="2px" style="border-color:#0F0F;">
+            <div id="edit_encode_section_abort" style="all:unset;">
+                <hr style="height:2px;border:none;background-color:#0F0F;">
                 <input type="button" value="abort" id="edit_encode_abort" title="go back without changes">
             </div>
         </div>
@@ -1243,9 +1242,9 @@
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur2"/>
                             <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur3"/>
                             <feMerge result="blur">
-                                <feMergeNode in="blur" mode="normal"/>
-                                <feMergeNode in="blu2" mode="normal"/>
-                                <feMergeNode in="blur3" mode="normal"/>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="blu2"/>
+                                <feMergeNode in="blur3"/>
                             </feMerge>
                             <feOffset in="blur" dx="0.7" dy="0.7"/>
                         </filter>
