@@ -1,7 +1,7 @@
 # MAZ01001.github.io
 
 >
-> my git [website](https://maz01001.github.io/) with random HTML/JS/CSS single-pages (for offline use)
+> my git [website](https://maz01001.github.io/ "https://MAZ01001.GitHub.io/") with random HTML/JS/CSS single-pages (for offline use)
 > made for pc/chrome browser
 >
 
@@ -23,38 +23,62 @@
 
 ----
 
-## [Unofficial Satisfactory U3 Flow Chart](./site/flowchart/index.html)
+## [Unofficial Satisfactory U3 Flow Chart](./site/satisfactory_u3_flowchart.html "view the source code")
 
-- interactive flow chart for the 3rd Update of [SATISFACTORY](https://www.satisfactorygame.com/)
+>
+> [view the live webpage](https://maz01001.github.io/site/satisfactory_u3_flowchart.html "open https://maz01001.github.io/site/satisfactory_u3_flowchart.html")
+>
 
-## [Ball Screensaver](./site/canvas%20ball.html)
+- interactive flow chart for the 3rd Update of [SATISFACTORY](https://www.satisfactorygame.com/ "official game website")
+
+## [Ball Screensaver](./site/canvas_ball.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/canvas_ball.html "open https://maz01001.github.io/site/canvas_ball.html")
+>
 
 - a ball that bounces back from the walls and fades through colors
-- made with [P5.js](https://p5js.org/)
+- made with [P5.js](https://p5js.org/ "official P5.js website")
 - shows fps counter
 
-## [Small Dice](./site/dice.html)
+## [Small Dice](./site/dice.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/dice.html "open https://maz01001.github.io/site/dice.html")
+>
 
 - dice for random numbers
 - choose min/max number of eyes (0-9)
 - left-click on dice for stats
 - uses `Math.random()` for random numbers - colors button differently for each new number ('cause sometimes the same number is generated multiple times in a row)
 
-## [Pascal's Triangle](./site/pascal's%20triangle.html)
+## [Pascal's Triangle](./site/pascals_triangle.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/pascals_triangle.html "open https://maz01001.github.io/site/pascals_triangle.html")
+>
 
 - choose the number of rows to generate
 
-## [Math Function Drawer](./site/math%20function%20drawer.html)
+## [Math Function Drawer](./site/math_function_drawer.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/math_function_drawer.html "open https://maz01001.github.io/site/math_function_drawer.html")
+>
 
 - use sliders(show sliders button on the right) to set the coefficients
 - scroll or use sliders(top & left) to set scale (zoom)
 - render own polynomial (check the checkbox top-left and enter your coefficients)
 - shows fps counter
 
-## [Error Correction Codes](./site/code%20error%20correction.html)
+## [Error Correction Codes](./site/code_error_correction.html "view the source code")
 
-- made from a [3Blue1Brown video](https://youtu.be/X8jsijhllIA)
-  - also see [Ben Eater's video](https://youtu.be/h0jloehRKas)
+>
+> [view the live webpage](https://maz01001.github.io/site/code_error_correction.html "open https://maz01001.github.io/site/code_error_correction.html")
+>
+
+- made from a [3Blue1Brown video](https://youtu.be/X8jsijhllIA "How to send a self-correcting message (Hamming codes)")
+  - also see [Ben Eater's video](https://youtu.be/h0jloehRKas "What is error correction? Hamming codes in hardware")
   - another very good page on [Harry Li's github](https://harryli0088.github.io/hamming-code/)
   - and of course in Minecraft by ["processAutomation" r/3Blue1Brown post](https://www.reddit.com/r/3Blue1Brown/comments/iochkl/)
 - binary input
@@ -63,7 +87,11 @@
 - input/output text (Unicode supported)
 - set byte size (if not auto, fill to length or remove if Unicode-char needs more bits)
 
-## [Enigma](./site/enigma.html)
+## [Enigma](./site/enigma.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/enigma.html "open https://maz01001.github.io/site/enigma.html")
+>
 
 - almost like the real thing ft. loading screen
 - create enigma for encoding
@@ -78,7 +106,11 @@
 - set custom turning number
 - auto "turn" on every character that is encoded, one after another
 
-## [Vector Field](./site/vector_field.html)
+## [Vector Field](./site/vector_field.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/vector_field.html "open https://maz01001.github.io/site/vector_field.html")
+>
 
 - vector objects
 - default points to mouse
@@ -89,36 +121,60 @@
   - scroll to make arrows larger
   - left-click/hold to hide cross with coordinates
 - shows fps counter
-- made with [P5.js](https://p5js.org/)
+- made with [P5.js](https://p5js.org/ "official P5.js website")
 
-## [ASCII Snake](./site/snake.html)
+## [ASCII Snake](./site/snake.html "view the source code")
 
-- snake game in ascii style ([port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp))
+>
+> [view the live webpage](https://maz01001.github.io/site/snake.html "open https://maz01001.github.io/site/snake.html")
+>
+
+- snake game in ascii style ([port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp "snake_cmd-game.cpp ducumentation in the other-projects/README.md"))
 - right-click for more options
 
-## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html)
+## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/BigIntType_calc.html "open https://maz01001.github.io/site/BigIntType_calc.html")
+>
 
 - Calculator for arbitrary-length-integers
-- see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js#biginttypejs) for more description
+- see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js#biginttypejs "BigIntType.js documentation in the Math-js/README.md") for a detailed description
 
 ----
 
 ## _hidden_
 
-### [Context menu example](./site/context%20menu%20example.html)
+### [Context menu example](./site/context_menu_example.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/context_menu_example.html "open https://maz01001.github.io/site/context_menu_example.html")
+>
 
 - example of a custom context menu using HTML/JS/CSS
 
-### [4 PI-Day 2021](./site/pi-day_2021.html)
+### [4 PI-Day 2021](./site/pi-day_2021.html "view the source code")
 
-- made from a [Coding Train coding-challenge video](https://youtu.be/EvS_a921dBo)
-- estimates PI with the [gcd](https://en.wikipedia.org/wiki/Greatest_common_divisor) of 100000 numbers
+>
+> [view the live webpage](https://maz01001.github.io/site/pi-day_2021.html "open https://maz01001.github.io/site/pi-day_2021.html")
+>
+
+- made from a [Coding Train coding-challenge video](https://youtu.be/EvS_a921dBo "Coding Challenge 161: Estimating π from Random Numbers with Euclid's Algorithm")
+- estimates PI with the [GCD](https://en.wikipedia.org/wiki/Greatest_common_divisor "Wikipedia: Greatest common divisor") of 100000 numbers
 - left-click to pause
 
-### [Touch example](./site/touch%20example.html)
+### [Touch example](./site/touch_example.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/touch_example.html "open https://maz01001.github.io/site/touch_example.html")
+>
 
 - example for detecting touch (not the best detection)
 
-### [3D-Card example](./site/3d-card%20example.html)
+### [3D-Card example](./site/3d-card_example.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/3d-card_example.html "open https://maz01001.github.io/site/3d-card_example.html")
+>
 
 - example of a 3d-card effect with HTML/JS/CSS
