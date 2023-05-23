@@ -3033,6 +3033,23 @@
         }
         /**__updates every value in `_NUMBERS.mem` on screen__*/
         function _update_mem_ui(){for(let i=0;i<_NUMBERS.mem.length;i++)document.getElementById(`mem_slot_${i}`).value=_NUMBERS.mem[i].toString(_CURRENT_BASE);}
+        /**
+         * __get the total memory used by all the saved `BigIntType` numbers just existing__
+         * @returns {BigInt} the number of Bytes used up by all `BigIntType` numbers
+         */
+        function _get_total_memory(){
+            let byteSize=0n;
+            byteSize+=BigInt(_NUMBERS.a.length);
+            byteSize+=BigInt(_NUMBERS.b.length);
+            byteSize+=BigInt(_NUMBERS.map.max1.length);
+            byteSize+=BigInt(_NUMBERS.map.max2.length);
+            byteSize+=BigInt(_NUMBERS.map.min1.length);
+            byteSize+=BigInt(_NUMBERS.map.min2.length);
+            for(const num of _NUMBERS.mem)byteSize+=BigInt(num.length);
+            byteSize+=BigInt(_NUMBERS.rand.max.length);
+            byteSize+=BigInt(_NUMBERS.rand.min.length);
+            return byteSize;
+        }
     </script>
 </head>
 <body>
