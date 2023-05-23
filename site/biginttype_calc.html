@@ -2863,7 +2863,10 @@
                         case"Amapmin2":_NUMBERS.map.min2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
                         case"Amapmax2":_NUMBERS.map.max2.setEqualTo(new BigIntType(element.value,_CURRENT_BASE));break;
                     }
-                    if(element.id==="number_a"||element.id==="number_b"){_stats_AtB_();}
+                    if(element.id==="number_a"||element.id==="number_b"){
+                        _stats_AtB_();
+                        _update_to_url();
+                    }
                 }catch(error){
                     console.error(error);
                     _error_html(`{InputError} reseted number entered because it was to large\ninput:\n${element.value}`);
@@ -2919,11 +2922,85 @@
         function _promise_finally(){
             loader.classList.add("hid");
             _stats_AtB_();
+            _update_to_url();
         }
-        // TODO load A B from url - use toURL and fromURL
-        // TODO → window.location.hash;//~ Returns the Location object's URL's fragment (includes leading "#" if non-empty).
-        // TODO → window.location.search;//~ Returns the Location object's URL's query (includes leading "?" if non-empty).
-        // TODO functions for _NUMBERS.mem;
+        /**
+         * __parses a number from uri component__
+         * @param {string} uri - uri component - an empty string results in +0
+         * @param {number} minMemory - min memory for `BigIntType.MAX_SIZE`
+         * @returns {Error|BigIntType} - an error or the number
+         */
+        function _parse_uri_number(uri,minMemory=0x1F4){
+            if(uri==="")return BigIntType.Zero;
+            BigIntType.MAX_SIZE=0x4000000;
+            let number;
+            try{number=BigIntType.fromURL(uri);}
+            catch(e){return e;}
+            switch(true){
+                case 0x1F4>=minMemory&&number.length<=0x1F4:BigIntType.MAX_SIZE=0x1F4;break;
+                case 0x3E8>=minMemory&&number.length<=0x3E8:BigIntType.MAX_SIZE=0x3E8;break;
+                case 0x1388>=minMemory&&number.length<=0x1388:BigIntType.MAX_SIZE=0x1388;break;
+                case 0x2710>=minMemory&&number.length<=0x2710:BigIntType.MAX_SIZE=0x2710;break;
+                case 0xC350>=minMemory&&number.length<=0xC350:BigIntType.MAX_SIZE=0xC350;break;
+                case 0x186A0>=minMemory&&number.length<=0x186A0:BigIntType.MAX_SIZE=0x186A0;break;
+                case 0x7A120>=minMemory&&number.length<=0x7A120:BigIntType.MAX_SIZE=0x7A120;break;
+                case 0xF4240>=minMemory&&number.length<=0xF4240:BigIntType.MAX_SIZE=0xF4240;break;
+                case 0x100000>=minMemory&&number.length<=0x100000:BigIntType.MAX_SIZE=0x100000;break;
+                case 0x989680>=minMemory&&number.length<=0x989680:BigIntType.MAX_SIZE=0x989680;break;
+                case 0x1000000>=minMemory&&number.length<=0x1000000:BigIntType.MAX_SIZE=0x1000000;break;
+                case 0x1312D00>=minMemory&&number.length<=0x1312D00:BigIntType.MAX_SIZE=0x1312D00;break;
+                case 0x2000000>=minMemory&&number.length<=0x2000000:BigIntType.MAX_SIZE=0x2000000;break;
+                case 0x2FAF080>=minMemory&&number.length<=0x2FAF080:BigIntType.MAX_SIZE=0x2FAF080;break;
+                case 0x4000000>=minMemory&&number.length<=0x4000000:BigIntType.MAX_SIZE=0x4000000;break;
+            }
+            return number;
+        }
+        /**__load A and B form URL if possible__*/
+        function _load_from_url(){
+            const urlArguments=window.location.search.substring(1).split('&');
+            let fetchA=null,fetchB=null,
+                minMemory=0x1F4;
+            for(const arg of urlArguments){
+                if(arg[0]==='A'&&arg[1]==='='){
+                    if(fetchA!=null)continue;
+                    const A=_parse_uri_number(arg.substring(2));
+                    if(A instanceof Error){
+                        if(A instanceof EvalError)_error_html("Error reading \"A\" from URL: could not decode to a BigIntType number");
+                        else if(A instanceof RangeError)_error_html("Error reading number A from URL: number is to large (> 64 MiB)");
+                        else if(A instanceof Error)_error_html(`Error reading number A from URL: {${A.name}} ${A.message}`);
+                        console.error(A);
+                    }else{
+                        fetchA=A;
+                        minMemory=BigIntType.MAX_SIZE;
+                    };
+                }else if(arg[0]==='B'&&arg[1]==='='){
+                    if(fetchB!=null)continue;
+                    const B=_parse_uri_number(arg.substring(2));
+                    if(B instanceof Error){
+                        if(B instanceof EvalError)_error_html("Error reading \"B\" from URL: could not decode to a BigIntType number");
+                        else if(B instanceof RangeError)_error_html("Error reading number B from URL: number is to large (> 64 MiB)");
+                        else if(B instanceof Error)_error_html(`Error reading number B from URL: {${A.name}} ${A.message}`);
+                        console.error(B);
+                    }else{
+                        fetchB=B;
+                        minMemory=BigIntType.MAX_SIZE;
+                    };
+                }
+            }
+            memory_size.value=BigIntType.MAX_SIZE;
+            _NUMBERS.a.setEqualTo(fetchA??BigIntType.One);
+            _NUMBERS.b.setEqualTo(fetchB??BigIntType.Zero);
+            number_a.value=_NUMBERS.a.toString(base_chooser.value);
+            number_b.value=_NUMBERS.b.toString(base_chooser.value);
+        }
+        /**__updates or add A and B to the URL__*/
+        function _update_to_url(){
+            const uri=window.location.search.substring(1).split('&').filter(v=>!/^[AB]=/.test(v));
+            uri.push(`A=${_NUMBERS.a.toURL()}`);
+            uri.push(`B=${_NUMBERS.b.toURL()}`);
+            window.history.replaceState(null,'',`?${uri.join('&')}`);
+        }
+        // TODO functions for _NUMBERS.mem (calc history only ! no save button, but load button (to A/B)) and maybe also save window.localStorage
     </script>
 </head>
 <body>
@@ -3152,17 +3229,19 @@
             Amapmin2=document.getElementById("Amapmin2"),Amapmax2=document.getElementById("Amapmax2"),
             loader=document.getElementById("loader");
         _error_html("Errors may be displayed here...\ndouble click anywhere on the page (except here) to remove this message");
+        _load_from_url();
         _stats_AtB_();
-        try{//~ Test number to console
-            console.log(
-                "TEST NUMBER: %c %s",
-                "background-color:#000;color:#0f0;font-family:consolas;font-size:2em;",
-                BigIntType.HelloThere.toString("braille")
-            );
-        }catch(error){
-            _error_html(`[TEST NUMBER] : {${error.name}} : \"${error.message}\"`);//~ show only recent message (on screen) and not the whole stack
-            console.error(error);//~ but do log the whole error object to console
-        }
+        _update_to_url();
+        BigIntType.HelloThere.logConsole("braille");
+        console.log(
+            "%c%s%c%s%c%s",
+            "background-color:#000;color:#0f0;font-family:consolas,monospace;font-size:large;",
+            "use class ",
+            "background-color:#000;color:#f90;font-family:consolas,monospace;font-size:large;",
+            "BigIntType ",
+            "background-color:#000;color:#0f0;font-family:consolas,monospace;font-size:large;",
+            "right here in the dev-tools console",
+        );
         // ## event listeners
         document.addEventListener("dblclick",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
         base_chooser.addEventListener("input",ev=>{
@@ -3261,11 +3340,11 @@
             },{passive:true});
         }
         // ## buttons
-        // TODO Asave
-        // TODO Bsave
-        switchAB.addEventListener("click",ev=>{
-            [number_a.value,number_b.value]=[number_b.value,number_a.value];
+        switchAB.addEventListener("click",async ev=>{
             _NUMBERS.a.swapWith(_NUMBERS.b);
+            [number_a.value,number_b.value]=[number_b.value,number_a.value];
+            _stats_AtB_();
+            _update_to_url();
         },{passive:true});
         AseqB.addEventListener("click",async ev=>{
             loader.classList.remove("hid");
