@@ -84,7 +84,7 @@
         div#border>div[data-content="base_and_memory"]>div[data-content]:hover{border-color: #a70;}
         div#border>div[data-content="base_and_memory"]{grid-area: 1/1/2/3;}
         div#border>div[data-content="number_a"]{grid-area: 2/1/3/2;}            div#border>div[data-content="number_b"]{grid-area: 2/2/3/3;}
-        div#border>div[data-content="function_buttons"]{grid-area: 3/1/4/2;}    div#border>div[data-content="saved_numbers"]{grid-area: 3/2/6/3;}
+        div#border>div[data-content="function_buttons"]{grid-area: 3/1/4/2;}    div#border>div[data-content="memory_numbers"]{grid-area: 3/2/6/3;}
         div#border>div[data-content="a_random"]{grid-area: 4/1/5/2;}
         div#border>div[data-content="a_map"]{grid-area: 5/1/6/2;}
         div#border>div[data-content="error_output"]{grid-area: 6/1/7/3;}
@@ -159,6 +159,17 @@
         }
         #Amaplimit:not(:checked)+label[for="Amaplimit"]{background-color: #000;}
         #Amaplimit:checked+label[for="Amaplimit"]{background-color: #040;}
+        div#border>div[data-content="memory_numbers"]>p{margin: 0.4rem;}
+        div#border>div[data-content="memory_numbers"]>div.slot{
+            display: inline-grid;
+            grid-template-columns: auto repeat(2, 3rem);
+            margin: 8px;
+            gap: 3px;
+        }
+        div#border>div[data-content="memory_numbers"]>div.slot>label{text-align: left; grid-area: 1 / 1 / span 1 / span 1;}
+        div#border>div[data-content="memory_numbers"]>div.slot>button:first-of-type{grid-area: 1 / 2 / span 1 / span 1;}
+        div#border>div[data-content="memory_numbers"]>div.slot>button:nth-of-type(2){grid-area: 1 / 3 / span 1 / span 1;}
+        div#border>div[data-content="memory_numbers"]>div.slot>textarea{grid-area: 2 / 1 / span 1 / span 3;}
         #base_chooser,select,button,.number,#error_output{
             background-color: #000;
             color: #0f0;
@@ -2794,8 +2805,18 @@
         function _stats_AtB_(){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':(_NUMBERS.a.isEqualTo(_NUMBERS.b)?"==":"!="))} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
         /**__numbers as BigIntType objects stored in this convenient object__*/
         let _NUMBERS=Object.freeze({
-                /**@type {BigIntType[]}*/
-                mem:[],//~ max 10 memory numbers
+                mem:Object.freeze([
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero,
+                    BigIntType.Zero
+                ]),
                 a:BigIntType.One,
                 b:BigIntType.Zero,
                 rand:Object.freeze({
@@ -2987,11 +3008,12 @@
                     };
                 }
             }
-            memory_size.value=BigIntType.MAX_SIZE;
+            _CURRENT_MEM_SIZE=BigIntType.MAX_SIZE;
+            memory_size.value=_CURRENT_MEM_SIZE;
             _NUMBERS.a.setEqualTo(fetchA??BigIntType.One);
             _NUMBERS.b.setEqualTo(fetchB??BigIntType.Zero);
-            number_a.value=_NUMBERS.a.toString(base_chooser.value);
-            number_b.value=_NUMBERS.b.toString(base_chooser.value);
+            number_a.value=_NUMBERS.a.toString(_CURRENT_BASE);
+            number_b.value=_NUMBERS.b.toString(_CURRENT_BASE);
         }
         /**__updates or add A and B to the URL__*/
         function _update_to_url(){
@@ -3000,7 +3022,17 @@
             uri.push(`B=${_NUMBERS.b.toURL()}`);
             window.history.replaceState(null,'',`?${uri.join('&')}`);
         }
-        // TODO functions for _NUMBERS.mem (calc history only ! no save button, but load button (to A/B)) and maybe also save window.localStorage
+        /**
+         * __adds the given number to memory__
+         * @param {BigIntType} number - a number
+         */
+        function _add_mem(number){
+            for(let i=_NUMBERS.mem.length-1;i>0;i--)_NUMBERS.mem[i].setEqualTo(_NUMBERS.mem[i-1]);
+            _NUMBERS.mem[0].setEqualTo(number);
+            _update_mem_ui();
+        }
+        /**__updates every value in `_NUMBERS.mem` on screen__*/
+        function _update_mem_ui(){for(let i=0;i<_NUMBERS.mem.length;i++)document.getElementById(`mem_slot_${i}`).value=_NUMBERS.mem[i].toString(_CURRENT_BASE);}
     </script>
 </head>
 <body>
@@ -3173,8 +3205,18 @@
                 <label for="Amapmax2" title="set final maximum for mapping">final maximum:</label>
                 <textarea id="Amapmax2" maxlength="2147483648" class="number" title="set final maximum for mapping">0</textarea>
             </div>
-            <div data-content="saved_numbers">
-                MEM<br><!-- TODO -->[ WIP ]
+            <div data-content="memory_numbers">
+                <p title="temporary until the page reloads">Temporary access memory</p>
+                <div class="slot"><label for="mem_slot_0" title="memory slot 0">Slot 0</label><button id="mem_0_to_a" title="load this number to A">→ A</button><button id="mem_0_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_0" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_1" title="memory slot 1">Slot 1</label><button id="mem_1_to_a" title="load this number to A">→ A</button><button id="mem_1_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_1" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_2" title="memory slot 2">Slot 2</label><button id="mem_2_to_a" title="load this number to A">→ A</button><button id="mem_2_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_2" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_3" title="memory slot 3">Slot 3</label><button id="mem_3_to_a" title="load this number to A">→ A</button><button id="mem_3_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_3" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_4" title="memory slot 4">Slot 4</label><button id="mem_4_to_a" title="load this number to A">→ A</button><button id="mem_4_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_4" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_5" title="memory slot 5">Slot 5</label><button id="mem_5_to_a" title="load this number to A">→ A</button><button id="mem_5_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_5" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_6" title="memory slot 6">Slot 6</label><button id="mem_6_to_a" title="load this number to A">→ A</button><button id="mem_6_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_6" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_7" title="memory slot 7">Slot 7</label><button id="mem_7_to_a" title="load this number to A">→ A</button><button id="mem_7_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_7" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_8" title="memory slot 8">Slot 8</label><button id="mem_8_to_a" title="load this number to A">→ A</button><button id="mem_8_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_8" class="number" title="stored number">0</textarea></div>
+                <div class="slot"><label for="mem_slot_9" title="memory slot 9">Slot 9</label><button id="mem_9_to_a" title="load this number to A">→ A</button><button id="mem_9_to_b" title="load this number to B">→ B</button><textarea readonly id="mem_slot_9" class="number" title="stored number">0</textarea></div>
             </div>
             <div data-content="error_output"><textarea id="error_output" title="displays errors when they occur" readonly></textarea></div>
         </div>
@@ -3339,8 +3381,16 @@
                 else{ev.target.value=String(Number(ev.target.value));}
             },{passive:true});
         }
+        // ## memory buttons
+        for(let i=0;i<10;i++){
+            const slot=_NUMBERS.mem[i];
+            document.getElementById(`mem_${i}_to_a`).addEventListener("click",ev=>{number_a.value=_NUMBERS.a.setEqualTo(slot).toString(_CURRENT_BASE);_stats_AtB_();_update_to_url();},{passive:true});
+            document.getElementById(`mem_${i}_to_b`).addEventListener("click",ev=>{number_b.value=_NUMBERS.b.setEqualTo(slot).toString(_CURRENT_BASE);_stats_AtB_();_update_to_url();},{passive:true});
+        }
         // ## buttons
-        switchAB.addEventListener("click",async ev=>{
+        Asave.addEventListener("click",ev=>{_add_mem(_NUMBERS.a);},{passive:true});
+        Bsave.addEventListener("click",ev=>{_add_mem(_NUMBERS.b);},{passive:true});
+        switchAB.addEventListener("click",ev=>{
             _NUMBERS.a.swapWith(_NUMBERS.b);
             [number_a.value,number_b.value]=[number_b.value,number_a.value];
             _stats_AtB_();
