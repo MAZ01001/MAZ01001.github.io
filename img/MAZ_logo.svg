@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="23cm" height="36.454cm" enable-background="new" version="1.1" viewBox="0 0 230 364.54" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>MAZ Logo</title>
+    <defs>
+        <linearGradient id="linearGradient4640">
+            <stop stop-color="#232803" stop-opacity="0" offset="0"/>
+            <stop stop-color="#55490c" offset=".080316"/>
+            <stop stop-color="#886a16" offset=".16361"/>
+            <stop stop-color="#a68c29" offset=".22415"/>
+            <stop stop-color="#ccb54a" offset=".2847"/>
+            <stop stop-color="#ebdb66" offset=".34524"/>
+            <stop stop-color="#f0e36b" offset=".3823"/>
+            <stop stop-color="#f5ec70" offset=".41402"/>
+            <stop stop-color="#e3d55e" offset=".46745"/>
+            <stop stop-color="#d1be4c" offset=".51642"/>
+            <stop stop-color="#c6ad3f" offset=".54168"/>
+            <stop stop-color="#bb9c33" offset=".57195"/>
+            <stop stop-color="#a88e2a" offset=".6325"/>
+            <stop stop-color="#b99e37" offset=".66277"/>
+            <stop stop-color="#caae44" offset=".69805"/>
+            <stop stop-color="#d2bc4d" offset=".72832"/>
+            <stop stop-color="#daca56" offset=".75793"/>
+            <stop stop-color="#d5c24f" offset=".7872"/>
+            <stop stop-color="#d0bb49" offset=".81747"/>
+            <stop stop-color="#bb9c33" offset=".87802"/>
+            <stop stop-color="#896c1a" offset=".93489"/>
+            <stop stop-color="#564a0e" offset=".97329"/>
+            <stop stop-color="#232803" offset="1"/>
+        </linearGradient>
+        <linearGradient id="linearGradient5310">
+            <stop stop-color="#232803" offset="0"/>
+            <stop stop-color="#55490c" offset=".080316"/>
+            <stop stop-color="#886a16" offset=".16361"/>
+            <stop stop-color="#a68c29" offset=".22415"/>
+            <stop stop-color="#ccb54a" offset=".2847"/>
+            <stop stop-color="#ebdb66" offset=".34524"/>
+            <stop stop-color="#f0e36b" offset=".3823"/>
+            <stop stop-color="#f5ec70" offset=".41402"/>
+            <stop stop-color="#e3d55e" offset=".46745"/>
+            <stop stop-color="#d1be4c" offset=".51642"/>
+            <stop stop-color="#c6ad3f" offset=".54168"/>
+            <stop stop-color="#bb9c33" offset=".57195"/>
+            <stop stop-color="#a88e2a" offset=".6325"/>
+            <stop stop-color="#b99e37" offset=".66277"/>
+            <stop stop-color="#caae44" offset=".69805"/>
+            <stop stop-color="#d2bc4d" offset=".72832"/>
+            <stop stop-color="#daca56" offset=".75793"/>
+            <stop stop-color="#d5c24f" offset=".7872"/>
+            <stop stop-color="#d0bb49" offset=".81747"/>
+            <stop stop-color="#bb9c33" offset=".87802"/>
+            <stop stop-color="#896c1a" offset=".93489"/>
+            <stop stop-color="#564a0e" offset=".97329"/>
+            <stop stop-color="#232803" offset="1"/>
+        </linearGradient>
+        <linearGradient id="linearGradient4592" x1="-120" x2="320" y1="150" y2="150" gradientUnits="userSpaceOnUse" xlink:href="#linearGradient4640"/>
+        <linearGradient id="linearGradient4673" x1="-120" x2="320" y1="150" y2="150" gradientUnits="userSpaceOnUse" xlink:href="#linearGradient5310"/>
+        <radialGradient id="radialGradient6149" cx="100" cy="132.96" r="215.04" gradientTransform="translate(15 49.542)" gradientUnits="userSpaceOnUse" xlink:href="#linearGradient5310"/>
+        <linearGradient id="linearGradient925" x1="-123.21" x2="323.21" y1="150.01" y2="150.01" gradientTransform="matrix(.9856 0 0 .9856 1.4397 2.1538)" gradientUnits="userSpaceOnUse" xlink:href="#linearGradient5310"/>
+        <linearGradient id="linearGradient897" x1="-120" x2="320" y1="150" y2="150" gradientUnits="userSpaceOnUse" xlink:href="#linearGradient5310"/>
+        <linearGradient id="linearGradient901" x1="-100" x2="300" y1="150" y2="150" gradientUnits="userSpaceOnUse" xlink:href="#linearGradient4640"/>
+    </defs>
+    <metadata>
+        <rdf:RDF>
+            <cc:Work rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+                <dc:title>MAZ Logo</dc:title>
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g fill="none" stroke-linejoin="bevel">
+        <circle cx="115" cy="183.3" r="215.61" display="none" stroke="#000" stroke-opacity=".95327" stroke-width="3" style="paint-order:normal"/>
+        <circle cx="115" cy="182.5" r="210.04" display="none" stroke="#000" stroke-opacity=".95327" stroke-width="15" style="paint-order:normal"/>
+        <circle cx="115" cy="182.5" r="210.04" display="none" stroke="url(#radialGradient6149)" stroke-width="10" style="paint-order:normal"/>
+    </g>
+    <g fill="none">
+        <g transform="translate(15 49.542)" stroke="#000" stroke-opacity=".95327" stroke-width="30">
+            <path d="m0 5e-6 62.038 93.057 137.96-93.057v300h-200zm62.038 93.057 137.96 206.94" style="paint-order:normal"/>
+            <path d="m0 206.94h137.96l-137.96 93.057" stroke-linejoin="bevel"/>
+        </g>
+        <g transform="translate(15 49.542)" stroke="url(#linearGradient897)" stroke-width="25">
+            <path d="m0 5e-6 62.038 93.057 137.96-93.057v300h-200zm62.038 93.057 137.96 206.94" style="paint-order:normal"/>
+            <path d="m0 206.94h137.96l-137.96 93.057" stroke-linejoin="bevel"/>
+        </g>
+        <g transform="translate(15 49.542)" display="none" stroke="#000">
+            <path d="m-1e-5 1.2326e-6 62.038 93.057 137.96-93.057v300h-200zm62.038 93.057 137.96 206.94" display="inline" stroke-opacity=".95327" stroke-width="30" style="paint-order:normal"/>
+            <path d="m0 206.94h137.96l-137.96 93.057" display="inline" stroke-linejoin="bevel" stroke-opacity=".95327" stroke-width="30"/>
+            <circle cx="100" cy="135.91" r="212.79" display="inline" stroke-linejoin="bevel" stroke-width="12" style="paint-order:normal"/>
+        </g>
+        <g transform="translate(15 49.542)" display="none">
+            <path d="m0 5e-6 62.038 93.057 137.96-93.057v300h-200zm62.038 93.057 137.96 206.94" display="inline" stroke="url(#linearGradient4673)" stroke-width="25" style="paint-order:normal"/>
+            <path d="m0 206.94h137.96l-137.96 93.057" display="inline" stroke="url(#linearGradient4673)" stroke-linejoin="bevel" stroke-width="25"/>
+            <circle cx="100" cy="135.91" r="212.8" display="inline" stroke="url(#linearGradient925)" stroke-linejoin="bevel" stroke-width="7" style="paint-order:normal"/>
+        </g>
+    </g>
+</svg>
