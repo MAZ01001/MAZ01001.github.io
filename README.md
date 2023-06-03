@@ -51,9 +51,9 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
     <tr><td><code>fpsView</code></td><td>0 or 1</td><td>show fps</td><td><code>1</code></td></tr>
     <tr><td><code>clearCanvas</code></td><td>0 or 1</td><td>clears the canvas every frame</td><td><code>1</code></td></tr>
     <tr><td><code>seed</code></td><td>any</td><td>set the seed for RNG</td><td>minute timestamp in hex</td></tr>
-    <tr><td><code>ballSize</code></td><td>0.0 to 1.0</td><td>set the ball size (%) relative to the smaller window size</td><td><code>0.2</code></td></tr>
-    <tr><td><code>ballSpeed</code></td><td>finite float number</td><td>set the speed of the ball</td><td><code>240.0</code></td></tr>
-    <tr><td><code>colorSpeed</code></td><td>finite float number</td><td>set the speed of the color shift</td><td><code>60.0</code></td></tr>
+    <tr><td><code>ballSize</code></td><td>0.000000001 to 1.0</td><td>set the ball size (%) relative to the smaller window size</td><td><code>0.2</code></td></tr>
+    <tr><td><code>ballSpeed</code></td><td>finite float (9 decimal digits)</td><td>set the speed of the ball</td><td><code>240.0</code></td></tr>
+    <tr><td><code>colorSpeed</code></td><td>finite float (9 decimal digits)</td><td>set the speed of the color shift</td><td><code>60.0</code></td></tr>
     <tr><td><code>img</code></td><td>HTML image source (URL)<br/>(encoded URI component)</td><td>put an image on the ball</td><td>none</td></tr>
     <tr><td><code>imgPixelArt</code></td><td>0 or 1</td><td>enable better renderer for pixel art</td><td><code>0</code></td></tr>
     <tr><td><code>imgOverrideBall</code></td><td>0 or 1</td><td>when active replaces the ball with the image</td><td><code>1</code></td></tr>

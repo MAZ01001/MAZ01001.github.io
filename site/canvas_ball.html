@@ -189,7 +189,7 @@
                     case arg==="transparent=1":document.body.style.backgroundColor="transparent";break;
                     case /^fpsView=[01]$/.test(arg):_fpsView_=arg.substring(8)==='1';break;
                     case /^clearCanvas=[01]$/.test(arg):_clearCanvas_=arg.substring(0xC)==='1';break;
-                    case /^ballSize=(?:[01]|0\.[0-9]{1,9})$/.test(arg):_ballSize_=Number(arg.substring(9));break;
+                    case /^ballSize=(?:1|0\.[0-9]{0,8}[1-9])$/.test(arg):_ballSize_=Number(arg.substring(9));break;
                     case /^ballSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xA))))_ballSpeed_=Number(arg.substring(0xA));break;
                     case /^colorSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xB))))_colorSpeed_=Number(arg.substring(0xB));break;
                     case /^seed=.*$/.test(arg):_seed_=arg.substring(5);break;
@@ -230,18 +230,16 @@
                 rng.bool,
                 rng.bool
             ],
-            position=[
-                rng.range(0,window.innerWidth),
-                rng.range(0,window.innerHeight)
-            ],
+            position=(ballSize=>[
+                rng.range(ballSize,window.innerWidth-ballSize),
+                rng.range(ballSize,window.innerHeight-ballSize)
+            ])((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5),
             lastFrameTime=0,
             colorHue=0x78,
             drawImg=false,
             fps=0x3C;
         if(ballImg!=null){
             if(ballImgPixelArt)img.style.imageRendering="pixelated";
-            img.style.width="100%";
-            img.style.height="100%";
             img.addEventListener("load",()=>drawImg=true,{passive:true,once:true});
             img.src=ballImg;
         }
@@ -264,12 +262,23 @@
             if(position[1]+ballSize>window.innerHeight)direction[1]=false;
             else if(position[1]-ballSize<0)direction[1]=true;
             //~ ball position
-            position[0]+=ballSpeed*deltaTime*(direction[0]?1:-1);
-            position[1]+=ballSpeed*deltaTime*(direction[1]?1:-1);
-            position[0]=clamp(position[0],0,window.innerWidth);
-            position[1]=clamp(position[1],0,window.innerHeight);
+            if(ballSize*2===window.innerWidth)position[0]=ballSize;
+            else{
+                position[0]+=ballSpeed*deltaTime*(direction[0]?1:-1);
+                position[0]=clamp(position[0],0,window.innerWidth);
+            }
+            if(ballSize*2===window.innerHeight)position[1]=ballSize;
+            else{
+                position[1]+=ballSpeed*deltaTime*(direction[1]?1:-1);
+                position[1]=clamp(position[1],0,window.innerHeight);
+            }
             //~ draw ball &/ img
-            if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-ballSize,position[1]-ballSize,ballSize*2,ballSize*2);
+            const[imgW,imgH]=(()=>{
+                if(img.width>img.height)return[ballSize,ballSize*(img.height/img.width)];
+                if(img.width<img.height)return[ballSize*(img.width/img.height),ballSize];
+                return[ballSize,ballSize];
+            })();
+            if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
             else{
                 canvas.beginPath();
                 canvas.arc(position[0],position[1],ballSize,0,Math.PI*2);
@@ -284,7 +293,7 @@
                     canvas.closePath();
                     canvas.save();
                     canvas.clip();
-                    canvas.drawImage(img,position[0]-ballSize,position[1]-ballSize,ballSize*2,ballSize*2);
+                    canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
                     canvas.restore();
                 }
             }
@@ -337,23 +346,23 @@
                 "%c%s",
                 "background-color:#000;color:#0F0;font-family:consolas,monospace",
                 [
-                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
-                    "| parameter       | possible values         | description                                               | default value           |",
-                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
-                    "| transparent     | 0 or 1                  | make the background of the website transparent            | 0                       |",
-                    "| fpsView         | 0 or 1                  | show fps                                                  | 1                       |",
-                    "| clearCanvas     | 0 or 1                  | clears the canvas every frame                             | 1                       |",
-                    "| seed            | any                     | set the seed for RNG                                      | minute timestamp in hex |",
-                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
-                    "| ballSize        | 0.0 to 1.0              | set the ball size (%) relative to the smaller window size | 0.2                     |",
-                    "| ballSpeed       | finite float number     | set the speed of the ball in pixels peer second           | 240                     |",
-                    "| colorSpeed      | finite float number     | set the speed of the color shift in degrees peer second   | 60                      |",
-                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
-                    "| img             | HTML image source (URL) | put an image on the ball (encode value as URI component)  | none                    |",
-                    "|                 | (encoded URI component) |                                                           |                         |",
-                    "| imgPixelArt     | 0 or 1                  | enable better renderer for pixel art                      | 0                       |",
-                    "| imgOverrideBall | 0 or 1                  | when active replaces the ball with the image              | 1                       |",
-                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+"
+                    "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| parameter       | possible values                 | description                                               | default value           |",
+                    "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| transparent     | 0 or 1                          | make the background of the website transparent            | 0                       |",
+                    "| fpsView         | 0 or 1                          | show fps                                                  | 1                       |",
+                    "| clearCanvas     | 0 or 1                          | clears the canvas every frame                             | 1                       |",
+                    "| seed            | any                             | set the seed for RNG                                      | minute timestamp in hex |",
+                    "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| ballSize        | 0.000000001 to 1.0              | set the ball size (%) relative to the smaller window size | 0.2                     |",
+                    "| ballSpeed       | finite float (9 decimal digits) | set the speed of the ball in pixels peer second           | 240                     |",
+                    "| colorSpeed      | finite float (9 decimal digits) | set the speed of the color shift in degrees peer second   | 60                      |",
+                    "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| img             | HTML image source (URL)         | put an image on the ball (encode value as URI component)  | none                    |",
+                    "|                 | (encoded URI component)         |                                                           |                         |",
+                    "| imgPixelArt     | 0 or 1                          | enable better renderer for pixel art                      | 0                       |",
+                    "| imgOverrideBall | 0 or 1                          | when active replaces the ball with the image              | 1                       |",
+                    "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+"
                 ].join('\n')
             );
         console.groupEnd();
