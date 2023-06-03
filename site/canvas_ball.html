@@ -40,7 +40,7 @@
          * @example new RNG("seed").value; //=> 0.8370377509475307
          * @author MAZ <https://MAZ01001.GitHub.io/>
          */
-        class RNG{
+        const RNG=class{
             /**@type {number} - [private] first internal rng value*/
             _a_=0;
             /**@type {number} - [private] second internal rng value*/
@@ -251,7 +251,10 @@
         //~ | | | | '__/ _` \ \ /\ / /
         //~ | |/ /| | | (_| |\ V  V /
         //~ |___/ |_|  \__,_| \_/\_/
-        function draw(deltaTime){
+        /**@type {(n:number,min:number,max:number)=>number} - clamps a number to given range*/
+        const clamp=(n,min,max)=>n<min?min:(n>max?max:n);
+        /**@type {(deltaTime:number)=>void} - renders one frame on `canvas`*/
+        const draw=deltaTime=>{
             "use strict";
             if(clearCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
             const ballSize=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5;
@@ -263,6 +266,8 @@
             //~ ball position
             position[0]+=ballSpeed*deltaTime*(direction[0]?1:-1);
             position[1]+=ballSpeed*deltaTime*(direction[1]?1:-1);
+            position[0]=clamp(position[0],0,window.innerWidth);
+            position[1]=clamp(position[1],0,window.innerHeight);
             //~ draw ball &/ img
             if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-ballSize,position[1]-ballSize,ballSize*2,ballSize*2);
             else{
@@ -301,7 +306,7 @@
         //~ \_____/\___/ \___/| .__/
         //~                   | |
         //~                   |_|
-        let _previousFrameTimestamp_=performance.now(),
+        let _previousFrameTimestamp_=0,
             _previousFPS_=[];
         const animationLoop=()=>{
             "use strict";
