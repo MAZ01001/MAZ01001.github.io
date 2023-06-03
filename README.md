@@ -42,20 +42,21 @@
 
 ### available URL parameters
 
+URL parameters can be in any order (_starting with `?` after the URL then parameters in format `PARAMETER=VALUE` with `&` between each parameter_)
+
 <details open><summary>click to hide table</summary>
   <table>
     <tr><th><code>parameter</code></th><th>possible values</th><th>description</th><th>default value</th></tr>
-    <tr><td><code>transparent</code></td><td>0 / 1</td><td>make the background of the website transparent</td><td><code>0</code></td></tr>
-    <tr><td><code>fpsView</code></td><td>0 / 1</td><td>show fps</td><td><code>1</code></td></tr>
-    <tr><td><code>clearCanvas</code></td><td>0 / 1</td><td>clears the canvas every frame</td><td><code>1</code></td></tr>
-    <tr><td><code>fpsMax</code></td><td>safe integer</td><td>set the max frame rate</td><td><code>60</code></td></tr>
-    <tr><td><code>ballSize</code></td><td>0.0 - 1.0</td><td>set the ball size (%) relative to the smaller window size</td><td><code>0.2</code></td></tr>
-    <tr><td><code>ballSpeed</code></td><td>finite float</td><td>set the speed of the ball</td><td><code>4</code></td></tr>
-    <tr><td><code>colorSpeed</code></td><td>finite float</td><td>set the speed of the color shift</td><td><code>1</code></td></tr>
+    <tr><td><code>transparent</code></td><td>0 or 1</td><td>make the background of the website transparent</td><td><code>0</code></td></tr>
+    <tr><td><code>fpsView</code></td><td>0 or 1</td><td>show fps</td><td><code>1</code></td></tr>
+    <tr><td><code>clearCanvas</code></td><td>0 or 1</td><td>clears the canvas every frame</td><td><code>1</code></td></tr>
     <tr><td><code>seed</code></td><td>any</td><td>set the seed for RNG</td><td>minute timestamp in hex</td></tr>
-    <tr><td><code>img</code></td><td>image (URI component)</td><td>put an image on the ball (encode value as URI component)</td><td>none</td></tr>
-    <tr><td><code>imgPixelArt</code></td><td>0/1</td><td>enable better renderer for pixel art</td><td><code>0</code></td></tr>
-    <tr><td><code>imgOverrideBall</code></td><td>0/1</td><td>when active replaces the ball with the image</td><td><code>1</code></td></tr>
+    <tr><td><code>ballSize</code></td><td>0.0 to 1.0</td><td>set the ball size (%) relative to the smaller window size</td><td><code>0.2</code></td></tr>
+    <tr><td><code>ballSpeed</code></td><td>finite float number</td><td>set the speed of the ball</td><td><code>240.0</code></td></tr>
+    <tr><td><code>colorSpeed</code></td><td>finite float number</td><td>set the speed of the color shift</td><td><code>60.0</code></td></tr>
+    <tr><td><code>img</code></td><td>HTML image source (URL)<br/>(encoded URI component)</td><td>put an image on the ball</td><td>none</td></tr>
+    <tr><td><code>imgPixelArt</code></td><td>0 or 1</td><td>enable better renderer for pixel art</td><td><code>0</code></td></tr>
+    <tr><td><code>imgOverrideBall</code></td><td>0 or 1</td><td>when active replaces the ball with the image</td><td><code>1</code></td></tr>
   </table>
 </details>
 

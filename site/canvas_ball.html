@@ -176,10 +176,9 @@
         let _seed_=Math.floor(Date.now()/0xEA60).toString(0x10),//~ changes every minute
             _fpsView_=true,
             _clearCanvas_=true,
-            _fpsMax_=0x3C,
             _ballSize_=0.2,
-            _ballSpeed_=4,
-            _colorSpeed_=1,
+            _ballSpeed_=0xF0,
+            _colorSpeed_=0x3C,
             _img_=undefined,
             _imgPixelArt_=false,
             _imgReplace_=true;
@@ -190,7 +189,6 @@
                     case arg==="transparent=1":document.body.style.backgroundColor="transparent";break;
                     case /^fpsView=[01]$/.test(arg):_fpsView_=arg.substring(8)==='1';break;
                     case /^clearCanvas=[01]$/.test(arg):_clearCanvas_=arg.substring(0xC)==='1';break;
-                    case /^fpsMax=[1-9][0-9]*$/.test(arg):if(Number.isSafeInteger(Number(arg.substring(7))))_fpsMax_=Number(arg.substring(7));break;
                     case /^ballSize=(?:[01]|0\.[0-9]{1,9})$/.test(arg):_ballSize_=Number(arg.substring(9));break;
                     case /^ballSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xA))))_ballSpeed_=Number(arg.substring(0xA));break;
                     case /^colorSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xB))))_colorSpeed_=Number(arg.substring(0xB));break;
@@ -199,8 +197,7 @@
                     case /^imgPixelArt=[01]$/.test(arg):_imgPixelArt_=arg.substring(0xC)==='1';break;
                     case /^imgOverrideBall=[01]$/.test(arg):_imgReplace_=arg.substring(0x10)==='1';break;
                 }
-        const fpsLimit=_fpsMax_,
-            showFPS=_fpsView_,
+        const showFPS=_fpsView_,
             clearCanvas=_clearCanvas_,
             ballSizePercent=_ballSize_,
             ballSpeed=_ballSpeed_,
@@ -238,7 +235,7 @@
                 rng.range(0,window.innerHeight)
             ],
             lastFrameTime=0,
-            colorHue=120,
+            colorHue=0x78,
             drawImg=false,
             fps=0x3C;
         if(ballImg!=null){
@@ -254,7 +251,7 @@
         //~ | | | | '__/ _` \ \ /\ / /
         //~ | |/ /| | | (_| |\ V  V /
         //~ |___/ |_|  \__,_| \_/\_/
-        async function draw(){
+        function draw(deltaTime){
             "use strict";
             if(clearCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
             const ballSize=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5;
@@ -264,8 +261,8 @@
             if(position[1]+ballSize>window.innerHeight)direction[1]=false;
             else if(position[1]-ballSize<0)direction[1]=true;
             //~ ball position
-            position[0]+=ballSpeed*(direction[0]?1:-1);
-            position[1]+=ballSpeed*(direction[1]?1:-1);
+            position[0]+=ballSpeed*deltaTime*(direction[0]?1:-1);
+            position[1]+=ballSpeed*deltaTime*(direction[1]?1:-1);
             //~ draw ball &/ img
             if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-ballSize,position[1]-ballSize,ballSize*2,ballSize*2);
             else{
@@ -273,7 +270,7 @@
                 canvas.arc(position[0],position[1],ballSize,0,Math.PI*2);
                 canvas.closePath();
                 canvas.stroke();
-                colorHue=(colorHue+colorSpeed)%360;
+                colorHue=(colorHue+colorSpeed*deltaTime)%0x168;
                 canvas.fillStyle=`hsl(${colorHue}, 100%, 50%)`;
                 canvas.fill();
                 if(drawImg){
@@ -308,19 +305,15 @@
             _previousFPS_=[];
         const animationLoop=()=>{
             "use strict";
-            window.requestAnimationFrame(async()=>{
+            window.requestAnimationFrame(frameTimestamp=>{
                 "use strict";
-                const now=performance.now();
+                const frameTime=frameTimestamp-_previousFrameTimestamp_;
+                _previousFrameTimestamp_=frameTimestamp;
                 fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
-                await draw();
-                _previousFrameTimestamp_=now;
-                const frameDelay=fpsLimit===0?0:((now+(1000/fpsLimit))-performance.now());
-                setTimeout(()=>{
-                    lastFrameTime=1000/(performance.now()-now);
-                    for(let i=Math.min(_previousFPS_.length,19);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
-                    _previousFPS_[0]=Math.round(lastFrameTime);
-                    animationLoop();
-                },Math.max(frameDelay,0));
+                draw(frameTime/0x3E8);
+                for(let i=Math.min(_previousFPS_.length,9);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
+                _previousFPS_[0]=Math.round(0x3E8/frameTime);
+                animationLoop();
             });
         }
         animationLoop();
@@ -339,23 +332,23 @@
                 "%c%s",
                 "background-color:#000;color:#0F0;font-family:consolas,monospace",
                 [
-                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
-                    "| parameter       | possible values       | description                                               | default value           |",
-                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
-                    "| transparent     | 0 / 1                 | make the background of the website transparent            | 0                       |",
-                    "| fpsView         | 0 / 1                 | show fps                                                  | 1                       |",
-                    "| clearCanvas     | 0 / 1                 | clears the canvas every frame                             | 1                       |",
-                    "| fpsMax          | safe integer          | set the max frame rate                                    | 60                      |",
-                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
-                    "| ballSize        | 0.0 - 1.0             | set the ball size (%) relative to the smaller window size | 0.2                     |",
-                    "| ballSpeed       | finite float          | set the speed of the ball                                 | 4                       |",
-                    "| colorSpeed      | finite float          | set the speed of the color shift                          | 1                       |",
-                    "| seed            | any                   | set the seed for RNG                                      | minute timestamp in hex |",
-                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
-                    "| img             | image (URI component) | put an image on the ball (encode value as URI component)  | none                    |",
-                    "| imgPixelArt     | 0/1                   | enable better renderer for pixel art                      | 0                       |",
-                    "| imgOverrideBall | 0/1                   | when active replaces the ball with the image              | 1                       |",
-                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+"
+                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| parameter       | possible values         | description                                               | default value           |",
+                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| transparent     | 0 or 1                  | make the background of the website transparent            | 0                       |",
+                    "| fpsView         | 0 or 1                  | show fps                                                  | 1                       |",
+                    "| clearCanvas     | 0 or 1                  | clears the canvas every frame                             | 1                       |",
+                    "| seed            | any                     | set the seed for RNG                                      | minute timestamp in hex |",
+                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| ballSize        | 0.0 to 1.0              | set the ball size (%) relative to the smaller window size | 0.2                     |",
+                    "| ballSpeed       | finite float number     | set the speed of the ball in pixels peer second           | 240                     |",
+                    "| colorSpeed      | finite float number     | set the speed of the color shift in degrees peer second   | 60                      |",
+                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+",
+                    "| img             | HTML image source (URL) | put an image on the ball (encode value as URI component)  | none                    |",
+                    "|                 | (encoded URI component) |                                                           |                         |",
+                    "| imgPixelArt     | 0 or 1                  | enable better renderer for pixel art                      | 0                       |",
+                    "| imgOverrideBall | 0 or 1                  | when active replaces the ball with the image              | 1                       |",
+                    "+-----------------+-------------------------+-----------------------------------------------------------+-------------------------+"
                 ].join('\n')
             );
         console.groupEnd();
