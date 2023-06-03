@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[MAZ01001.github.io] Colored bouncing ball screensaver made with P5.js">
+    <meta name="description" content="[MAZ01001.github.io] Colored bouncing ball screensaver with HTML5">
     <meta name="author" content="MAZ01001">
     <link rel="apple-touch-icon" sizes="180x180" href="../img/apple-touch-icon.png">
     <link rel="icon" type="image/x-icon" href="../img/MAZ_logo.svg">
@@ -15,289 +15,350 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="msapplication-config" content="../img/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
-    <title>bildschirmschoner</title>
+    <title>Screensaver</title>
     <style>
-        body {
-            background-color: #2c2c2c;
+        body{
+            background-color: #222;
             padding: 0;
-            margin: 0;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
             overflow: hidden;
         }
     </style>
 </head>
-
 <body>
-    <canvas id="playField" style="border:2px solid #ff0000;"></canvas>
     <script>
-        const times = []; //frame timestamps
-        let cnvhtml = document.getElementById('playField'), //canvas HTMLelement
-            cnv = cnvhtml.getContext("2d"), //canvas content
-            originFont = cnv.font, //original font
-            h = true, //horizontal movement {true=(+)}[x]
-            v = true, //vertical movement {false=(-)}[y]
-            x = innerWidth / 2, //x ball position
-            y = innerHeight / 2, //y ball position
-            r = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.1, //ball radius
-            movM = 8, //momentum {0 - inf}[speed]
-            movMTouch = false, //random speed at touch
-            movMTouchValue = {
-                min: 1,
-                max: movM * 2,
-                last: movM,
-            }, //speed at touch
-            ballSpeed = 0, //actual ball speed
-            c = 'rgb(255, 0, 0)', //ball color [RGB()]
-            cStage = 0, //color cycle
-            cStep = 10, //color cycle rate
-            cTouch = false, //touch or cycle
-            log = [], //cmd log
-            fps = NaN; //fps
-        cnvhtml.width = innerWidth - 4;
-        cnvhtml.height = innerHeight - 4;
-
-        function draw() {
-            //resize canvas
-            cnvhtml.width = innerWidth - 4;
-            cnvhtml.height = innerHeight - 4;
-            //ball
-            cTouch ? cStage = 0 : color(c, cStep);
-            r = (cnvhtml.width > cnvhtml.height ? cnvhtml.height : cnvhtml.width) * 0.1;
-            cnv.beginPath();
-            cnv.arc(x, y, r, 0, 2 * Math.PI);
-            cnv.stroke();
-            cnv.fillStyle = c;
-            cnv.fill();
-            //set speed and move ball
-            if (movMTouch) {
-                ballSpeed = movMTouchValue.last;
-            } else {
-                ballSpeed = movM;
+        "use strict";
+        //~ ______ _   _ _____
+        //~ | ___ \ \ | |  __ \
+        //~ | |_/ /  \| | |  \/
+        //~ |    /| . ` | | __
+        //~ | |\ \| |\  | |_\ \
+        //~ \_| \_\_| \_/\____/
+        /**
+         * __a class to get random numbers like `Math.random` but seed-able__ \
+         * uses `MurmurHash3` for initial seed and `sfc32` for generating values
+         * @example new RNG("seed").value; //=> 0.8370377509475307
+         * @author MAZ <https://MAZ01001.GitHub.io/>
+         */
+        class RNG{
+            /**@type {number} - [private] first internal rng value*/
+            _a_=0;
+            /**@type {number} - [private] second internal rng value*/
+            _b_=0;
+            /**@type {number} - [private] third internal rng value*/
+            _c_=0;
+            /**@type {number} - [private] fourth internal rng value*/
+            _d_=0;
+            /**
+             * __get the current state__ \
+             * four 32bit numbers (one 128bit number)
+             * @returns {readonly[number,number,number,number]} current state as four 32bit numbers (one 128bit number)
+             */
+            get state(){
+                "use strict";
+                return Object.freeze([this._a_,this._b_,this._c_,this._d_]);
             }
-            if ((x + r) > (cnvhtml.width - 1)) {
-                //right
-                h = false;
-                cTouch ? colorTouch() : null;
-                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
+            /**
+             * __create a new `RNG` object__
+             * @param {string?} seed - a string used as the seed (via `cyrb128`) - defaults to current timestamp (in hex)
+             * @returns {RNG} a new `RNG` object with the given seed
+             * @example new RNG("seed").value; //=> 0.8370377509475307
+             * @throws {TypeError} - if `seedString` is not a string (not when it is null/undefined)
+             */
+            constructor(seed){
+                "use strict";
+                if(seed==null)seed=Date.now().toString(0x10);
+                if(typeof seed!=="string")throw new TypeError("[RNG::constructor] seedString is not a string");
+                [this._a_,this._b_,this._c_,this._d_]=RNG._generateSeed_(seed);
             }
-            if ((y + r) > (cnvhtml.height - 1)) {
-                //bottom
-                v = false;
-                cTouch ? colorTouch() : null;
-                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
+            /**
+             * __creates a new `RNG` object with given state__
+             * @param {[number,number,number,number]} state - custom state (for sfc32) - must be four 32bit numbers
+             * @returns {RNG} new `RNG` object with given state
+             */
+            static from(state){
+                "use strict";
+                if(!Array.isArray(state))throw new TypeError("[RNG::from] state is not an array");
+                if(state.length!==4)throw new TypeError("[RNG::from] state is not an array with four values");
+                if(state.some(v=>typeof v!=="number"))throw new TypeError("[RNG::from] state is not an array with four numbers");
+                if(state.some(v=>v<0||v>0xFFFFFFFF))throw new TypeError("[RNG::from] state is not an array with four 32bit numbers");
+                const rng=new RNG("");
+                [rng._a_,rng._b_,rng._c_,rng._d_]=state;
+                return rng;
             }
-            if ((x - r) < 1) {
-                //left
-                h = true;
-                cTouch ? colorTouch() : null;
-                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
-            }
-            if ((y - r) < 1) {
-                //top
-                v = true;
-                cTouch ? colorTouch() : null;
-                movMTouchValue.last = randomInt(movMTouchValue.min, movMTouchValue.max);
-            }
-            if (v && h) {
-                x += ballSpeed; //next x position
-                y += ballSpeed; //next y position
-            } else if (v && !h) {
-                x -= ballSpeed; //next x position
-                y += ballSpeed; //next y position
-            } else if (!v && !h) {
-                x -= ballSpeed; //next x position
-                y -= ballSpeed; //next y position
-            } else if (!v && h) {
-                x += ballSpeed; //next x position
-                y -= ballSpeed; //next y position
-            }
-            //fps
-            cnv.font = '20px consolas';
-            cnv.fillStyle = '#00ff00';
-            cnv.fillText('fps:' + fps, 15, 30);
-            cnv.font = originFont;
-        }
-
-        window.addEventListener("mousedown", e => {
-            if ((typeof e === 'object') && (e.button == 1)) {
-                let tmp = '';
-                for (const key in logCmd()) {
-                    const element = log[key];
-                    tmp += key + ': ' + element + '\n';
+            /**
+             * __[private] creates a 128 bit seed from the given string__ \
+             * using `MurmurHash3`
+             * @param {string} str - a string
+             * @returns {readonly[number,number,number,number]} an array of four 32bit integers (one 128bit integer seed)
+             * @throws {TypeError} - if `str` is not a string
+             */
+            static _generateSeed_(str){
+                "use strict";
+                if(typeof str!=="string")throw new TypeError("[RNG::_generateSeed_] str is not a string");
+                let h=0x811C9DC5>>>0;
+                for(let i=0;i<str.length;i++){
+                    const char=(k=>(k<<0xF)|(k>>>0x11))(Math.imul(str.charCodeAt(i),0xCC9E2D51));
+                    h^=Math.imul(char,0x1B873593);
+                    h=(h<<0xD)|(h>>>0x13);
+                    h=(Math.imul(h,5)+0xE6546B64)|0;
                 }
-                tmp.slice(0, -2);
-                alert(tmp);
+                h^=str.length;
+                const seed=()=>{
+                    h^=h>>>0x10;
+                    h=Math.imul(h,0x85EBCA6B);
+                    h^=h>>>0xD;
+                    h=Math.imul(h,0xC2B2AE35);
+                    h^=h>>>0x10;
+                    return h>>>0;
+                };
+                return Object.freeze([seed(),seed(),seed(),seed()]);
             }
-        });
-
-        function color(color = 'rgb(255,0,0)', step = 1) {
-            let R = parseInt(color.slice(4, -1).split(',')[0]),
-                G = parseInt(color.slice(4, -1).split(',')[1]),
-                B = parseInt(color.slice(4, -1).split(',')[2]);
-            switch (cStage) {
-                case 0:
-                    if ((R == 255) && (G == 0) && (B == 0)) {
-                        cStage++;
-                        break;
-                    }
-                    if (B > 0) {
-                        (B - step) < 0 ? B = 0 : B -= step;
-                    }
-                    if (G > 0) {
-                        (G - step) < 0 ? G = 0 : G -= step;
-                    }
-                    if (R < 255) {
-                        (R + step) > 255 ? R = 255 : R += step;
-                    }
-                    break;
-                case 1:
-                    if ((R == 255) && (G == 0) && (B == 0)) {
-                        cStage++;
-                        break;
-                    }
-                    if (B > 0) {
-                        (B - step) < 0 ? B = 0 : B -= step;
-                    }
-                    break;
-                case 2:
-                    if ((R == 255) && (G == 255) && (B == 0)) {
-                        cStage++;
-                        break;
-                    }
-                    if (G < 255) {
-                        (G + step) > 255 ? G = 255 : G += step;
-                    }
-                    break;
-                case 3:
-                    if ((R == 0) && (G == 255) && (B == 0)) {
-                        cStage++;
-                        break;
-                    }
-                    if (R > 0) {
-                        (R - step) < 0 ? R = 0 : R -= step;
-                    }
-                    break;
-                case 4:
-                    if ((R == 0) && (G == 255) && (B == 255)) {
-                        cStage++;
-                        break;
-                    }
-                    if (B < 255) {
-                        (B + step) > 255 ? B = 255 : B += step;
-                    }
-                    break;
-                case 5:
-                    if ((R == 0) && (G == 0) && (B == 255)) {
-                        cStage++;
-                        break;
-                    }
-                    if (G > 0) {
-                        (G - step) < 0 ? G = 0 : G -= step;
-                    }
-                    break;
-                case 6:
-                    if ((R == 255) && (G == 0) && (B == 255)) {
-                        cStage = 1;
-                        break;
-                    }
-                    if (R < 255) {
-                        (R + step) > 255 ? R = 255 : R += step;
-                    }
-                    break;
-
-                default:
-                    break;
+            /**
+             * __get the next random 32bit value__ \
+             * using `sfc32`
+             * @returns {number} a random 32bit unsigned integer
+             */
+            get value32bit(){
+                "use strict";
+                this._a_|=0;
+                this._b_|=0;
+                this._c_|=0;
+                this._d_|=0;
+                let val=(((this._a_+this._b_)|0)+this._d_)|0;
+                this._d_=(++this._d_)|0;
+                this._a_=this._b_^(this._b_>>>9);
+                this._b_=(this._c_+(this._c_<<3))|0;
+                this._c_=(this._c_<<0x15)|(this._c_>>>0xB);
+                this._c_=(this._c_+val)|0;
+                return val>>>0;
             }
-            c = `rgb(${R}, ${G}, ${B})`;
-        }
-
-        function colorTouch() {
-            let tmp = Math.round(Math.random() * 255),
-                tmp2 = Math.round(Math.random() * 255),
-                tmp3 = Math.round(Math.random() * 255);
-            c = `rgb(${tmp}, ${tmp2}, ${tmp3})`;
-        }
-
-        function mapRange(value, low1, high1, low2, high2) {
-            return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
-        }
-
-        function randomInt(min = 0, max = 1, arrLength = 0, arr2Length = 0, arr3Length = 0) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            arrLength = Math.floor(arrLength);
-            arr2Length = Math.floor(arr2Length);
-            arr3Length = Math.floor(arr3Length);
-            if (min > max) {
-                let tmp = min;
-                min = max;
-                max = tmp;
+            /**
+             * __get the next random value__
+             * @returns {number} a random value between 0 and 1 (inclusive)
+             */
+            get value(){
+                "use strict";
+                return this.value32bit/0xFFFFFFFF;
             }
-            if (arrLength > 0) {
-                let tmp = [];
-                for (let i = 0; i < arrLength; i++) {
-                    if (arr2Length > 0) {
-                        tmp[i] = [];
-                        for (let i2 = 0; i2 < arr2Length; i2++) {
-                            if (arr3Length > 0) {
-                                tmp[i][i2] = [];
-                                for (let i3 = 0; i3 < arr3Length; i3++) {
-                                    tmp[i][i2].push(Math.floor(Math.random() * (max - min + 1)) + min);
-                                }
-                            } else {
-                                tmp[i].push(Math.floor(Math.random() * (max - min + 1)) + min);
-                            }
-                        }
-                    } else {
-                        tmp.push(Math.floor(Math.random() * (max - min + 1)) + min);
-                    }
+            /**
+             * __get a random boolean value__
+             * @returns {boolean} a random boolean value
+             */
+            get bool(){
+                "use strict";
+                return this.value32bit<0x10000;
+            }
+            /**
+             * __get the next random value and translate it to given range__ \
+             * _range is inclusive and gives a float_
+             * @param {number} min - lower bound (inclusive)
+             * @param {number} max - upper bound (inclusive)
+             * @returns {number} random value within set range
+             * @throws {TypeError} - if `min` or `max` are not finite numbers
+             */
+            range(min,max){
+                "use strict";
+                if(!((typeof min==="number")&&Number.isFinite(min)))throw new TypeError("[RNG::range] min is not a finite number");
+                if(!((typeof max==="number")&&Number.isFinite(max)))throw new TypeError("[RNG::range] max is not a finite number");
+                if(min===max)return min;
+                return(this.value32bit*(max-min)+0xFFFFFFFF*min)/0xFFFFFFFF;
+            }
+        }
+        //~  _   _______ _        ___                                       _
+        //~ | | | | ___ \ |      / _ \                                     | |
+        //~ | | | | |_/ / |     / /_\ \_ __ __ _ _   _ _ __ ___   ___ _ __ | |_ ___
+        //~ | | | |    /| |     |  _  | '__/ _` | | | | '_ ` _ \ / _ \ '_ \| __/ __|
+        //~ | |_| | |\ \| |____ | | | | | | (_| | |_| | | | | | |  __/ | | | |_\__ \
+        //~  \___/\_| \_\_____/ \_| |_/_|  \__, |\__,_|_| |_| |_|\___|_| |_|\__|___/
+        //~                                 __/ |
+        //~                                |___/
+        let _seed_=Math.floor(Date.now()/0xEA60).toString(0x10),//~ changes every minute
+            _fpsView_=true,
+            _clearCanvas_=true,
+            _fpsMax_=0x3C,
+            _ballSize_=0.2,
+            _ballSpeed_=4,
+            _colorSpeed_=1,
+            _img_=undefined,
+            _imgPixelArt_=false,
+            _imgReplace_=true;
+        const args=window.location.search;
+        if(args.length>1)
+            for(const arg of args.substring(1).split('&'))
+                switch(true){
+                    case arg==="transparent=1":document.body.style.backgroundColor="transparent";break;
+                    case /^fpsView=[01]$/.test(arg):_fpsView_=arg.substring(8)==='1';break;
+                    case /^clearCanvas=[01]$/.test(arg):_clearCanvas_=arg.substring(0xC)==='1';break;
+                    case /^fpsMax=[1-9][0-9]*$/.test(arg):if(Number.isSafeInteger(Number(arg.substring(7))))_fpsMax_=Number(arg.substring(7));break;
+                    case /^ballSize=(?:[01]|0\.[0-9]{1,9})$/.test(arg):_ballSize_=Number(arg.substring(9));break;
+                    case /^ballSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xA))))_ballSpeed_=Number(arg.substring(0xA));break;
+                    case /^colorSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xB))))_colorSpeed_=Number(arg.substring(0xB));break;
+                    case /^seed=.*$/.test(arg):_seed_=arg.substring(5);break;
+                    case /^img=.+$/.test(arg):_img_=decodeURIComponent(arg.substring(4));break;
+                    case /^imgPixelArt=[01]$/.test(arg):_imgPixelArt_=arg.substring(0xC)==='1';break;
+                    case /^imgOverrideBall=[01]$/.test(arg):_imgReplace_=arg.substring(0x10)==='1';break;
                 }
-                return tmp;
-            } else {
-                return (Math.floor(Math.random() * (max - min + 1)) + min);
-            }
-        };
-
-        function refreshLoop() {
-            window.requestAnimationFrame(() => {
-                const now = performance.now();
-                while (times.length > 0 && times[0] <= now - 1000) {
-                    times.shift();
+        const fpsLimit=_fpsMax_,
+            showFPS=_fpsView_,
+            clearCanvas=_clearCanvas_,
+            ballSizePercent=_ballSize_,
+            ballSpeed=_ballSpeed_,
+            colorSpeed=_colorSpeed_,
+            ballImg=_img_,
+            ballImgPixelArt=_imgPixelArt_,
+            ballImgReplace=_imgReplace_,
+            rng=new RNG(_seed_);
+        //~  _____      _
+        //~ /  ___|    | |
+        //~ \ `--.  ___| |_ _   _ _ __
+        //~  `--. \/ _ \ __| | | | '_ \
+        //~ /\__/ /  __/ |_| |_| | |_) |
+        //~ \____/ \___|\__|\__,_| .__/
+        //~                      | |
+        //~                      |_|
+        const canvasHTML=document.createElement("canvas"),
+            img=document.createElement("img"),
+            canvas=canvasHTML.getContext("2d"),
+            ogFont=canvas.font;
+        document.body.appendChild(canvasHTML);
+        canvasHTML.width=innerWidth;
+        canvasHTML.height=innerHeight;
+        window.addEventListener("resize",()=>{
+            "use strict";
+            canvasHTML.width=innerWidth;
+            canvasHTML.height=innerHeight;
+        },{passive:true});
+        let direction=[
+                rng.bool,
+                rng.bool
+            ],
+            position=[
+                rng.range(0,window.innerWidth),
+                rng.range(0,window.innerHeight)
+            ],
+            lastFrameTime=0,
+            colorHue=120,
+            drawImg=false,
+            fps=0x3C;
+        if(ballImg!=null){
+            if(ballImgPixelArt)img.style.imageRendering="pixelated";
+            img.style.width="100%";
+            img.style.height="100%";
+            img.addEventListener("load",()=>drawImg=true,{passive:true,once:true});
+            img.src=ballImg;
+        }
+        //~ ______
+        //~ |  _  \
+        //~ | | | |_ __ __ ___      __
+        //~ | | | | '__/ _` \ \ /\ / /
+        //~ | |/ /| | | (_| |\ V  V /
+        //~ |___/ |_|  \__,_| \_/\_/
+        async function draw(){
+            "use strict";
+            if(clearCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
+            const ballSize=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5;
+            //~ ball direction
+            if(position[0]+ballSize>window.innerWidth)direction[0]=false;
+            else if(position[0]-ballSize<0)direction[0]=true;
+            if(position[1]+ballSize>window.innerHeight)direction[1]=false;
+            else if(position[1]-ballSize<0)direction[1]=true;
+            //~ ball position
+            position[0]+=ballSpeed*(direction[0]?1:-1);
+            position[1]+=ballSpeed*(direction[1]?1:-1);
+            //~ draw ball &/ img
+            if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-ballSize,position[1]-ballSize,ballSize*2,ballSize*2);
+            else{
+                canvas.beginPath();
+                canvas.arc(position[0],position[1],ballSize,0,Math.PI*2);
+                canvas.closePath();
+                canvas.stroke();
+                colorHue=(colorHue+colorSpeed)%360;
+                canvas.fillStyle=`hsl(${colorHue}, 100%, 50%)`;
+                canvas.fill();
+                if(drawImg){
+                    canvas.beginPath();
+                    canvas.arc(position[0],position[1],ballSize,0,Math.PI*2);
+                    canvas.closePath();
+                    canvas.save();
+                    canvas.clip();
+                    canvas.drawImage(img,position[0]-ballSize,position[1]-ballSize,ballSize*2,ballSize*2);
+                    canvas.restore();
                 }
-                times.push(now);
-                fps = times.length;
-                draw(); /* repeat this function */
-                refreshLoop();
+            }
+            //~ draw fps
+            if(showFPS){
+                canvas.beginPath();
+                canvas.font="20px consolas,monospace";
+                canvas.fillStyle="#0f0";
+                canvas.strokeText(`fps ${fps}`,15,30);
+                canvas.fillText(`fps ${fps}`,15,30);
+                canvas.closePath();
+            }
+        }
+        //~  _
+        //~ | |
+        //~ | |     ___   ___  _ __
+        //~ | |    / _ \ / _ \| '_ \
+        //~ | |___| (_) | (_) | |_) |
+        //~ \_____/\___/ \___/| .__/
+        //~                   | |
+        //~                   |_|
+        let _previousFrameTimestamp_=performance.now(),
+            _previousFPS_=[];
+        const animationLoop=()=>{
+            "use strict";
+            window.requestAnimationFrame(async()=>{
+                "use strict";
+                const now=performance.now();
+                fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
+                await draw();
+                _previousFrameTimestamp_=now;
+                const frameDelay=fpsLimit===0?0:((now+(1000/fpsLimit))-performance.now());
+                setTimeout(()=>{
+                    lastFrameTime=1000/(performance.now()-now);
+                    for(let i=Math.min(_previousFPS_.length,19);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
+                    _previousFPS_[0]=Math.round(lastFrameTime);
+                    animationLoop();
+                },Math.max(frameDelay,0));
             });
         }
-
-        function logCmd() {
-            log.length = 0;
-            log = {
-                h: h,
-                v: v,
-                x: x,
-                y: y,
-                r: r,
-                movM: movM,
-                movMTouch: movMTouch,
-                movMTouchValue: 'min: ' + movMTouchValue.min + 'px, max: ' + movMTouchValue.max + 'px (last: ' + movMTouchValue.last + 'px)',
-                ballspeed: ballSpeed,
-                c: c,
-                cStage: cStage,
-                cStep: cStep,
-                cTouch: cTouch,
-                fps: fps,
-                cnvhtml_width: cnvhtml.width,
-                cnvhtml_height: cnvhtml.height
-            };
-            console.log(log);
-            return log;
-        }
-        logCmd();
-        refreshLoop();
+        animationLoop();
+        //~  _____       __
+        //~ |_   _|     / _|
+        //~   | | _ __ | |_ ___
+        //~   | || '_ \|  _/ _ \
+        //~  _| || | | | || (_) |
+        //~  \___/_| |_|_| \___/
+        console.groupCollapsed(
+            "%c%s",
+            "background-color:#000;color:#0F0;font-size:larger",
+            "available URL parameters"
+        );
+            console.log(
+                "%c%s",
+                "background-color:#000;color:#0F0;font-family:consolas,monospace",
+                [
+                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
+                    "| parameter       | possible values       | description                                               | default value           |",
+                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
+                    "| transparent     | 0 / 1                 | make the background of the website transparent            | 0                       |",
+                    "| fpsView         | 0 / 1                 | show fps                                                  | 1                       |",
+                    "| clearCanvas     | 0 / 1                 | clears the canvas every frame                             | 1                       |",
+                    "| fpsMax          | safe integer          | set the max frame rate                                    | 60                      |",
+                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
+                    "| ballSize        | 0.0 - 1.0             | set the ball size (%) relative to the smaller window size | 0.2                     |",
+                    "| ballSpeed       | finite float          | set the speed of the ball                                 | 4                       |",
+                    "| colorSpeed      | finite float          | set the speed of the color shift                          | 1                       |",
+                    "| seed            | any                   | set the seed for RNG                                      | minute timestamp in hex |",
+                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+",
+                    "| img             | image (URI component) | put an image on the ball (encode value as URI component)  | none                    |",
+                    "| imgPixelArt     | 0/1                   | enable better renderer for pixel art                      | 0                       |",
+                    "| imgOverrideBall | 0/1                   | when active replaces the ball with the image              | 1                       |",
+                    "+-----------------+-----------------------+-----------------------------------------------------------+-------------------------+"
+                ].join('\n')
+            );
+        console.groupEnd();
     </script>
 </body>
-
 </html>
