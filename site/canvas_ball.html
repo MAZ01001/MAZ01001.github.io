@@ -176,6 +176,7 @@
         let _seed_=Math.floor(Date.now()/0xEA60).toString(0x10),//~ changes every minute
             _fpsView_=true,
             _clearCanvas_=true,
+            _ballOutline_=true,
             _ballSize_=0.2,
             _ballSpeed_=0xF0,
             _colorSpeed_=0x3C,
@@ -189,6 +190,7 @@
                     case arg==="transparent=1":document.body.style.backgroundColor="transparent";break;
                     case /^fpsView=[01]$/.test(arg):_fpsView_=arg.substring(8)==='1';break;
                     case /^clearCanvas=[01]$/.test(arg):_clearCanvas_=arg.substring(0xC)==='1';break;
+                    case /^ballOutline=[01]$/.test(arg):_ballOutline_=arg.substring(0xC)==='1';break;
                     case /^ballSize=(?:[01]|0?\.[0-9]*[1-9])$/.test(arg):_ballSize_=Number(arg.substring(9));break;
                     case /^ballSpeed=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xA))))_ballSpeed_=Number(arg.substring(0xA));break;
                     case /^colorSpeed=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xB))))_colorSpeed_=Number(arg.substring(0xB));break;
@@ -199,6 +201,7 @@
                 }
         const showFPS=_fpsView_,
             clearCanvas=_clearCanvas_,
+            ballOutline=_ballOutline_,
             ballSizePercent=_ballSize_,
             ballSpeed=_ballSpeed_,
             colorSpeed=_colorSpeed_,
@@ -300,7 +303,7 @@
                     canvas.beginPath();
                     canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
                     canvas.closePath();
-                    canvas.stroke();
+                    if(ballOutline)canvas.stroke();
                     colorHue=(colorHue+colorSpeed*deltaTime)%0x168;
                     canvas.fillStyle=`hsl(${colorHue}, 100%, 50%)`;
                     canvas.fill();
@@ -370,6 +373,7 @@
                     "| transparent     | 0 or 1                          | make the background of the website transparent            | 0                       |",
                     "| fpsView         | 0 or 1                          | show fps                                                  | 1                       |",
                     "| clearCanvas     | 0 or 1                          | clears the canvas every frame                             | 1                       |",
+                    "| ballOutline     | 0 or 1                          | give the ball/image drawn a black outline                 | 1                       |",
                     "| seed            | anything                        | set the seed for RNG                                      | minute timestamp in hex |",
                     "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
                     "| ballSize        | 0 to 1                          | set the ball size (%) relative to the smaller window size | 0.2                     |",

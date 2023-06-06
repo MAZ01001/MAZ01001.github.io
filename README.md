@@ -50,6 +50,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
     <tr><td><code>transparent</code></td><td>0 or 1</td><td>make the background of the website transparent</td><td><code>0</code></td></tr>
     <tr><td><code>fpsView</code></td><td>0 or 1</td><td>show fps</td><td><code>1</code></td></tr>
     <tr><td><code>clearCanvas</code></td><td>0 or 1</td><td>clears the canvas every frame</td><td><code>1</code></td></tr>
+    <tr><td><code>ballOutline</code></td><td>0 or 1</td><td>give the ball/image drawn a black outline</td><td><code>1</code></td></tr>
     <tr><td><code>seed</code></td><td>anything</td><td>set the seed for RNG</td><td>minute timestamp in hex</td></tr>
     <tr><td><code>ballSize</code></td><td>0 to 1</td><td>set the ball size (%) relative to the smaller window size</td><td><code>0.2</code></td></tr>
     <tr><td><code>ballSpeed</code></td><td>positive decimal number<br/>(supports scientific notation)</td><td>set the speed of the ball in pixels per second</td><td><code>240</code></td></tr>
