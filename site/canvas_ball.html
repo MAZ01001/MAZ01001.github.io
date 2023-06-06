@@ -189,9 +189,9 @@
                     case arg==="transparent=1":document.body.style.backgroundColor="transparent";break;
                     case /^fpsView=[01]$/.test(arg):_fpsView_=arg.substring(8)==='1';break;
                     case /^clearCanvas=[01]$/.test(arg):_clearCanvas_=arg.substring(0xC)==='1';break;
-                    case /^ballSize=(?:1|0\.[0-9]{0,8}[1-9])$/.test(arg):_ballSize_=Number(arg.substring(9));break;
-                    case /^ballSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xA))))_ballSpeed_=Number(arg.substring(0xA));break;
-                    case /^colorSpeed=(?:0\.[0-9]{0,8}[1-9]|[1-9][0-9]*(?:\.[0-9]{1,9})?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xB))))_colorSpeed_=Number(arg.substring(0xB));break;
+                    case /^ballSize=(?:[01]|0?\.[0-9]*[1-9])$/.test(arg):_ballSize_=Number(arg.substring(9));break;
+                    case /^ballSpeed=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xA))))_ballSpeed_=Number(arg.substring(0xA));break;
+                    case /^colorSpeed=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):if(Number.isFinite(Number(arg.substring(0xB))))_colorSpeed_=Number(arg.substring(0xB));break;
                     case /^seed=.*$/.test(arg):_seed_=arg.substring(5);break;
                     case /^img=.+$/.test(arg):_img_=decodeURIComponent(arg.substring(4));break;
                     case /^imgPixelArt=[01]$/.test(arg):_imgPixelArt_=arg.substring(0xC)==='1';break;
@@ -238,9 +238,9 @@
             colorHue=0x78,
             drawImg=false,
             fps=0x3C;
+        canvas.imageSmoothingEnabled=!ballImgPixelArt;
         if(ballImg!=null){
-            if(ballImgPixelArt)img.style.imageRendering="pixelated";
-            img.addEventListener("load",()=>drawImg=true,{passive:true,once:true});
+            img.addEventListener("load",()=>{drawImg=true},{passive:true,once:true});
             img.src=ballImg;
         }
         //~ ______
@@ -249,39 +249,55 @@
         //~ | | | | '__/ _` \ \ /\ / /
         //~ | |/ /| | | (_| |\ V  V /
         //~ |___/ |_|  \__,_| \_/\_/
-        /**@type {(n:number,min:number,max:number)=>number} - clamps a number to given range*/
-        const clamp=(n,min,max)=>n<min?min:(n>max?max:n);
         /**@type {(deltaTime:number)=>void} - renders one frame on `canvas`*/
         const draw=deltaTime=>{
             "use strict";
             if(clearCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
-            const ballSize=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5;
-            //~ ball direction
-            if(position[0]+ballSize>window.innerWidth)direction[0]=false;
-            else if(position[0]-ballSize<0)direction[0]=true;
-            if(position[1]+ballSize>window.innerHeight)direction[1]=false;
-            else if(position[1]-ballSize<0)direction[1]=true;
-            //~ ball position
-            if(ballSize*2===window.innerWidth)position[0]=ballSize;
-            else{
-                position[0]+=ballSpeed*deltaTime*(direction[0]?1:-1);
-                position[0]=clamp(position[0],0,window.innerWidth);
+            const ballRadius=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5;
+            //~ ball position (possibly overshoot)
+            if(ballSizePercent===1&&window.innerWidth<window.innerHeight)position[0]=ballRadius;
+            else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
+            if(ballSizePercent===1&&window.innerHeight<window.innerWidth)position[1]=ballRadius;
+            else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
+            //~ ball trajectory calculation (clamp position)
+            const limitRight=window.innerWidth-ballRadius,
+                limitDown=window.innerHeight-ballRadius,
+                boundWidth=window.innerWidth-(ballRadius*2),
+                boundHeight=window.innerHeight-(ballRadius*2);
+            //~ X overshoot right/left
+            if(position[0]>=limitRight){
+                const xFields=Math.floor((position[0]-ballRadius)/boundWidth);
+                position[0]=ballRadius+((position[0]-ballRadius)%boundWidth);
+                if(xFields&1===1)position[0]=window.innerWidth-position[0];
+                direction[0]=false;
+            }else if(position[0]<=ballRadius){
+                const xFields=Math.floor((ballRadius-position[0])/boundWidth);
+                position[0]=ballRadius+((ballRadius-position[0])%boundWidth);
+                if(xFields&1===0)position[0]=window.innerWidth-position[0];
+                direction[0]=true;
             }
-            if(ballSize*2===window.innerHeight)position[1]=ballSize;
-            else{
-                position[1]+=ballSpeed*deltaTime*(direction[1]?1:-1);
-                position[1]=clamp(position[1],0,window.innerHeight);
+            //~ Y overshoot down/up
+            if(position[1]>=limitDown){
+                const yFields=Math.floor((position[1]-ballRadius)/boundHeight);
+                position[1]=ballRadius+((position[1]-ballRadius)%boundHeight);
+                if(yFields&1===1)position[1]=window.innerHeight-position[1];
+                direction[1]=false;
+            }else if(position[1]<=ballRadius){
+                const yFields=Math.floor((ballRadius-position[1])/boundHeight);
+                position[1]=ballRadius+((ballRadius-position[1])%boundHeight);
+                if(yFields&1===0)position[1]=window.innerHeight-position[1];
+                direction[1]=true;
             }
             //~ draw ball &/ img
             const[imgW,imgH]=(()=>{
-                if(img.width>img.height)return[ballSize,ballSize*(img.height/img.width)];
-                if(img.width<img.height)return[ballSize*(img.width/img.height),ballSize];
-                return[ballSize,ballSize];
+                if(img.width>img.height)return[ballRadius,ballRadius*(img.height/img.width)];
+                if(img.width<img.height)return[ballRadius*(img.width/img.height),ballRadius];
+                return[ballRadius,ballRadius];
             })();
             if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
             else{
                 canvas.beginPath();
-                canvas.arc(position[0],position[1],ballSize,0,Math.PI*2);
+                canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
                 canvas.closePath();
                 canvas.stroke();
                 colorHue=(colorHue+colorSpeed*deltaTime)%0x168;
@@ -289,7 +305,7 @@
                 canvas.fill();
                 if(drawImg){
                     canvas.beginPath();
-                    canvas.arc(position[0],position[1],ballSize,0,Math.PI*2);
+                    canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
                     canvas.closePath();
                     canvas.save();
                     canvas.clip();
@@ -324,7 +340,7 @@
                 const frameTime=frameTimestamp-_previousFrameTimestamp_;
                 _previousFrameTimestamp_=frameTimestamp;
                 fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
-                draw(frameTime/0x3E8);
+                if(frameTimestamp>100&&ballSizePercent>0)draw(frameTime/0x3E8);
                 for(let i=Math.min(_previousFPS_.length,9);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
                 _previousFPS_[0]=Math.round(0x3E8/frameTime);
                 animationLoop();
