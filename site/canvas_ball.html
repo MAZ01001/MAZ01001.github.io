@@ -253,64 +253,66 @@
         const draw=deltaTime=>{
             "use strict";
             if(clearCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
-            const ballRadius=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5;
-            //~ ball position (possibly overshoot)
-            if(ballSizePercent===1&&window.innerWidth<window.innerHeight)position[0]=ballRadius;
-            else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
-            if(ballSizePercent===1&&window.innerHeight<window.innerWidth)position[1]=ballRadius;
-            else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
-            //~ ball trajectory calculation (clamp position)
-            const limitRight=window.innerWidth-ballRadius,
-                limitDown=window.innerHeight-ballRadius,
-                boundWidth=window.innerWidth-(ballRadius*2),
-                boundHeight=window.innerHeight-(ballRadius*2);
-            //~ X overshoot right/left
-            if(position[0]>=limitRight){
-                const xFields=Math.floor((position[0]-ballRadius)/boundWidth);
-                position[0]=ballRadius+((position[0]-ballRadius)%boundWidth);
-                if(xFields&1===1)position[0]=window.innerWidth-position[0];
-                direction[0]=false;
-            }else if(position[0]<=ballRadius){
-                const xFields=Math.floor((ballRadius-position[0])/boundWidth);
-                position[0]=ballRadius+((ballRadius-position[0])%boundWidth);
-                if(xFields&1===0)position[0]=window.innerWidth-position[0];
-                direction[0]=true;
-            }
-            //~ Y overshoot down/up
-            if(position[1]>=limitDown){
-                const yFields=Math.floor((position[1]-ballRadius)/boundHeight);
-                position[1]=ballRadius+((position[1]-ballRadius)%boundHeight);
-                if(yFields&1===1)position[1]=window.innerHeight-position[1];
-                direction[1]=false;
-            }else if(position[1]<=ballRadius){
-                const yFields=Math.floor((ballRadius-position[1])/boundHeight);
-                position[1]=ballRadius+((ballRadius-position[1])%boundHeight);
-                if(yFields&1===0)position[1]=window.innerHeight-position[1];
-                direction[1]=true;
-            }
-            //~ draw ball &/ img
-            const[imgW,imgH]=(()=>{
-                if(img.width>img.height)return[ballRadius,ballRadius*(img.height/img.width)];
-                if(img.width<img.height)return[ballRadius*(img.width/img.height),ballRadius];
-                return[ballRadius,ballRadius];
-            })();
-            if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
-            else{
-                canvas.beginPath();
-                canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
-                canvas.closePath();
-                canvas.stroke();
-                colorHue=(colorHue+colorSpeed*deltaTime)%0x168;
-                canvas.fillStyle=`hsl(${colorHue}, 100%, 50%)`;
-                canvas.fill();
-                if(drawImg){
+            if(ballSizePercent>0){
+                const ballRadius=((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent)*0.5;
+                //~ ball position (possibly overshoot)
+                if(ballSizePercent===1&&window.innerWidth<window.innerHeight)position[0]=ballRadius;
+                else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
+                if(ballSizePercent===1&&window.innerHeight<window.innerWidth)position[1]=ballRadius;
+                else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
+                //~ ball trajectory calculation (clamp position)
+                const limitRight=window.innerWidth-ballRadius,
+                    limitDown=window.innerHeight-ballRadius,
+                    boundWidth=window.innerWidth-(ballRadius*2),
+                    boundHeight=window.innerHeight-(ballRadius*2);
+                //~ X overshoot right/left
+                if(position[0]>=limitRight){
+                    const xFields=Math.floor((position[0]-ballRadius)/boundWidth);
+                    position[0]=ballRadius+((position[0]-ballRadius)%boundWidth);
+                    if(xFields&1===1)position[0]=window.innerWidth-position[0];
+                    direction[0]=false;
+                }else if(position[0]<=ballRadius){
+                    const xFields=Math.floor((ballRadius-position[0])/boundWidth);
+                    position[0]=ballRadius+((ballRadius-position[0])%boundWidth);
+                    if(xFields&1===0)position[0]=window.innerWidth-position[0];
+                    direction[0]=true;
+                }
+                //~ Y overshoot down/up
+                if(position[1]>=limitDown){
+                    const yFields=Math.floor((position[1]-ballRadius)/boundHeight);
+                    position[1]=ballRadius+((position[1]-ballRadius)%boundHeight);
+                    if(yFields&1===1)position[1]=window.innerHeight-position[1];
+                    direction[1]=false;
+                }else if(position[1]<=ballRadius){
+                    const yFields=Math.floor((ballRadius-position[1])/boundHeight);
+                    position[1]=ballRadius+((ballRadius-position[1])%boundHeight);
+                    if(yFields&1===0)position[1]=window.innerHeight-position[1];
+                    direction[1]=true;
+                }
+                //~ draw ball &/ img
+                const[imgW,imgH]=(()=>{
+                    if(img.width>img.height)return[ballRadius,ballRadius*(img.height/img.width)];
+                    if(img.width<img.height)return[ballRadius*(img.width/img.height),ballRadius];
+                    return[ballRadius,ballRadius];
+                })();
+                if(drawImg&&ballImgReplace)canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
+                else{
                     canvas.beginPath();
                     canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
                     canvas.closePath();
-                    canvas.save();
-                    canvas.clip();
-                    canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
-                    canvas.restore();
+                    canvas.stroke();
+                    colorHue=(colorHue+colorSpeed*deltaTime)%0x168;
+                    canvas.fillStyle=`hsl(${colorHue}, 100%, 50%)`;
+                    canvas.fill();
+                    if(drawImg){
+                        canvas.beginPath();
+                        canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
+                        canvas.closePath();
+                        canvas.save();
+                        canvas.clip();
+                        canvas.drawImage(img,position[0]-imgW,position[1]-imgH,imgW*2,imgH*2);
+                        canvas.restore();
+                    }
                 }
             }
             //~ draw fps
@@ -340,7 +342,7 @@
                 const frameTime=frameTimestamp-_previousFrameTimestamp_;
                 _previousFrameTimestamp_=frameTimestamp;
                 fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
-                if(frameTimestamp>100&&ballSizePercent>0)draw(frameTime/0x3E8);
+                if(frameTimestamp>100)draw(frameTime/0x3E8);
                 for(let i=Math.min(_previousFPS_.length,9);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
                 _previousFPS_[0]=Math.round(0x3E8/frameTime);
                 animationLoop();
@@ -368,11 +370,13 @@
                     "| transparent     | 0 or 1                          | make the background of the website transparent            | 0                       |",
                     "| fpsView         | 0 or 1                          | show fps                                                  | 1                       |",
                     "| clearCanvas     | 0 or 1                          | clears the canvas every frame                             | 1                       |",
-                    "| seed            | any                             | set the seed for RNG                                      | minute timestamp in hex |",
+                    "| seed            | anything                        | set the seed for RNG                                      | minute timestamp in hex |",
                     "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
-                    "| ballSize        | 0.000000001 to 1.0              | set the ball size (%) relative to the smaller window size | 0.2                     |",
-                    "| ballSpeed       | finite float (9 decimal digits) | set the speed of the ball in pixels peer second           | 240                     |",
-                    "| colorSpeed      | finite float (9 decimal digits) | set the speed of the color shift in degrees peer second   | 60                      |",
+                    "| ballSize        | 0 to 1                          | set the ball size (%) relative to the smaller window size | 0.2                     |",
+                    "| ballSpeed       | positive decimal number         | set the speed of the ball in pixels per second            | 240                     |",
+                    "|                 | (supports scientific notation)  |                                                           |                         |",
+                    "| colorSpeed      | positive decimal number         | set the speed of the color shift in degrees per second    | 60                      |",
+                    "|                 | (supports scientific notation)  |                                                           |                         |",
                     "+-----------------+---------------------------------+-----------------------------------------------------------+-------------------------+",
                     "| img             | HTML image source (URL)         | put an image on the ball (encode value as URI component)  | none                    |",
                     "|                 | (encoded URI component)         |                                                           |                         |",
