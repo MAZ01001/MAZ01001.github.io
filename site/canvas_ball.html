@@ -40,7 +40,7 @@
          * @example new RNG("seed").value; //=> 0.8370377509475307
          * @author MAZ <https://MAZ01001.GitHub.io/>
          */
-        const RNG=class{
+        const RNG=Object.freeze(class RNG{
             /**@type {number} - [private] first internal rng value*/
             _a_=0;
             /**@type {number} - [private] second internal rng value*/
@@ -70,6 +70,7 @@
                 if(seed==null)seed=Date.now().toString(0x10);
                 if(typeof seed!=="string")throw new TypeError("[RNG::constructor] seedString is not a string");
                 [this._a_,this._b_,this._c_,this._d_]=RNG._generateSeed_(seed);
+                return Object.preventExtensions(this);
             }
             /**
              * __creates a new `RNG` object with given state__
@@ -164,7 +165,7 @@
                 if(min===max)return min;
                 return(this.value32bit*(max-min)+0xFFFFFFFF*min)/0xFFFFFFFF;
             }
-        }
+        });
         //~  _   _______ _        ___                                       _
         //~ | | | | ___ \ |      / _ \                                     | |
         //~ | | | | |_/ / |     / /_\ \_ __ __ _ _   _ _ __ ___   ___ _ __ | |_ ___
@@ -241,7 +242,7 @@
             colorHue=0x78,
             drawImg=false,
             fps=0x3C;
-        canvas.imageSmoothingEnabled=!ballImgPixelArt;
+        if(canvas.imageSmoothingEnabled=!ballImgPixelArt)canvas.imageSmoothingQuality="high";
         if(ballImg!=null){
             img.addEventListener("load",()=>{drawImg=true},{passive:true,once:true});
             img.src=ballImg;
@@ -338,20 +339,17 @@
         //~                   |_|
         let _previousFrameTimestamp_=0,
             _previousFPS_=[];
-        const animationLoop=()=>{
+        const animationLoop=frameTimestamp=>{
             "use strict";
-            window.requestAnimationFrame(frameTimestamp=>{
-                "use strict";
-                const frameTime=frameTimestamp-_previousFrameTimestamp_;
-                _previousFrameTimestamp_=frameTimestamp;
-                fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
-                if(frameTimestamp>100)draw(frameTime/0x3E8);
-                for(let i=Math.min(_previousFPS_.length,9);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
-                _previousFPS_[0]=Math.round(0x3E8/frameTime);
-                animationLoop();
-            });
+            const frameTime=frameTimestamp-_previousFrameTimestamp_;
+            _previousFrameTimestamp_=frameTimestamp;
+            fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
+            if(frameTimestamp>0x64)draw(frameTime/0x3E8);
+            for(let i=Math.min(_previousFPS_.length,9);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
+            _previousFPS_[0]=Math.round(0x3E8/frameTime);
+            window.requestAnimationFrame(animationLoop);
         }
-        animationLoop();
+        window.requestAnimationFrame(animationLoop);
         //~  _____       __
         //~ |_   _|     / _|
         //~   | | _ __ | |_ ___
