@@ -293,6 +293,7 @@
                     if(yFields&1===0)position[1]=window.innerHeight-position[1];
                     direction[1]=true;
                 }
+                // TODO add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
                 //~ draw ball &/ img
                 const[imgW,imgH]=(()=>{
                     if(img.width>img.height)return[ballRadius,ballRadius*(img.height/img.width)];
