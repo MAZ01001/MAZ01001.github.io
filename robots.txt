@@ -1,5 +1,10 @@
 User-agent: *
 Disallow: /*
 Allow: /$
-Allow: /README.md$
-Allow: /*.html$
+Allow: /index
+Allow: /README
+Allow: /site/*
+User-agent: GPTBot
+Disallow: /*
+Allow: /README
+Allow: /site/*
