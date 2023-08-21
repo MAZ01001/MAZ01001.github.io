@@ -27,7 +27,7 @@
     <meta name="msapplication-config" content="./img/browserconfig.xml">
     <meta name="theme-color" content="#ff9900">
     <title>MAZ01001 Homepage</title>
-    <script>// [ CSS.registerProperty() ] Chromium only (https://developer.mozilla.org/en-US/docs/Web/API/CSS/RegisterProperty#browser_compatibility)
+    <script>//! [ CSS.registerProperty() ] Chromium only (https://developer.mozilla.org/en-US/docs/Web/API/CSS/RegisterProperty#browser_compatibility)
         CSS.registerProperty({name:'--barsplus',syntax:'<length>',initialValue:'0px',inherits:false});
         CSS.registerProperty({name:'--rainbowanglecolor',syntax:'<angle>',initialValue:'120deg',inherits:false});
         CSS.registerProperty({name:'--textshadowcolorglow',syntax:'<color>',initialValue:'#0f0',inherits:false});
@@ -42,29 +42,6 @@
             margin:0;
             overflow: hidden;
         }
-        @keyframes bgbars{to{background-position:-56px 0;}}
-        .bgbars{/* old technique with extra div: */
-            --barsc1: #ff0;
-            --barsc2: #000;
-            background-image: repeating-linear-gradient(-45deg,
-                var(--barsc1) 0, var(--barsc1) 18px,
-                var(--barsc2) 0, var(--barsc2) 39px
-            );/* 2 bars = 56px */
-            background-size: calc(100% + 58px) 100%;
-            background-position: 0px 0;
-            animation: bgbars 2s linear 0s infinite reverse running;
-        }
-        /* old technique 2 with js:
-            style:
-                div#box{--barsplus:0px; [...] }
-            script:
-                setInterval(()=>{
-                    const el=document.getElementById('box');
-                    let n=parseFloat(getComputedStyle(el).getPropertyValue('--barsplus'));
-                    while(n<0){n+=39;}
-                    el.style.setProperty('--barsplus',`${n-(39*.02)}px`);
-                },50);
-        */
         @keyframes bars{to{--barsplus:39px;}}
         div#box{
             --barsc1: #ff0;
@@ -104,9 +81,6 @@
             height: max(100vh,1000px);
             pointer-events: none;
             --shadow: 0.4em;
-            /* filter: url(#drop-shadow); */
-            /* filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='"+hsl(var(--rainbowanglecolor),100%,50%)+"')"; */
-            /* -webkit-filter: drop-shadow(0px 0px var(--shadow,20px) hsl(var(--rainbowanglecolor),100%,50%)); */
             filter: drop-shadow(0px 0px var(--shadow,20px) hsl(var(--rainbowanglecolor),100%,50%));
             animation: shadowcolor 5s linear -1s infinite normal backwards running;
         }
@@ -244,31 +218,36 @@
             font-size: large;
         }
         ::-webkit-scrollbar{width: 1.2rem;height: 1.2rem;}
-        ::-webkit-scrollbar-thumb:window-inactive{border-color: #040F !important;}
+        ::-webkit-scrollbar-thumb:vertical:window-inactive{border-right-style: dashed;}
+        ::-webkit-scrollbar-thumb:horizontal:window-inactive{border-bottom-style: dashed;}
         ::-webkit-scrollbar-thumb:vertical{
             background-color: #0000;
-            border-right: .5rem solid #080F;
+            border-right: 0.2rem solid #000F;
             border-radius: 0;
         }
-        ::-webkit-scrollbar-thumb:vertical:hover{
-            background-color: #0F0F;
+        :hover::-webkit-scrollbar-thumb:vertical{
+            background-color: #000F;
+            box-shadow: inset 0.4rem 0 0.4rem 0 #0A0F;
             border: none;
-            border-top-left-radius: 1rem;
-            border-bottom-left-radius: 1rem;
+            border-top-left-radius: 1.4rem;
+            border-bottom-left-radius: 1.4rem;
         }
         ::-webkit-scrollbar-thumb:horizontal{
             background-color: #0000;
-            border-bottom: .5rem solid #080F;
+            border-bottom: 0.2rem solid #000F;
             border-radius: 0;
         }
-        ::-webkit-scrollbar-thumb:horizontal:hover{
-            background-color: #0F0F;
+        :hover::-webkit-scrollbar-thumb:horizontal{
+            background-color: #000F;
+            box-shadow: inset 0.4rem 0 0.4rem 0 #0A0F;
             border: none;
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
+            border-top-left-radius: 1.4rem;
+            border-top-right-radius: 1.4rem;
         }
-        ::-webkit-scrollbar-track{display: none;background-color: #0000;}
-        ::-webkit-scrollbar-track-piece{display: none;background-color: #0000;}
+        :hover::-webkit-scrollbar-thumb:hover:vertical,
+        :hover::-webkit-scrollbar-thumb:hover:horizontal{box-shadow: inset 0.4rem 0 0.4rem 0 #0F0F;}
+        ::-webkit-scrollbar-track,
+        ::-webkit-scrollbar-track-piece,
         ::-webkit-scrollbar-corner{display: none;background-color: #0000;}
     </style>
 </head>
