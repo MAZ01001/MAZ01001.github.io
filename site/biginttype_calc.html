@@ -2652,6 +2652,7 @@
          * @returns {number} the base or `NaN` if not supported
          */
         function _string_to_base(str){
+            "use strict";
             //~ ( https://en.wikipedia.org/wiki/list_of_numeral_systems#standard_positional_numeral_systems )
             switch(String(str).toLowerCase()){
                 //~ ALL YOUR BASE ARE BELONG TO US
@@ -2777,6 +2778,7 @@
          * @returns {boolean} `true` if valid `false` otherwise
          */
         function _test_num(base,num){
+            "use strict";
             base=Math.abs(Number(base));if(!Number.isSafeInteger(base)){return false;}
             num=String(num);
             if(base<=0x24){
@@ -2858,6 +2860,7 @@
          * @param {string} message - message to print
          */
         function _error_html(message){
+            "use strict";
             error_output.value=message;
             error_output.style.height="";
             error_output.style.height=error_output.scrollHeight + "px";
@@ -2868,6 +2871,7 @@
          * @param {string} message - message to apply
          */
         function _error_css(element,message){
+            "use strict";
             element.setCustomValidity(message);
             element.reportValidity();
         }
@@ -2877,6 +2881,7 @@
          * @param {HTMLElement} element - html element
          */
         function _numberInput(element){
+            "use strict";
             if(_test_num(_string_to_base(_CURRENT_BASE),element.value)){_error_css(element,"");}
             else{_error_css(element,`not in correct format for base ${_CURRENT_BASE}`);}
         }
@@ -2888,6 +2893,7 @@
          * @param {HTMLElement} element - html element
          */
         function _numberChange(element){
+            "use strict";
             _error_html("");
             _error_css(element,"");
             if(_test_num(_string_to_base(_CURRENT_BASE),element.value)){
@@ -2937,12 +2943,14 @@
         /**
          * __for use in button eventlisteners__
          * @discription set a delay in a promise that resolves after `t`ms
-         * @param {number} t - time in ms to delay
+         * @param {number} [t] - time in ms to delay - _default `100`_
          * @returns {Promise} Promise that resolves after `t`ms
          * @throw {TypeError} if `t` is not a save integer
          */
-        function _promise_delay(t=100){
-            t=Number(t);if(!Number.isSafeInteger(t)){throw new TypeError("[delay]:[t] is not a save integer");}
+        function _promise_delay(t){
+            "use strict";
+            if(t==null)t=100;
+            else if(typeof t!=="number"||!Number.isSafeInteger(t)){throw new TypeError("[delay]:[t] is not a save integer");}
             return new Promise(resolve=>setTimeout(resolve,t));
         }
         /**
@@ -2951,6 +2959,7 @@
          * @param {Error} error from promise
          */
         function _promise_error(error){
+            "use strict";
             _error_html(`{${error.name}} : "${error.message}"`);
             console.error(error);
         }
@@ -2959,6 +2968,7 @@
          * @discription set the value of `AtB` and hides the loader
          */
         function _promise_finally(){
+            "use strict";
             loader.classList.add("hid");
             _stats_AtB_();
             _update_to_url();
@@ -2966,11 +2976,13 @@
         /**
          * __parses a number from uri component__
          * @param {string} uri - uri component - an empty string results in +0
-         * @param {number} minMemory - min memory for `BigIntType.MAX_SIZE`
+         * @param {number} [minMemory] - min memory for `BigIntType.MAX_SIZE` - _default `500`_
          * @returns {Error|BigIntType} - an error or the number
          */
-        function _parse_uri_number(uri,minMemory=0x1F4){
+        function _parse_uri_number(uri,minMemory){
+            "use strict";
             if(uri==="")return BigIntType.Zero;
+            if(minMemory==null)minMemory=0x1F4;
             BigIntType.MAX_SIZE=0x4000000;
             let number;
             try{number=BigIntType.fromURL(uri);}
@@ -2996,6 +3008,7 @@
         }
         /**__load A and B form URL if possible__*/
         function _load_from_url(){
+            "use strict";
             const urlArguments=window.location.search.substring(1).split('&');
             let fetchA=null,fetchB=null,
                 minMemory=0x1F4;
@@ -3035,6 +3048,7 @@
         }
         /**__updates or add A and B to the URL__*/
         function _update_to_url(){
+            "use strict";
             const uri=window.location.search.substring(1).split('&').filter(v=>!/^[AB]=/.test(v));
             uri.push(`A=${_NUMBERS.a.toURL()}`);
             uri.push(`B=${_NUMBERS.b.toURL()}`);
@@ -3045,17 +3059,22 @@
          * @param {BigIntType} number - a number
          */
         function _add_mem(number){
+            "use strict";
             for(let i=_NUMBERS.mem.length-1;i>0;i--)_NUMBERS.mem[i].setEqualTo(_NUMBERS.mem[i-1]);
             _NUMBERS.mem[0].setEqualTo(number);
             _update_mem_ui();
         }
         /**__updates every value in `_NUMBERS.mem` on screen__*/
-        function _update_mem_ui(){for(let i=0;i<_NUMBERS.mem.length;i++)document.getElementById(`mem_slot_${i}`).value=_NUMBERS.mem[i].toString(_CURRENT_BASE);}
+        function _update_mem_ui(){
+            "use strict";
+            for(let i=0;i<_NUMBERS.mem.length;i++)document.getElementById(`mem_slot_${i}`).value=_NUMBERS.mem[i].toString(_CURRENT_BASE);
+        }
         /**
          * __get the total memory used by all the saved `BigIntType` numbers just existing__
          * @returns {BigInt} the number of Bytes used up by all `BigIntType` numbers
          */
         function _get_total_memory(){
+            "use strict";
             let byteSize=0n;
             byteSize+=BigInt(_NUMBERS.a.length);
             byteSize+=BigInt(_NUMBERS.b.length);
