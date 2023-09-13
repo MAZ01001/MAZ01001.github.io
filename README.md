@@ -7,6 +7,7 @@
 
 - [Unofficial Satisfactory U3 Flow Chart](#unofficial-satisfactory-u3-flow-chart)
 - [Ball Screensaver](#ball-screensaver)
+  - [[Ball Screensaver] available URL parameters](#ball-screensaver-available-url-parameters)
 - [Small Dice](#small-dice)
 - [Pascal's Triangle](#pascals-triangle)
 - [Math Function Drawer](#math-function-drawer)
@@ -40,25 +41,26 @@
 - a ball that moves diagonally across the screen and changes color
 - using only javascript (HTML5 canvas)
 
-### available URL parameters
+### [Ball Screensaver] available URL parameters
 
 URL parameters can be in any order (_starting with `?` after the URL then parameters in format `PARAMETER=VALUE` with `&` between each parameter_)
 
 <details open><summary>click to hide table</summary>
-  <table>
-    <tr><th><code>parameter</code></th><th>possible values</th><th>description</th><th>default value</th></tr>
-    <tr><td><code>transparent</code></td><td>0 or 1</td><td>make the background of the website transparent</td><td><code>0</code></td></tr>
-    <tr><td><code>fpsView</code></td><td>0 or 1</td><td>show fps</td><td><code>1</code></td></tr>
-    <tr><td><code>clearCanvas</code></td><td>0 or 1</td><td>clears the canvas every frame</td><td><code>1</code></td></tr>
-    <tr><td><code>ballOutline</code></td><td>0 or 1</td><td>give the ball/image drawn a black outline</td><td><code>1</code></td></tr>
-    <tr><td><code>seed</code></td><td>anything</td><td>set the seed for RNG</td><td>minute timestamp in hex</td></tr>
-    <tr><td><code>ballSize</code></td><td>0 to 1</td><td>set the ball size (%) relative to the smaller window size</td><td><code>0.2</code></td></tr>
-    <tr><td><code>ballSpeed</code></td><td>positive decimal number<br/>(supports scientific notation)</td><td>set the speed of the ball in pixels per second</td><td><code>240</code></td></tr>
-    <tr><td><code>colorSpeed</code></td><td>positive decimal number<br/>(supports scientific notation)</td><td>set the speed of the color shift in degrees per second</td><td><code>60</code></td></tr>
-    <tr><td><code>img</code></td><td>HTML image source (URL)<br/>(encoded URI component)</td><td>put an image on the ball</td><td>none</td></tr>
-    <tr><td><code>imgPixelArt</code></td><td>0 or 1</td><td>enable better renderer for pixel art</td><td><code>0</code></td></tr>
-    <tr><td><code>imgOverrideBall</code></td><td>0 or 1</td><td>when active replaces the ball with the image</td><td><code>1</code></td></tr>
-  </table>
+
+| parameter         | description                                               | default value           | possible values                                              |
+| ----------------- | --------------------------------------------------------- | ----------------------- | ------------------------------------------------------------ |
+| `transparent`     | make the background of the website transparent            | `0`                     | `0` or `1`                                                   |
+| `fpsView`         | show fps                                                  | `1`                     | `0` or `1`                                                   |
+| `clearCanvas`     | clears the canvas every frame                             | `1`                     | `0` or `1`                                                   |
+| `ballOutline`     | give the ball/image drawn a black outline                 | `1`                     | `0` or `1`                                                   |
+| `seed`            | set the seed for RNG                                      | minute timestamp in hex | anything                                                     |
+| `ballSize`        | set the ball size (%) relative to the smaller window size | `0.2`                   | `0` to `1`                                                   |
+| `ballSpeed`       | set the speed of the ball in pixels per second            | `240`                   | positive decimal number <br/> (supports scientific notation) |
+| `colorSpeed`      | set the speed of the color shift in degrees per second    | `60`                    | positive decimal number <br/> (supports scientific notation) |
+| `img`             | put an image on the ball                                  | none                    | HTML image source (URL) <br/> (encoded URI component)        |
+| `imgPixelArt`     | enable better renderer for pixel art                      | `0`                     | `0` or `1`                                                   |
+| `imgOverrideBall` | when active replaces the ball with the image              | `1`                     | `0` or `1`                                                   |
+
 </details>
 
 ## [Small Dice](./site/dice.html "view the source code")
