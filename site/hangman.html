@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="[MAZ01001.github.io] A simple word guessing game">
+    <meta name="author" content="MAZ01001">
+    <link rel="apple-touch-icon" sizes="180x180" href="../img/apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="../img/MAZ_logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png">
+    <link rel="manifest" href="../img/site.webmanifest">
+    <link rel="mask-icon" href="../img/safari-pinned-tab.svg" color="#ff9900">
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="../img/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <title>Hangman</title>
+    <style>
+        ::-webkit-scrollbar{width:.8rem;height:.8rem;}
+        ::-webkit-scrollbar-thumb:vertical:window-inactive{border-right-style:dashed;}
+        ::-webkit-scrollbar-thumb:horizontal:window-inactive{border-bottom-style:dashed;}
+        ::-webkit-scrollbar-thumb:vertical{
+            background-color:#0000;
+            border-right:.2rem solid #000F;
+            border-radius:0;
+        }
+        ::-webkit-scrollbar-thumb:hover:vertical,
+        :hover::-webkit-scrollbar-thumb:vertical{
+            background-color:#000F;
+            box-shadow:inset .4rem 0 .4rem 0 #0A0F;
+            border:none;
+            border-top-left-radius:1rem;
+            border-bottom-left-radius:1rem;
+        }
+        ::-webkit-scrollbar-thumb:horizontal{
+            background-color:#0000;
+            border-bottom:.2rem solid #000F;
+            border-radius:0;
+        }
+        ::-webkit-scrollbar-thumb:hover:horizontal,
+        :hover::-webkit-scrollbar-thumb:horizontal{
+            background-color:#000F;
+            box-shadow:inset 0 .4rem .4rem 0 #0A0F;
+            border:none;
+            border-top-left-radius:1rem;
+            border-top-right-radius:1rem;
+        }
+        ::-webkit-scrollbar-thumb:hover:vertical,
+        :hover::-webkit-scrollbar-thumb:hover:vertical{box-shadow:inset .4rem 0 .4rem 0 #0F0F;}
+        ::-webkit-scrollbar-thumb:hover:horizontal,
+        :hover::-webkit-scrollbar-thumb:hover:horizontal{box-shadow:inset 0 .4rem .4rem 0 #0F0F;}
+        ::-webkit-scrollbar-track,
+        ::-webkit-scrollbar-track-piece,
+        ::-webkit-scrollbar-corner{display:none;background-color:#0000;}
+        body{
+            background-color: #000;
+            color: #0f0;
+            padding: 0;
+            margin: 0;
+            overflow: visible;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: large;
+        }
+        *{user-select: none;}
+        ::selection {
+            background-color: #f90;
+            color: #000;
+        }
+        div#box{
+            position: absolute;
+            top: 50%;left: 50%;
+            transform:translate(-50%, -50%);
+            width: max-content;
+            height: max-content;
+            padding: 0 .5rem 1rem .5rem;
+            max-width: calc(100vw - calc(1rem + 4px));
+            max-height: calc(100vh - calc(1rem + 4px));
+            overflow: overlay;
+            background-color:#222;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 5px 5px 30px -5px #080;
+            border: 2px outset #444;
+            display: grid;
+            gap: 3rem;
+            align-items: center;
+            align-content: center;
+            justify-items: center;
+            justify-content: center;
+        }
+        div#box>h1{grid-area: 1/1/2/3;}
+        div#displayWord{
+            grid-area: 2/1/4/2;
+            min-width: 20rem;
+            max-width: 60rem;
+            max-height: 20rem;
+            overflow-y: overlay;
+            display: flex;
+            flex-wrap: wrap;
+            gap: .3em;
+            align-items: center;
+            align-content: center;
+            justify-items: center;
+            justify-content: center;
+            user-select: text;
+        }
+        div#displayWord>span{
+            font-family: consolas, monospace;
+            font-size: x-large;
+            user-select: text;
+        }
+        div#letterButtons{
+            grid-area: 4/1/5/2;
+            min-width: 20rem;
+            max-width: 30rem;
+            max-height: 20rem;
+            overflow-y: overlay;
+            display: flex;
+            flex-wrap: wrap;
+            gap: .3rem;
+            align-items: center;
+            align-content: center;
+            justify-items: center;
+            justify-content: center;
+        }
+        div#letterButtons>input{
+            font-family: consolas, monospace;
+            font-size: large;
+            font-weight: bold;
+            background-color: #000;
+            border-radius: .5rem;
+            color: #0F0;
+            cursor: pointer;
+        }
+        div#letterButtons>input:disabled{
+            background-color: #111;
+            border-style: inset;
+            color: #0A0;
+            cursor: not-allowed;
+        }
+        span#timer{
+            grid-area: 2/2/3/3;
+            font-size: larger;
+        }
+        span#guesses{
+            grid-area: 3/2/4/3;
+            font-size: xx-large;
+        }
+        div#options{
+            grid-area: 4/2/5/3;
+            display: flex;
+            gap: .5rem;
+            flex-direction: column;
+        }
+        div#options>input{
+            background-color: #111;
+            color: #0F0;
+            padding: .2rem .5rem;
+            border-radius: .4rem;
+            cursor: pointer;
+        }
+        dialog#settingsMenu::backdrop{background-color: #0007;}
+        dialog#settingsMenu{
+            background-color: #444;
+            color: #0F0;
+            border-radius: 1rem;
+            display: grid;
+            gap: .7rem;
+            align-items: center;
+            align-content: center;
+            justify-items: center;
+            justify-content: center;
+        }
+        dialog#settingsMenu input{
+            background-color: #111;
+            color: #0F0;
+            border-color: #000;
+            border-radius: .4rem;
+        }
+        dialog#settingsMenu input[type="button"]{cursor: pointer;}
+        dialog#settingsMenu fieldset{
+            background-color: #222;
+            border-color: #222;
+            border-radius: .5rem;
+            padding: .3rem;
+        }
+        dialog#settingsMenu fieldset>legend{cursor: help;}
+        div#settingsWordList{
+            display: flex;
+            flex-direction: column;
+            min-height: 1rem;
+            max-height: 7rem;
+            overflow: overlay;
+            margin: .3rem 0;
+        }
+        div#settingsWordList>div>input{float: right;}
+        div#settingsWordList>div>span{
+            display: inline-block;
+            width: 10.8rem;
+            overflow: overlay;
+            user-select: text;
+        }
+        input#settingsCharInput,
+        input#settingsWordInput{width: 10rem;}
+        div#settingsCharList{
+            display: flex;
+            flex-wrap: wrap;
+            gap: .3rem;
+            min-height: 1rem;
+            max-height: 7rem;
+            max-width: 15rem;
+            overflow: overlay;
+            margin: .3rem 0;
+        }
+        div#settingsCharList>input{
+            font-family: consolas, monospace;
+            font-size: medium;
+        }
+        div#settingsCharList>input.unhide{background-color: #333;}
+        label[for="settingsCharRandomUnhide"]{grid-area: 2/1/3/2;}
+        dialog#settingsMenu>label{
+            background-color: #222;
+            border: 2px groove #222;
+            border-radius: .3rem;
+            padding: .3rem;
+        }
+        input#settingsCharRandomUnhide{width: 2.2rem;}
+        fieldset#settingsChar{grid-area: 1/1/2/2;}
+        fieldset#settingsWord{grid-area: 1/2/2/3;}
+        label[for="settingsMaxFails"]{grid-area: 2/2/3/3;}
+        input#settingsMaxFails{width: 4rem;}
+        div#settingsClosing{grid-area: 3/1/4/3;}
+    </style>
+    <script>
+        //@ts-check
+        //~ globals (before DOM loads)
+        const wordList=["Unguessable"],
+            keyboardLetters="ABCDEFGHIJKLMNOPQRSTUVWXYZ,.- ".toLocaleUpperCase().split(""),
+            guessedLetterIndecies=[];
+        let maxFails=8,
+            tries=0,
+            fails=0,
+            startTime=Date.now(),
+            secretWordIndex=Math.floor(Math.random()*wordList.length);
+        /**
+         * ## guess a letter of the current word
+         * @param {number} letterIndex - the index of a letter from {@linkcode keyboardLetters}
+         * @returns {number[]} a list of indecies into the current word ({@linkcode secretWordIndex}) where the letters ({@linkcode letterIndex}) are (if present)
+         */
+        const guess=letterIndex=>{
+            "use strict";
+            tries++;
+            guessedLetterIndecies.push(letterIndex);
+            const letterIndecies=[],
+                word=wordList[secretWordIndex].toLocaleUpperCase(),
+                letter=keyboardLetters[letterIndex];
+            for(let i=word.indexOf(letter);i>=0;i=word.indexOf(letter,i+1))letterIndecies.push(i);
+            return letterIndecies;
+        };
+        /** ## resets the game values and rolls a new word from {@linkcode wordList} */
+        const retry=()=>{
+            "use strict";
+            secretWordIndex=Math.floor(Math.random()*wordList.length);
+            guessedLetterIndecies.length=0;
+            tries=0;
+            startTime=Date.now();
+        };
+        /**
+         * ## test if a word only contains characters from {@linkcode keyboardLetters} (locale case insensitive)
+         * @param {string} word - a word
+         * @returns {boolean} `true` if the word only contains characters from {@linkcode keyboardLetters} (locale case insensitive) and `false` otherwise
+         */
+        const testWord=word=>{
+            "use strict";
+            for(const char of word.toLocaleUpperCase())
+                if(!keyboardLetters.includes(char))return false;
+            return true;
+        };
+        /**
+         * ## format time for the timer
+         * @param {number} time - the current timer value in seconds
+         * @returns {string} time in format `[H:]mm:ss`
+         */
+        const formatTimer=time=>{
+            "use strict";
+            const hours=Math.floor(time/3600),
+                min=Math.floor(time/60)%60,
+                sec=Math.floor(time%60);
+            if(hours>0)return`${hours.toString()}:${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
+            return`${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
+        };
+    </script>
+</head>
+<body>
+    <div id="box">
+        <h1>Hangman</h1>
+        <div id="displayWord">
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+            <span>_</span>
+        </div>
+        <span id="timer">--:--</span>
+        <span id="guesses">0/8</span>
+        <div id="letterButtons">
+            <input type="button" value="A">
+            <input type="button" value="B">
+            <input type="button" value="C">
+            <input type="button" value="D">
+            <input type="button" value="E">
+            <input type="button" value="F">
+            <input type="button" value="G">
+            <input type="button" value="H">
+            <input type="button" value="I">
+            <input type="button" value="J">
+            <input type="button" value="K">
+            <input type="button" value="L">
+            <input type="button" value="M">
+            <input type="button" value="N">
+            <input type="button" value="O">
+            <input type="button" value="P">
+            <input type="button" value="Q">
+            <input type="button" value="R">
+            <input type="button" value="S">
+            <input type="button" value="T">
+            <input type="button" value="U">
+            <input type="button" value="V">
+            <input type="button" value="W">
+            <input type="button" value="X">
+            <input type="button" value="Y">
+            <input type="button" value="Z">
+        </div>
+        <div id="options">
+            <input type="button" value="reset" id="resetButton">
+            <input type="button" value="settings" id="settingsButton">
+        </div>
+    </div>
+    <!-- TODO remove open -->
+    <dialog id="settingsMenu" open>
+        <fieldset id="settingsChar">
+            <legend title="Letters for guessing (words in the word list must only have these characters)">Alphabet</legend>
+            <div id="settingsCharList">
+                <input type="button" value=" " class="unhide" title="Click to remove this character from the list (this character will always show )">
+                <input type="button" value="," class="unhide" title="Click to remove this character from the list (this character will always show )">
+                <input type="button" value="-" class="unhide" title="Click to remove this character from the list (this character will always show )">
+                <input type="button" value="." class="unhide" title="Click to remove this character from the list (this character will always show )">
+                <input type="button" value="A" title="Click to remove this character from the list">
+                <input type="button" value="B" title="Click to remove this character from the list">
+                <input type="button" value="C" title="Click to remove this character from the list">
+                <input type="button" value="D" title="Click to remove this character from the list">
+                <input type="button" value="E" title="Click to remove this character from the list">
+                <input type="button" value="F" title="Click to remove this character from the list">
+                <input type="button" value="G" title="Click to remove this character from the list">
+                <input type="button" value="H" title="Click to remove this character from the list">
+                <input type="button" value="I" title="Click to remove this character from the list">
+                <input type="button" value="J" title="Click to remove this character from the list">
+                <input type="button" value="K" title="Click to remove this character from the list">
+                <input type="button" value="L" title="Click to remove this character from the list">
+                <input type="button" value="M" title="Click to remove this character from the list">
+                <input type="button" value="N" title="Click to remove this character from the list">
+                <input type="button" value="O" title="Click to remove this character from the list">
+                <input type="button" value="P" title="Click to remove this character from the list">
+                <input type="button" value="Q" title="Click to remove this character from the list">
+                <input type="button" value="R" title="Click to remove this character from the list">
+                <input type="button" value="S" title="Click to remove this character from the list">
+                <input type="button" value="T" title="Click to remove this character from the list">
+                <input type="button" value="U" title="Click to remove this character from the list">
+                <input type="button" value="V" title="Click to remove this character from the list">
+                <input type="button" value="W" title="Click to remove this character from the list">
+                <input type="button" value="X" title="Click to remove this character from the list">
+                <input type="button" value="Y" title="Click to remove this character from the list">
+                <input type="button" value="Z" title="Click to remove this character from the list">
+            </div>
+            <div>
+                <input type="text" id="settingsCharInput" maxlength="1" placeholder="Add a character" title="Add a new character to the list above">
+                <input type="button" id="settingsCharConfirm" value="+" title="Click to add the character to the list above">
+                <input type="button" id="settingsCharConfirm" value="[+]" title="Click to add the character to the list above (not for guessing - will always show)">
+            </div>
+        </fieldset>
+        <fieldset id="settingsWord">
+            <legend title="Word list for guessing (chooses a random word from this list) - case insensitive">Word list</legend>
+            <div id="settingsWordList">
+                <div><span>Unguessable</span><input type="button" value="x" title="Click to remove this word from the list"></div>
+            </div>
+            <div>
+                <input type="text" id="settingsWordInput" spellcheck="true" placeholder="Add a word" title="Add a new word to the list above">
+                <input type="button" id="settingsWordConfirm" value="+" title="Click to add the word to the list above">
+            </div>
+        </fieldset>
+        <label for="settingsCharRandomUnhide" title="Percentage of letters of the guessing word to randomly unhide (for each round)">
+            Randomly unhide
+            <input type="number" value="1" min="0" max="99" step="1" id="settingsCharRandomUnhide">
+            % of letters
+        </label>
+        <label for="settingsMaxFails" title="Maximum number of fails per round">
+            Max fails
+            <input type="number" value="8" min="0" step="1" id="settingsMaxFails">
+        </label>
+        <div id="settingsClosing">
+            <input type="button" id="settingsConfirm" value="OK" title="confirm changes and start a new round">
+            <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu">
+        </div>
+    </dialog>
+    <script>
+        //~ DOM elements
+        //@ts-ignore element does exist in DOM
+        /** @type {HTMLSpanElement} */const timer=document.getElementById("timer");
+        //@ts-ignore element does exist in DOM
+        /** @type {HTMLDialogElement} */const settingsMenu=document.getElementById("settingsMenu");
+
+        // //@ts-ignore element does exist in DOM
+        // /** @type {HTMLElement} */const _=document.getElementById("_");
+
+        const timerInterval=setInterval(()=>timer.textContent=formatTimer((Date.now()-startTime)*.001),300);
+        //TODO settingsMenu.showModal();
+        settingsMenu.addEventListener("close",()=>{
+            // TODO revert changes (settings)
+        },{passive:true});
+ 
+    </script>
+</body>
+</html>
