@@ -55,9 +55,9 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 | `ballOutline`     | give the ball/image drawn a black outline                 | `1`                     | `0` or `1`                                                   |
 | `seed`            | set the seed for RNG                                      | minute timestamp in hex | anything                                                     |
 | `ballSize`        | set the ball size (%) relative to the smaller window size | `0.2`                   | `0` to `1`                                                   |
-| `ballSpeed`       | set the speed of the ball in pixels per second            | `240`                   | positive decimal number <br/> (supports scientific notation) |
-| `colorSpeed`      | set the speed of the color shift in degrees per second    | `60`                    | positive decimal number <br/> (supports scientific notation) |
-| `img`             | put an image on the ball                                  | none                    | HTML image source (URL) <br/> (encoded URI component)        |
+| `ballSpeed`       | set the speed of the ball in pixels per second            | `240`                   | positive decimal number <br> (supports scientific notation) |
+| `colorSpeed`      | set the speed of the color shift in degrees per second    | `60`                    | positive decimal number <br> (supports scientific notation) |
+| `img`             | put an image on the ball                                  | none                    | HTML image source (URL) <br> (encoded URI component)        |
 | `imgPixelArt`     | enable better renderer for pixel art                      | `0`                     | `0` or `1`                                                   |
 | `imgOverrideBall` | when active replaces the ball with the image              | `1`                     | `0` or `1`                                                   |
 
