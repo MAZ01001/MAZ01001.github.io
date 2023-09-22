@@ -63,10 +63,41 @@
             font-size: large;
         }
         *{user-select: none;}
-        ::selection {
-            background-color: #f90;
+        ::selection{
+            background-color: #F90;
             color: #000;
         }
+        input[type="button"]{cursor: pointer;}
+        dialog::backdrop{background-color: #0007;}
+        dialog[open]{
+            background-color: #444;
+            color: #0F0;
+            border-radius: 1rem;
+            display: grid;
+            gap: .7rem;
+            place-items: safe center;
+            place-content: safe center;
+        }
+        dialog input{
+            background-color: #111;
+            color: #0F0;
+            border-color: #000;
+            border-radius: .4rem;
+        }
+        dialog fieldset{
+            background-color: #222;
+            border-color: #222;
+            border-radius: .5rem;
+            padding: .6rem;
+        }
+        dialog#settingsMenu>label{
+            background-color: #222;
+            border: 2px groove #222;
+            border-radius: .5rem;
+            padding: .3rem .6rem;
+        }
+        dialog h2{margin: 0;}
+        dialog fieldset>legend{cursor: help;}
         div#box{
             position: absolute;
             top: 50%;left: 50%;
@@ -84,31 +115,24 @@
             border: 2px outset #444;
             display: grid;
             gap: 3rem;
-            align-items: center;
-            align-content: center;
-            justify-items: center;
-            justify-content: center;
+            place-items: safe center;
+            place-content: safe center;
         }
-        div#box>h1{grid-area: 1/1/2/3;}
-        div#displayWord{
+        div#box>h1{grid-area: 1/1/2/2;}
+        span#displayWord{
             grid-area: 2/1/4/2;
             min-width: 20rem;
             max-width: 60rem;
             max-height: 20rem;
             overflow-y: overlay;
-            display: flex;
-            flex-wrap: wrap;
-            gap: .3em;
-            align-items: center;
-            align-content: center;
-            justify-items: center;
-            justify-content: center;
             user-select: text;
         }
-        div#displayWord>span{
+        span#displayWord>span{
             font-family: consolas, monospace;
             font-size: x-large;
             user-select: text;
+            padding: 0 2px;
+            word-break: break-all;
         }
         div#letterButtons{
             grid-area: 4/1/5/2;
@@ -119,10 +143,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: .3rem;
-            align-items: center;
-            align-content: center;
-            justify-items: center;
-            justify-content: center;
+            place-items: safe center;
+            place-content: safe center;
         }
         div#letterButtons>input{
             font-family: consolas, monospace;
@@ -131,7 +153,6 @@
             background-color: #000;
             border-radius: .5rem;
             color: #0F0;
-            cursor: pointer;
         }
         div#letterButtons>input:disabled{
             background-color: #111;
@@ -158,34 +179,7 @@
             color: #0F0;
             padding: .2rem .5rem;
             border-radius: .4rem;
-            cursor: pointer;
         }
-        dialog#settingsMenu::backdrop{background-color: #0007;}
-        dialog#settingsMenu{
-            background-color: #444;
-            color: #0F0;
-            border-radius: 1rem;
-            display: grid;
-            gap: .7rem;
-            align-items: center;
-            align-content: center;
-            justify-items: center;
-            justify-content: center;
-        }
-        dialog#settingsMenu input{
-            background-color: #111;
-            color: #0F0;
-            border-color: #000;
-            border-radius: .4rem;
-        }
-        dialog#settingsMenu input[type="button"]{cursor: pointer;}
-        dialog#settingsMenu fieldset{
-            background-color: #222;
-            border-color: #222;
-            border-radius: .5rem;
-            padding: .3rem;
-        }
-        dialog#settingsMenu fieldset>legend{cursor: help;}
         div#settingsWordList{
             display: flex;
             flex-direction: column;
@@ -218,64 +212,134 @@
             font-size: medium;
         }
         div#settingsCharList>input.unhide{background-color: #333;}
-        label[for="settingsCharRandomUnhide"]{grid-area: 2/1/3/2;}
-        dialog#settingsMenu>label{
-            background-color: #222;
-            border: 2px groove #222;
-            border-radius: .3rem;
-            padding: .3rem;
-        }
+        dialog#settingsMenu>h2{grid-area: 1/1/2/3;}
+        fieldset#settingsChar{grid-area: 2/1/3/2;}
+        fieldset#settingsWord{grid-area: 2/2/3/3;}
+        label[for="settingsCharRandomUnhide"]{grid-area: 3/1/4/2;}
         input#settingsCharRandomUnhide{width: 2.2rem;}
-        fieldset#settingsChar{grid-area: 1/1/2/2;}
-        fieldset#settingsWord{grid-area: 1/2/2/3;}
-        label[for="settingsMaxFails"]{grid-area: 2/2/3/3;}
+        label[for="settingsMaxFails"]{grid-area: 3/2/4/3;}
         input#settingsMaxFails{width: 4rem;}
-        div#settingsClosing{grid-area: 3/1/4/3;}
+        div#settingsClosing{grid-area: 4/1/5/3;}
+        dialog#finMenu>h2{grid-area: 1/1/2/2;}
+        dialog#finMenu>fieldset{
+            grid-area: 2/1/3/2;
+            line-height: 2rem;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        dialog#finMenu>fieldset *:not(legend){user-select: text;}
+        dialog#finMenu>input{grid-area: 3/1/4/2;}
+        span#finWord,
+        span#finWordGuess,
+        span#finWordIni{
+            display: inline-block;
+            vertical-align: bottom;
+            max-height: 5rem;
+            overflow: overlay;
+            font-size: larger;
+            word-break: break-all;
+        }
+        span#finWordGuess>span,
+        span#finWordIni>span{padding: 0 2px;}
+        span#displayWord>span.locked,
+        span#finWordGuess>span.locked,
+        span#finWordIni>span.locked{color: #0A0;}
+        span#displayWord>span.hidden,
+        span#finWordGuess>span.hidden,
+        span#finWordIni>span.hidden{color: #040;}
     </style>
     <script>
         //@ts-check
-        //~ globals (before DOM loads)
-        const wordList=["Unguessable"],
-            keyboardLetters="ABCDEFGHIJKLMNOPQRSTUVWXYZ,.- ".toLocaleUpperCase().split(""),
-            guessedLetterIndecies=[];
-        let maxFails=8,
-            tries=0,
+        //~ game logic (before DOM loads)
+        /**
+         * ## get the item at position {@linkcode index} in {@linkcode set}
+         * @param {Set<any>} set - a {@linkcode Set} object
+         * @param {number} index - a positive integer to seek the position of an item in {@linkcode set} (must be smaller than the size of {@linkcode set})
+         * @returns {any} the item in {@linkcode set} at position {@linkcode index} (otherwise `undefined`)
+         */
+        const indexOfSet=(set,index)=>{
+            "use strict";
+            for(const item of set)
+                if(--index<0)return item;
+            return undefined;
+        };
+        const
+            /** @type {Set<string>} list of all words (locale case inseneitive) */
+            wordList=new Set([
+                "Unguessable","Inexpensive","Paste","Neighbor","Knock",
+                "Calculus","Stone","Pretending","Warning","Recognize",
+                "Spongebob","Train","Impressive","Aromatic","Crazy",
+                "Entertainer","Copycat","Dark","Closed","Mathmatics"
+            ]),
+            /** @type {Set<string>} list of all unique letters for guessing (locale uppercase) */
+            keyboardLetters=new Set([
+                "A","B","C","D","E","F","G","H","I","J",
+                "K","L","M","N","O","P","Q","R","S","T",
+                "U","V","W","X","Y","Z"
+            ]),
+            /** @type {Set<string>} list of all unique letters to always display (locale uppercase) */
+            keyboardLettersAlt=new Set([
+                ",",".","-"," "
+            ]),
+            /** @type {Set<string>} [settings] list of all words */
+            confWordList=new Set(wordList),
+            /** @type {Set<string>} [settings] list of all unique letters for guessing (locale uppercase) */
+            confKeyboardLetters=new Set(keyboardLetters),
+            /** @type {Set<string>} [settings] list of all unique letters to always display (locale uppercase) */
+            confKeyboardLettersAlt=new Set(keyboardLettersAlt),
+            /** @type {Set<string>} letters that are revealed at the start of the round (if any) */
+            startLetters=new Set(),
+            /** @type {boolean[]} guesses of the current word (same length as the current word) */
+            guessWord=[];
+        let
+            /** @type {number} max allowed fails for each round */
+            maxFails=8,
+            /** @type {number} number of fails for each round */
             fails=0,
+            /** @type {number} percentage of random letters to unhide at start of each round */
+            rngUnhide=20,
+            /** @type {number} timestamp at start of each round */
             startTime=Date.now(),
-            secretWordIndex=Math.floor(Math.random()*wordList.length);
+            /** @type {string} the current word to guess each round (from {@linkcode wordList}) */
+            secretWord=indexOfSet(wordList,Math.floor(wordList.size*Math.random()));
+        /** ## gets {@linkcode rngUnhide} % of random letters from current word ({@linkcode secretWord}) and add them to {@linkcode startLetters} (if any) */
+        const setRngLetters=()=>{
+            "use strict";
+            //~ get unique letters from current word (locale uppercase)
+            const wordLetters=(letterSet=>{
+                "use strict";
+                //~ remove letters that are also in keyboardLettersAlt
+                for(const char of keyboardLettersAlt)letterSet.delete(char);
+                return Array.from(letterSet);
+            })(new Set(secretWord.toLocaleUpperCase()));
+            //~ now remove some random letters and also add them to startLetters
+            for(let i=Math.floor(wordLetters.length*rngUnhide*.01);i>0;i--){
+                const letter=wordLetters.splice(Math.floor(wordLetters.length*Math.random()),1)[0];
+                startLetters.add(letter);
+            }
+        };
         /**
          * ## guess a letter of the current word
-         * @param {number} letterIndex - the index of a letter from {@linkcode keyboardLetters}
-         * @returns {number[]} a list of indecies into the current word ({@linkcode secretWordIndex}) where the letters ({@linkcode letterIndex}) are (if present)
+         * @param {string} letter - a letter from {@linkcode keyboardLetters}
+         * @returns {Set<number>} a set of indices of the current word ({@linkcode secretWord}) where the letters ({@linkcode letter}) are (if present)
          */
-        const guess=letterIndex=>{
+        const guess=letter=>{
             "use strict";
-            tries++;
-            guessedLetterIndecies.push(letterIndex);
-            const letterIndecies=[],
-                word=wordList[secretWordIndex].toLocaleUpperCase(),
-                letter=keyboardLetters[letterIndex];
-            for(let i=word.indexOf(letter);i>=0;i=word.indexOf(letter,i+1))letterIndecies.push(i);
-            return letterIndecies;
+            const letterIndices=new Set(),
+                word=secretWord.toLocaleUpperCase();
+            for(let i=word.indexOf(letter);i>=0;i=word.indexOf(letter,i+1))letterIndices.add(i);
+            return letterIndices;
         };
         /** ## resets the game values and rolls a new word from {@linkcode wordList} */
         const retry=()=>{
             "use strict";
-            secretWordIndex=Math.floor(Math.random()*wordList.length);
-            guessedLetterIndecies.length=0;
-            tries=0;
+            secretWord=indexOfSet(wordList,Math.floor(wordList.size*Math.random()));
+            startLetters.clear();
+            setRngLetters();
+            guessWord.length=secretWord.length;
+            for(let i=0;i<guessWord.length;i++)guessWord[i]=keyboardLettersAlt.has(secretWord[i])||startLetters.has(secretWord[i]);
+            fails=0;
             startTime=Date.now();
-        };
-        /**
-         * ## test if a word only contains characters from {@linkcode keyboardLetters} (locale case insensitive)
-         * @param {string} word - a word
-         * @returns {boolean} `true` if the word only contains characters from {@linkcode keyboardLetters} (locale case insensitive) and `false` otherwise
-         */
-        const testWord=word=>{
-            "use strict";
-            for(const char of word.toLocaleUpperCase())
-                if(!keyboardLetters.includes(char))return false;
-            return true;
         };
         /**
          * ## format time for the timer
@@ -285,8 +349,8 @@
         const formatTimer=time=>{
             "use strict";
             const hours=Math.floor(time/3600),
-                min=Math.floor(time/60)%60,
-                sec=Math.floor(time%60);
+                min=~~(time/60)%60,
+                sec=~~(time%60);
             if(hours>0)return`${hours.toString()}:${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
             return`${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
         };
@@ -295,101 +359,29 @@
 <body>
     <div id="box">
         <h1>Hangman</h1>
-        <div id="displayWord">
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-            <span>_</span>
-        </div>
+        <span id="displayWord">loading...</span>
         <span id="timer">--:--</span>
-        <span id="guesses">0/8</span>
-        <div id="letterButtons">
-            <input type="button" value="A">
-            <input type="button" value="B">
-            <input type="button" value="C">
-            <input type="button" value="D">
-            <input type="button" value="E">
-            <input type="button" value="F">
-            <input type="button" value="G">
-            <input type="button" value="H">
-            <input type="button" value="I">
-            <input type="button" value="J">
-            <input type="button" value="K">
-            <input type="button" value="L">
-            <input type="button" value="M">
-            <input type="button" value="N">
-            <input type="button" value="O">
-            <input type="button" value="P">
-            <input type="button" value="Q">
-            <input type="button" value="R">
-            <input type="button" value="S">
-            <input type="button" value="T">
-            <input type="button" value="U">
-            <input type="button" value="V">
-            <input type="button" value="W">
-            <input type="button" value="X">
-            <input type="button" value="Y">
-            <input type="button" value="Z">
-        </div>
+        <span id="guesses">-/-</span>
+        <div id="letterButtons">loading...</div>
         <div id="options">
-            <input type="button" value="reset" id="resetButton">
-            <input type="button" value="settings" id="settingsButton">
+            <input type="button" value="New round" id="retryButton">
+            <input type="button" value="Settings" id="settingsButton" autofocus>
         </div>
     </div>
-    <!-- TODO remove open -->
-    <dialog id="settingsMenu" open>
+    <dialog id="settingsMenu">
+        <h2>Settings</h2>
         <fieldset id="settingsChar">
             <legend title="Letters for guessing (words in the word list must only have these characters)">Alphabet</legend>
-            <div id="settingsCharList">
-                <input type="button" value=" " class="unhide" title="Click to remove this character from the list (this character will always show )">
-                <input type="button" value="," class="unhide" title="Click to remove this character from the list (this character will always show )">
-                <input type="button" value="-" class="unhide" title="Click to remove this character from the list (this character will always show )">
-                <input type="button" value="." class="unhide" title="Click to remove this character from the list (this character will always show )">
-                <input type="button" value="A" title="Click to remove this character from the list">
-                <input type="button" value="B" title="Click to remove this character from the list">
-                <input type="button" value="C" title="Click to remove this character from the list">
-                <input type="button" value="D" title="Click to remove this character from the list">
-                <input type="button" value="E" title="Click to remove this character from the list">
-                <input type="button" value="F" title="Click to remove this character from the list">
-                <input type="button" value="G" title="Click to remove this character from the list">
-                <input type="button" value="H" title="Click to remove this character from the list">
-                <input type="button" value="I" title="Click to remove this character from the list">
-                <input type="button" value="J" title="Click to remove this character from the list">
-                <input type="button" value="K" title="Click to remove this character from the list">
-                <input type="button" value="L" title="Click to remove this character from the list">
-                <input type="button" value="M" title="Click to remove this character from the list">
-                <input type="button" value="N" title="Click to remove this character from the list">
-                <input type="button" value="O" title="Click to remove this character from the list">
-                <input type="button" value="P" title="Click to remove this character from the list">
-                <input type="button" value="Q" title="Click to remove this character from the list">
-                <input type="button" value="R" title="Click to remove this character from the list">
-                <input type="button" value="S" title="Click to remove this character from the list">
-                <input type="button" value="T" title="Click to remove this character from the list">
-                <input type="button" value="U" title="Click to remove this character from the list">
-                <input type="button" value="V" title="Click to remove this character from the list">
-                <input type="button" value="W" title="Click to remove this character from the list">
-                <input type="button" value="X" title="Click to remove this character from the list">
-                <input type="button" value="Y" title="Click to remove this character from the list">
-                <input type="button" value="Z" title="Click to remove this character from the list">
-            </div>
+            <div id="settingsCharList">Loading...</div>
             <div>
-                <input type="text" id="settingsCharInput" maxlength="1" placeholder="Add a character" title="Add a new character to the list above">
+                <input type="text" id="settingsCharInput" maxlength="1" placeholder="Add a character" title="Add a new character to the list above (case insensitive)">
                 <input type="button" id="settingsCharConfirm" value="+" title="Click to add the character to the list above">
-                <input type="button" id="settingsCharConfirm" value="[+]" title="Click to add the character to the list above (not for guessing - will always show)">
+                <input type="button" id="settingsCharConfirmAlt" value="[+]" title="Click to add the character to the list above (not for guessing - will always show)">
             </div>
         </fieldset>
         <fieldset id="settingsWord">
             <legend title="Word list for guessing (chooses a random word from this list) - case insensitive">Word list</legend>
-            <div id="settingsWordList">
-                <div><span>Unguessable</span><input type="button" value="x" title="Click to remove this word from the list"></div>
-            </div>
+            <div id="settingsWordList">Loading...</div>
             <div>
                 <input type="text" id="settingsWordInput" spellcheck="true" placeholder="Add a word" title="Add a new word to the list above">
                 <input type="button" id="settingsWordConfirm" value="+" title="Click to add the word to the list above">
@@ -400,31 +392,378 @@
             <input type="number" value="1" min="0" max="99" step="1" id="settingsCharRandomUnhide">
             % of letters
         </label>
-        <label for="settingsMaxFails" title="Maximum number of fails per round">
+        <label for="settingsMaxFails" title="Maximum number of fails per round (-1 → never loose)">
             Max fails
-            <input type="number" value="8" min="0" step="1" id="settingsMaxFails">
+            <input type="number" value="8" min="-1" step="1" id="settingsMaxFails">
         </label>
         <div id="settingsClosing">
+            <!-- TODO add [export] save-button and [import] file-input-field to write/read settings to/from a file (encoded JSON object) {wordList,keyboardLetters,keyboardLettersAlt,maxFails,rngUnhide} -->
             <input type="button" id="settingsConfirm" value="OK" title="confirm changes and start a new round">
-            <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu">
+            <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu" autofocus>
         </div>
+    </dialog>
+    <dialog id="finMenu">
+        <h2>Loading...</h2>
+        <fieldset>
+            <legend title="Statistics for the last round">Stats</legend>
+            <div>Word: <span id="finWord">________</span></div>
+            <div>Your guess: <span id="finWordGuess">________</span></div>
+            <div>Initial word: <span id="finWordIni">________</span></div>
+            <div>Time taken: <span id="finTime">--:--</span></div>
+            <div>Failed guesses: <span id="finFails">-</span> of max <span id="finFailsMax">-</span></div>
+        </fieldset>
+        <input type="button" id="finAgain" value="Play again" autofocus>
     </dialog>
     <script>
         //~ DOM elements
-        //@ts-ignore element does exist in DOM
-        /** @type {HTMLSpanElement} */const timer=document.getElementById("timer");
-        //@ts-ignore element does exist in DOM
-        /** @type {HTMLDialogElement} */const settingsMenu=document.getElementById("settingsMenu");
+        /** @type {HTMLSpanElement} the guessing word with `span` for each character (unguessed characters are `█` and use class `hidden` - unhidden characters use class `locked`) *///@ts-ignore element does exist in DOM
+        const displayWord=document.getElementById("displayWord");
+        /** @type {HTMLSpanElement} timer text element (use {@linkcode formatTimer} for dislaying time) *///@ts-ignore element does exist in DOM
+        const timer=document.getElementById("timer");
+        /** @type {HTMLSpanElement} text  to show the current and max fails in format `[current fails]/[max fails]` *///@ts-ignore element does exist in DOM
+        const guesses=document.getElementById("guesses");
+        /** @type {HTMLDivElement} the keyboard with `input[type=button]` for each character (after a character has been choosen the button gets deactivated) *///@ts-ignore element does exist in DOM
+        const letterButtons=document.getElementById("letterButtons");
+        /** @type {HTMLInputElement} the reset button to start a new round (use {@linkcode retry}) *///@ts-ignore element does exist in DOM
+        const retryButton=document.getElementById("retryButton");
+        /** @type {HTMLInputElement} button to open the {@linkcode settingsMenu} *///@ts-ignore element does exist in DOM
+        const settingsButton=document.getElementById("settingsButton");
 
-        // //@ts-ignore element does exist in DOM
-        // /** @type {HTMLElement} */const _=document.getElementById("_");
+        /** @type {HTMLDialogElement} the settings menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
+        const settingsMenu=document.getElementById("settingsMenu");
+        /** @type {HTMLDivElement} the character list (list of `input[type=button]` and `input[type=button].unhide` elements for each character) *///@ts-ignore element does exist in DOM
+        const settingsCharList=document.getElementById("settingsCharList");
+        /** @type {HTMLInputElement} text input for adding characters to {@linkcode settingsCharList} *///@ts-ignore element does exist in DOM
+        const settingsCharInput=document.getElementById("settingsCharInput");
+        /** @type {HTMLInputElement} button to confirm adding a character from {@linkcode settingsCharInput} to {@linkcode settingsCharList} *///@ts-ignore element does exist in DOM
+        const settingsCharConfirm=document.getElementById("settingsCharConfirm");
+        /** @type {HTMLInputElement} button to confirm adding a character from {@linkcode settingsCharInput} to {@linkcode settingsCharList} (with the `unhide` class) *///@ts-ignore element does exist in DOM
+        const settingsCharConfirmAlt=document.getElementById("settingsCharConfirmAlt");
+        /** @type {HTMLDivElement} the word list (list of `span` and `input[type=button]` within a `div` for each word) *///@ts-ignore element does exist in DOM
+        const settingsWordList=document.getElementById("settingsWordList");
+        /** @type {HTMLInputElement} text input for adding words to {@linkcode settingsWordList} *///@ts-ignore element does exist in DOM
+        const settingsWordInput=document.getElementById("settingsWordInput");
+        /** @type {HTMLInputElement} button to confirm adding a word from {@linkcode settingsWordInput} to {@linkcode settingsWordList} *///@ts-ignore element does exist in DOM
+        const settingsWordConfirm=document.getElementById("settingsWordConfirm");
+        /** @type {HTMLInputElement} number input for getting the "random unhide letters by percentage" value *///@ts-ignore element does exist in DOM
+        const settingsCharRandomUnhide=document.getElementById("settingsCharRandomUnhide");
+        /** @type {HTMLInputElement} number input for getting the "max failed attemps" value *///@ts-ignore element does exist in DOM
+        const settingsMaxFails=document.getElementById("settingsMaxFails");
+        /** @type {HTMLInputElement} button to confirm set settings and close {@linkcode settingsMenu} *///@ts-ignore element does exist in DOM
+        const settingsConfirm=document.getElementById("settingsConfirm");
+        /** @type {HTMLInputElement} button to abort and revert set settings and close {@linkcode settingsMenu} *///@ts-ignore element does exist in DOM
+        const settingsAbort=document.getElementById("settingsAbort");
 
-        const timerInterval=setInterval(()=>timer.textContent=formatTimer((Date.now()-startTime)*.001),300);
-        //TODO settingsMenu.showModal();
-        settingsMenu.addEventListener("close",()=>{
-            // TODO revert changes (settings)
+        /** @type {HTMLDialogElement} the fin menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
+        const finMenu=document.getElementById("finMenu");
+        /** @type {HTMLHeadingElement} the h2 heading in {@linkcode finMenu} *///@ts-ignore element does exist in DOM
+        const finMenuHeading=finMenu.querySelector("h2");
+        /** @type {HTMLSpanElement} the word guessed {@linkcode displayWord} fully uncovered *///@ts-ignore element does exist in DOM
+        const finWord=document.getElementById("finWord");
+        /** @type {HTMLSpanElement} the word guessed {@linkcode displayWord} *///@ts-ignore element does exist in DOM
+        const finWordGuess=document.getElementById("finWordGuess");
+        /** @type {HTMLSpanElement} the word guessed {@linkcode displayWord} in its original state at the start of the round *///@ts-ignore element does exist in DOM
+        const finWordIni=document.getElementById("finWordIni");
+        /** @type {HTMLSpanElement} the time it took to guess the word (use {@linkcode formatTimer}) *///@ts-ignore element does exist in DOM
+        const finTime=document.getElementById("finTime");
+        /** @type {HTMLSpanElement} the total fails of this round *///@ts-ignore element does exist in DOM
+        const finFails=document.getElementById("finFails");
+        /** @type {HTMLSpanElement} the max fails allowed for this round *///@ts-ignore element does exist in DOM
+        const finFailsMax=document.getElementById("finFailsMax");
+        /** @type {HTMLInputElement} button to close the {@linkcode finMenu} and start a new round *///@ts-ignore element does exist in DOM
+        const finAgain=document.getElementById("finAgain");
+
+        //~ game logic (after DOM loaded and elements exist as variables)
+        /**
+         * ## Ends the rund by showing the {@linkcode finMenu}
+         * @param {boolean} win - `true` if this round was won and `false` if lost
+         */
+        const endRound=win=>{
+            finTime.textContent=formatTimer((Date.now()-startTime)*.001);
+            finMenuHeading.textContent=win?"Congratulations":"Game over";
+            finWord.textContent=secretWord;
+            finWordGuess.replaceChildren(...secretWord.split("").map((v,i)=>{
+                "use strict";
+                const V=v.toLocaleUpperCase(),
+                    isLocked=keyboardLettersAlt.has(V)||startLetters.has(V),
+                    txt=document.createElement("span");
+                if(!isLocked&&guessWord[i]){
+                    txt.textContent=v;
+                    return txt;
+                }
+                txt.textContent=isLocked?v:"█";
+                txt.classList.add(isLocked?"locked":"hidden");
+                return txt;
+            }));
+            finWordIni.replaceChildren(...secretWord.split("").map((v,i)=>{
+                "use strict";
+                const V=v.toLocaleUpperCase(),
+                    isLocked=keyboardLettersAlt.has(V)||startLetters.has(V),
+                    txt=document.createElement("span");
+                txt.textContent=isLocked?v:"█";
+                txt.classList.add(isLocked?"locked":"hidden");
+                return txt;
+            }));
+            finFails.textContent=fails.toString();
+            finFailsMax.textContent=maxFails.toString();
+            finMenu.showModal();
+        };
+        /** ## functione for when clicking on a letter for guessing */
+        const letterClick=letter=>{
+            "use strict";
+            const guessIndices=guess(letter);
+            if(guessIndices.size===0){
+                if(++fails>=maxFails)endRound(false);
+                updateFails();
+                return;
+            }
+            for(let i=0;i<guessWord.length;i++)
+                if(guessIndices.has(i))guessWord[i]=true;
+            if(guessWord.every(v=>v))endRound(true);
+            updateWord();
+        }
+        /** ## updates {@linkcode displayWord} with current settings ({@linkcode guessWord}) */
+        const updateWord=()=>{
+            "use strict";
+            displayWord.replaceChildren(...secretWord.split("").map((v,i)=>{
+                "use strict";
+                const txt=document.createElement("span"),
+                    V=v.toLocaleUpperCase();
+                if(keyboardLettersAlt.has(V)||startLetters.has(V)){
+                    txt.textContent=v;
+                    txt.classList.add("locked");
+                }else if(!guessWord[i]){
+                    txt.textContent="█";
+                    txt.classList.add("hidden");
+                }else txt.textContent=v;
+                return txt;
+            }));
+        };
+        /** ## updates the {@linkcode guesses} value */
+        const updateFails=()=>{
+            "use strict";
+            guesses.textContent=`${fails}/${maxFails}`;
+            if(fails/maxFails<.3)guesses.style.color="";
+            else if(fails/maxFails<.5)guesses.style.color="#F90";
+            else guesses.style.color="#F22";
+        };
+        /** ## updates the keyboard with current settings ({@linkcode keyboardLetters} and {@linkcode startLetters}) */
+        const updateKeyboard=()=>{
+            "use strict";
+            letterButtons.replaceChildren(...Array.from(keyboardLetters).map(v=>{
+                "use strict";
+                const letter=document.createElement("input");
+                letter.type="button";
+                letter.value=v;
+                if(startLetters.has(v))letter.disabled=true;
+                else letter.addEventListener("click",()=>{
+                    "use strict";
+                    letter.disabled=true;
+                    letterClick(letter.value);
+                },{passive:true,once:true});
+                return letter;
+            }));
+        };
+
+        /**
+         * ## removes all words from {@linkcode settingsWordList} and {@linkcode confWordList} that contain {@linkcode char}
+         * @param {string} char - a letter from the "Alphabet"
+         */
+        const removeWordsWithChar=char=>{
+            "use strict";
+            for(const container of settingsWordList.childNodes)
+                if(container?.firstChild?.textContent?.toLocaleUpperCase()?.includes(char)??false)
+                    container.remove();
+            for(const word of confWordList)
+                if(word.toLocaleUpperCase().includes(char))confWordList.delete(word);
+        }
+        /**
+         * ## adds {@linkcode char} to {@linkcode confKeyboardLetters} and as button to {@linkcode settingsCharList} (incl. event listener for removal)
+         * @param {string} char - a single letter for the "Alphabet"
+         * @param {boolean} alt - if `true` uses {@linkcode confKeyboardLettersAlt} instead and adds class "unhide" to button
+         */
+        const settingsAddChar=(char,alt)=>{
+            "use strict";
+            const letter=document.createElement("input");
+            letter.type="button";
+            letter.value=char;
+            settingsCharList.insertBefore(letter,settingsCharList.firstChild);
+            if(alt){
+                letter.title="(This character will always show) Click to remove this character and all words containing it";
+                letter.classList.add("unhide");
+                confKeyboardLettersAlt.add(char);
+                letter.addEventListener("click",()=>{
+                    "use strict";
+                    confKeyboardLettersAlt.delete(char);
+                    removeWordsWithChar(char);
+                    letter.remove();
+                },{passive:true,once:true});
+            }else{
+                letter.title="Click to remove this character and all words containing it";
+                confKeyboardLetters.add(char);
+                letter.addEventListener("click",()=>{
+                    "use strict";
+                    confKeyboardLetters.delete(char);
+                    removeWordsWithChar(char);
+                    letter.remove();
+                },{passive:true,once:true});
+            }
+        }
+        /**
+         * ## adds {@linkcode word} to {@linkcode confWordList} and {@linkcode settingsWordList} (with a button to remove)
+         * @param {string} word - a word for the guessing words list
+         */
+        const settingsAddWord=word=>{
+            "use strict";
+            confWordList.add(word);
+            const container=document.createElement("div"),
+                txt=document.createElement("span"),
+                btn=document.createElement("input");
+            txt.textContent=word;
+            btn.type="button";
+            btn.value="x";
+            btn.title="Click to remove this word from the list";
+            container.append(txt,btn);
+            settingsWordList.insertBefore(container,settingsWordList.firstChild);
+            btn.addEventListener("click",()=>{
+                "use strict";
+                confWordList.delete(word);
+                container.remove();
+            },{passive:true,once:true});
+        }
+
+        //~ add all event listeners
+        let timerInterval=setInterval(()=>timer.textContent=formatTimer((Date.now()-startTime)*.001),300);
+        document.body.addEventListener("mousedown",()=>document.getSelection()?.empty(),{passive:true});
+        document.body.addEventListener("keypress",ev=>{
+            if(settingsMenu.open||finMenu.open)return;
+            const key=ev.key.toLocaleUpperCase();
+            if(keyboardLetters.has(key)){
+                ev.preventDefault();
+                for(const letter of letterButtons.children)
+                    if(letter instanceof HTMLInputElement&&letter.value===key){
+                        letter.click();
+                        break;
+                    }
+            }
+        },{passive:false});
+
+        retryButton.addEventListener("click",()=>{
+            "use strict";
+            retry();
+            updateKeyboard();
+            updateWord();
+            updateFails();
         },{passive:true});
- 
+        settingsButton.addEventListener("click",()=>{
+            "use strict";
+            settingsCharList.replaceChildren();
+            confKeyboardLetters.clear();
+            for(const letter of keyboardLetters)settingsAddChar(letter,false);
+            confKeyboardLettersAlt.clear();
+            for(const letter of keyboardLettersAlt)settingsAddChar(letter,true);
+            settingsWordList.replaceChildren();
+            confWordList.clear();
+            for(const word of wordList)settingsAddWord(word);
+            settingsCharRandomUnhide.value=rngUnhide.toString();
+            settingsMaxFails.value=maxFails.toString();
+            settingsMenu.showModal();
+        },{passive:true});
+
+        settingsCharInput.addEventListener("input",()=>{
+            "use strict";
+            settingsCharInput.setCustomValidity("");
+            const char=settingsCharInput.value.toLocaleUpperCase();
+            if(char.length>1){
+                settingsCharInput.setCustomValidity("Can only be one character");
+                return;
+            }
+            if(confKeyboardLetters.has(char))settingsCharInput.setCustomValidity("Character already exist in list");
+        },{passive:true});
+        settingsCharConfirm.addEventListener("click",()=>{
+            "use strict";
+            if(!settingsCharInput.reportValidity())return;
+            settingsAddChar(settingsCharInput.value,false);
+            settingsCharInput.value="";
+        },{passive:true});
+        settingsCharConfirmAlt.addEventListener("click",()=>{
+            "use strict";
+            if(!settingsCharInput.reportValidity())return;
+            settingsAddChar(settingsCharInput.value,true);
+            settingsCharInput.value="";
+        },{passive:true});
+        settingsWordInput.addEventListener("input",()=>{
+            "use strict";
+            settingsWordInput.setCustomValidity("");
+            const word=settingsWordInput.value.toLocaleUpperCase();
+            for(const char of word){
+                if(confKeyboardLetters.has(char))continue;
+                settingsWordInput.setCustomValidity("Can only contain characters from the Alphabet list");
+                break;
+            }
+        },{passive:true});
+        settingsWordConfirm.addEventListener("click",()=>{
+            "use strict";
+            if(!settingsWordInput.reportValidity())return;
+            settingsAddWord(settingsWordInput.value);
+            settingsWordInput.value="";
+        },{passive:true});
+        settingsCharRandomUnhide.addEventListener("input",()=>{
+            "use strict";
+            settingsCharRandomUnhide.setCustomValidity("");
+            if(!/^(0|[1-9][0-9]?)(\.[0-9]+)?$/.test(settingsCharRandomUnhide.value))settingsCharRandomUnhide.setCustomValidity("Must be a number from 0 to 99");
+        },{passive:true});
+        settingsMaxFails.addEventListener("input",()=>{
+            "use strict";
+            settingsMaxFails.setCustomValidity("");
+            if(!/^(-1|0|[1-9][0-9]*)$/.test(settingsMaxFails.value))settingsMaxFails.setCustomValidity("Must be a whole number, larger or equal to -1");
+        },{passive:true});
+        settingsAbort.addEventListener("click",()=>{
+            "use strict";
+            settingsCharList.replaceChildren();
+            confKeyboardLetters.clear();
+            for(const letter of keyboardLetters)settingsAddChar(letter,false);
+            confKeyboardLettersAlt.clear();
+            for(const letter of keyboardLettersAlt)settingsAddChar(letter,true);
+            confWordList.clear();
+            for(const word of wordList)settingsAddWord(word);
+            settingsCharRandomUnhide.value=rngUnhide.toString();
+            settingsMaxFails.value=maxFails.toString();
+            settingsMenu.close();
+        },{passive:true});
+        settingsConfirm.addEventListener("click",()=>{
+            "use strict";
+            if(!settingsCharRandomUnhide.reportValidity())return;
+            if(!settingsMaxFails.reportValidity())return;
+            keyboardLetters.clear();
+            for(const letter of confKeyboardLetters)keyboardLetters.add(letter);
+            keyboardLettersAlt.clear();
+            for(const letter of confKeyboardLettersAlt)keyboardLettersAlt.add(letter);
+            wordList.clear();
+            for(const word of confWordList)wordList.add(word);
+            rngUnhide=Number(settingsCharRandomUnhide.value);
+            maxFails=Number(settingsMaxFails.value);
+            settingsMenu.close();
+            retry();
+            updateKeyboard();
+            updateWord();
+            updateFails();
+        },{passive:true});
+
+        finAgain.addEventListener("click",()=>{
+            "use strict";
+            finMenu.close();
+            retry();
+            updateKeyboard();
+            updateWord();
+            updateFails();
+        },{passive:true});
+
+        //~ start the game
+        retry();
+        updateKeyboard();
+        updateWord();
+        updateFails();
     </script>
 </body>
 </html>
