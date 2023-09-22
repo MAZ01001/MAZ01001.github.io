@@ -1,7 +1,7 @@
 # MAZ01001.github.io
 
 >
-> my git [website](https://maz01001.github.io/ "https://MAZ01001.GitHub.io/") with random HTML/JS/CSS single-pages (for offline use)
+> my git [website](https://maz01001.github.io/ "https://MAZ01001.GitHub.io/") with random HTML/JS/CSS single-pages (can be used offline)
 > made for pc/chrome browser
 >
 
@@ -27,7 +27,7 @@
 ## [Unofficial Satisfactory U3 Flow Chart](./site/satisfactory_u3_flowchart.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/satisfactory_u3_flowchart.html "open https://maz01001.github.io/site/satisfactory_u3_flowchart.html")
+> [view the live webpage](https://maz01001.github.io/site/satisfactory_u3_flowchart "open https://maz01001.github.io/site/satisfactory_u3_flowchart")
 >
 
 - interactive flow chart for the 3rd Update of [SATISFACTORY](https://www.satisfactorygame.com/ "official game website")
@@ -35,7 +35,7 @@
 ## [Ball Screensaver](./site/canvas_ball.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/canvas_ball.html "open https://maz01001.github.io/site/canvas_ball.html")
+> [view the live webpage](https://maz01001.github.io/site/canvas_ball "open https://maz01001.github.io/site/canvas_ball")
 >
 
 - a ball that moves diagonally across the screen and changes color
@@ -66,7 +66,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Small Dice](./site/dice.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/dice.html "open https://maz01001.github.io/site/dice.html")
+> [view the live webpage](https://maz01001.github.io/site/dice "open https://maz01001.github.io/site/dice")
 >
 
 - dice for random numbers
@@ -77,7 +77,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Pascal's Triangle](./site/pascals_triangle.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/pascals_triangle.html "open https://maz01001.github.io/site/pascals_triangle.html")
+> [view the live webpage](https://maz01001.github.io/site/pascals_triangle "open https://maz01001.github.io/site/pascals_triangle")
 >
 
 - choose the number of rows to generate
@@ -85,7 +85,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Math Function Drawer](./site/math_function_drawer.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/math_function_drawer.html "open https://maz01001.github.io/site/math_function_drawer.html")
+> [view the live webpage](https://maz01001.github.io/site/math_function_drawer "open https://maz01001.github.io/site/math_function_drawer")
 >
 
 - use sliders(show sliders button on the right) to set the coefficients
@@ -96,7 +96,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Error Correction Codes](./site/code_error_correction.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/code_error_correction.html "open https://maz01001.github.io/site/code_error_correction.html")
+> [view the live webpage](https://maz01001.github.io/site/code_error_correction "open https://maz01001.github.io/site/code_error_correction")
 >
 
 - made from a [3Blue1Brown video](https://youtu.be/X8jsijhllIA "How to send a self-correcting message (Hamming codes)")
@@ -112,7 +112,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Enigma](./site/enigma.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/enigma.html "open https://maz01001.github.io/site/enigma.html")
+> [view the live webpage](https://maz01001.github.io/site/enigma "open https://maz01001.github.io/site/enigma")
 >
 
 - almost like the real thing ft. loading screen
@@ -131,7 +131,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Vector Field](./site/vector_field.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/vector_field.html "open https://maz01001.github.io/site/vector_field.html")
+> [view the live webpage](https://maz01001.github.io/site/vector_field "open https://maz01001.github.io/site/vector_field")
 >
 
 - vector objects
@@ -148,7 +148,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [ASCII Snake](./site/snake.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/snake.html "open https://maz01001.github.io/site/snake.html")
+> [view the live webpage](https://maz01001.github.io/site/snake "open https://maz01001.github.io/site/snake")
 >
 
 - snake game in ascii style ([port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp "snake_cmd-game.cpp ducumentation in the other-projects/README.md"))
@@ -157,7 +157,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/BigIntType_calc.html "open https://maz01001.github.io/site/BigIntType_calc.html")
+> [view the live webpage](https://maz01001.github.io/site/BigIntType_calc "open https://maz01001.github.io/site/BigIntType_calc")
 >
 
 - Calculator for arbitrary-length-integers
@@ -170,7 +170,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ### [Context menu example](./site/context_menu_example.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/context_menu_example.html "open https://maz01001.github.io/site/context_menu_example.html")
+> [view the live webpage](https://maz01001.github.io/site/context_menu_example "open https://maz01001.github.io/site/context_menu_example")
 >
 
 - example of a custom context menu using HTML/JS/CSS
@@ -178,7 +178,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ### [4 PI-Day 2021](./site/pi-day_2021.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/pi-day_2021.html "open https://maz01001.github.io/site/pi-day_2021.html")
+> [view the live webpage](https://maz01001.github.io/site/pi-day_2021 "open https://maz01001.github.io/site/pi-day_2021")
 >
 
 - made from a [Coding Train coding-challenge video](https://youtu.be/EvS_a921dBo "Coding Challenge 161: Estimating π from Random Numbers with Euclid's Algorithm")
@@ -188,7 +188,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ### [Touch example](./site/touch_example.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/touch_example.html "open https://maz01001.github.io/site/touch_example.html")
+> [view the live webpage](https://maz01001.github.io/site/touch_example "open https://maz01001.github.io/site/touch_example")
 >
 
 - example for detecting touch (not the best detection)
@@ -196,7 +196,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 ### [3D-Card example](./site/3d-card_example.html "view the source code")
 
 >
-> [view the live webpage](https://maz01001.github.io/site/3d-card_example.html "open https://maz01001.github.io/site/3d-card_example.html")
+> [view the live webpage](https://maz01001.github.io/site/3d-card_example "open https://maz01001.github.io/site/3d-card_example")
 >
 
 - example of a 3d-card effect with HTML/JS/CSS
