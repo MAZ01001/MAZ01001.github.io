@@ -336,8 +336,9 @@
             secretWord=indexOfSet(wordList,Math.floor(wordList.size*Math.random()));
             startLetters.clear();
             setRngLetters();
+            const word=secretWord.toLocaleUpperCase();
             guessWord.length=secretWord.length;
-            for(let i=0;i<guessWord.length;i++)guessWord[i]=keyboardLettersAlt.has(secretWord[i])||startLetters.has(secretWord[i]);
+            for(let i=0;i<guessWord.length;i++)guessWord[i]=keyboardLettersAlt.has(word[i])||startLetters.has(word[i]);
             fails=0;
             startTime=Date.now();
         };
