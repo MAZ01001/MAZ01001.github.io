@@ -151,7 +151,7 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 > [view the live webpage](https://maz01001.github.io/site/snake "open https://maz01001.github.io/site/snake")
 >
 
-- snake game in ascii style ([port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp "snake_cmd-game.cpp ducumentation in the other-projects/README.md"))
+- snake game in ascii style ([direct port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp "snake_cmd-game.cpp ducumentation in the other-projects/README.md"))
 - right-click for more options
 
 ## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html "view the source code")
