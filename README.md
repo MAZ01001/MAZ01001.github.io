@@ -16,6 +16,7 @@
 - [Vector Field](#vector-field)
 - [ASCII Snake](#ascii-snake)
 - [Calculator for arbitrary-length-integers](#calculator-for-arbitrary-length-integers)
+- [Hangman](#hangman)
 - [_hidden_](#hidden)
   - [Context menu example](#context-menu-example)
   - [4 PI-Day 2021](#4-pi-day-2021)
@@ -162,6 +163,21 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 
 - Calculator for arbitrary-length-integers
 - see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js#biginttypejs "BigIntType.js documentation in the Math-js/README.md") for a detailed description
+
+## [Hangman](./site/hangman.html "view the source code")
+
+>
+> [view the live webpage](https://maz01001.github.io/site/hangman "open https://maz01001.github.io/site/hangman")
+>
+
+- A simple word guessing game
+- _no graphics (no actual hangman)_
+- settings
+  - custom alphabet (keyboard)
+  - custom words (case insensitive)
+  - set maximum fails (or disable loosing)
+  - set a chance for how many letters are randomly uncovered at the start of each round (or disable this feature)
+- (__WIP__) save/load settings from a file
 
 ----
 
