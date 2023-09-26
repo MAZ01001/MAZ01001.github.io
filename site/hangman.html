@@ -184,7 +184,7 @@
             display: flex;
             flex-direction: column;
             min-height: 1rem;
-            max-height: 7rem;
+            max-height: 10rem;
             overflow: overlay;
             margin: .3rem 0;
         }
@@ -202,7 +202,7 @@
             flex-wrap: wrap;
             gap: .3rem;
             min-height: 1rem;
-            max-height: 7rem;
+            max-height: 10rem;
             max-width: 15rem;
             overflow: overlay;
             margin: .3rem 0;
@@ -252,18 +252,22 @@
         //@ts-check
         //~ game logic (before DOM loads)
         /**
-         * ## get the item at position {@linkcode index} in {@linkcode set}
+         * ## get a random item from {@linkcode set}
          * @param {Set<any>} set - a {@linkcode Set} object
-         * @param {number} index - a positive integer to seek the position of an item in {@linkcode set} (must be smaller than the size of {@linkcode set})
-         * @returns {any} the item in {@linkcode set} at position {@linkcode index} (otherwise `undefined`)
+         * @returns {any} a random item from {@linkcode set}
          */
-        const indexOfSet=(set,index)=>{
+        const randomOfSet=set=>{
             "use strict";
+            let index=Math.floor(set.size*Math.random());
             for(const item of set)
                 if(--index<0)return item;
-            return undefined;
+            return set.values().next().value;
         };
         const
+            /** @type {RegExp} RegExp matching each (combined) unicode symbol/character/emoji consecutively */
+            unicodeRegExp=/(?:\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*(?:\p{Join_Control}\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*)*|\s|.)\p{M}*/guy,
+            /** @type {RegExp} RegExp matching one (combined) unicode symbol/character/emoji (does not match an empty string) */
+            unicodeRegExpSingle=/^(?:\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*(?:\p{Join_Control}\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*)*|\s|.)\p{M}*$/u,
             /** @type {Set<string>} list of all words (locale case inseneitive) */
             wordList=new Set([
                 "Unguessable","Inexpensive","Paste","Neighbor","Knock",
@@ -301,7 +305,7 @@
             /** @type {number} timestamp at start of each round */
             startTime=Date.now(),
             /** @type {string} the current word to guess each round (from {@linkcode wordList}) */
-            secretWord=indexOfSet(wordList,Math.floor(wordList.size*Math.random()));
+            secretWord=randomOfSet(wordList);
         /** ## gets {@linkcode rngUnhide} % of random letters from current word ({@linkcode secretWord}) and add them to {@linkcode startLetters} (if any) */
         const setRngLetters=()=>{
             "use strict";
@@ -311,7 +315,7 @@
                 //~ remove letters that are also in keyboardLettersAlt
                 for(const char of keyboardLettersAlt)letterSet.delete(char);
                 return Array.from(letterSet);
-            })(new Set(secretWord.toLocaleUpperCase()));
+            })(new Set(Array.from(secretWord.toLocaleUpperCase().matchAll(unicodeRegExp),v=>v[0])));
             //~ now remove some random letters and also add them to startLetters
             for(let i=Math.floor(wordLetters.length*rngUnhide*.01);i>0;i--){
                 const letter=wordLetters.splice(Math.floor(wordLetters.length*Math.random()),1)[0];
@@ -321,24 +325,26 @@
         /**
          * ## guess a letter of the current word
          * @param {string} letter - a letter from {@linkcode keyboardLetters}
-         * @returns {Set<number>} a set of indices of the current word ({@linkcode secretWord}) where the letters ({@linkcode letter}) are (if present)
+         * @returns {Set<number>} a set of (unicode) indices of the current word ({@linkcode secretWord}) where the letters ({@linkcode letter}) are (if present)
          */
         const guess=letter=>{
             "use strict";
-            const letterIndices=new Set(),
-                word=secretWord.toLocaleUpperCase();
-            for(let i=word.indexOf(letter);i>=0;i=word.indexOf(letter,i+1))letterIndices.add(i);
+            const letterIndices=new Set();
+            let index=0;
+            for(const[char]of secretWord.toLocaleUpperCase().matchAll(unicodeRegExp)){
+                if(char===letter)letterIndices.add(index);
+                index++;
+            }
             return letterIndices;
         };
         /** ## resets the game values and rolls a new word from {@linkcode wordList} */
         const retry=()=>{
             "use strict";
-            secretWord=indexOfSet(wordList,Math.floor(wordList.size*Math.random()));
+            secretWord=randomOfSet(wordList);
             startLetters.clear();
             setRngLetters();
-            const word=secretWord.toLocaleUpperCase();
-            guessWord.length=secretWord.length;
-            for(let i=0;i<guessWord.length;i++)guessWord[i]=keyboardLettersAlt.has(word[i])||startLetters.has(word[i]);
+            guessWord.length=0;
+            for(const[char]of secretWord.toLocaleUpperCase().matchAll(unicodeRegExp))guessWord.push(keyboardLettersAlt.has(char)||startLetters.has(char));
             fails=0;
             startTime=Date.now();
         };
@@ -375,7 +381,7 @@
             <legend title="Letters for guessing (words in the word list must only have these characters)">Alphabet</legend>
             <div id="settingsCharList">Loading...</div>
             <div>
-                <input type="text" id="settingsCharInput" maxlength="1" placeholder="Add a character" title="Add a new character to the list above (case insensitive)">
+                <input type="text" id="settingsCharInput" placeholder="Add a character" title="Add a new character to the list above (case insensitive)">
                 <input type="button" id="settingsCharConfirm" value="+" title="Click to add the character to the list above">
                 <input type="button" id="settingsCharConfirmAlt" value="[+]" title="Click to add the character to the list above (not for guessing - will always show)">
             </div>
@@ -398,7 +404,7 @@
             <input type="number" value="8" min="-1" step="1" id="settingsMaxFails">
         </label>
         <div id="settingsClosing">
-            <!-- TODO add [export] save-button and [import] file-input-field to write/read settings to/from a file (encoded JSON object) {wordList,keyboardLetters,keyboardLettersAlt,maxFails,rngUnhide} -->
+            <!-- TODO add [export] save-button and [import] file-input-field -->
             <input type="button" id="settingsConfirm" value="OK" title="confirm changes and start a new round">
             <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu" autofocus>
         </div>
@@ -483,38 +489,41 @@
             finTime.textContent=formatTimer((Date.now()-startTime)*.001);
             finMenuHeading.textContent=win?"Congratulations":"Game over";
             finWord.textContent=secretWord;
-            finWordGuess.replaceChildren(...secretWord.split("").map((v,i)=>{
+            finWordGuess.replaceChildren(...Array.from(secretWord.matchAll(unicodeRegExp),(match,i)=>{
                 "use strict";
-                const V=v.toLocaleUpperCase(),
-                    isLocked=keyboardLettersAlt.has(V)||startLetters.has(V),
+                const upper=match[0].toLocaleUpperCase(),
+                    isLocked=keyboardLettersAlt.has(upper)||startLetters.has(upper),
                     txt=document.createElement("span");
                 if(!isLocked&&guessWord[i]){
-                    txt.textContent=v;
+                    txt.textContent=match[0];
                     return txt;
                 }
-                txt.textContent=isLocked?v:"█";
+                txt.textContent=isLocked?match[0]:"█";
                 txt.classList.add(isLocked?"locked":"hidden");
                 return txt;
             }));
-            finWordIni.replaceChildren(...secretWord.split("").map((v,i)=>{
+            finWordIni.replaceChildren(...Array.from(secretWord.matchAll(unicodeRegExp),match=>{
                 "use strict";
-                const V=v.toLocaleUpperCase(),
-                    isLocked=keyboardLettersAlt.has(V)||startLetters.has(V),
+                const upper=match[0].toLocaleUpperCase(),
+                    isLocked=keyboardLettersAlt.has(upper)||startLetters.has(upper),
                     txt=document.createElement("span");
-                txt.textContent=isLocked?v:"█";
+                txt.textContent=isLocked?match[0]:"█";
                 txt.classList.add(isLocked?"locked":"hidden");
                 return txt;
             }));
             finFails.textContent=fails.toString();
-            finFailsMax.textContent=maxFails.toString();
+            finFailsMax.textContent=maxFails===-1?"∞":maxFails.toString();
             finMenu.showModal();
         };
-        /** ## functione for when clicking on a letter for guessing */
+        /**
+         * ## function callback when clicking on a letter for guessing
+         * @param {string} letter - the letter (value) that was clicked on
+         */
         const letterClick=letter=>{
             "use strict";
             const guessIndices=guess(letter);
             if(guessIndices.size===0){
-                if(++fails>=maxFails)endRound(false);
+                if(++fails>maxFails&&maxFails!==-1)endRound(false);
                 updateFails();
                 return;
             }
@@ -526,23 +535,27 @@
         /** ## updates {@linkcode displayWord} with current settings ({@linkcode guessWord}) */
         const updateWord=()=>{
             "use strict";
-            displayWord.replaceChildren(...secretWord.split("").map((v,i)=>{
+            displayWord.replaceChildren(...Array.from(secretWord.matchAll(unicodeRegExp),(match,i)=>{
                 "use strict";
                 const txt=document.createElement("span"),
-                    V=v.toLocaleUpperCase();
-                if(keyboardLettersAlt.has(V)||startLetters.has(V)){
-                    txt.textContent=v;
+                    upper=match[0].toLocaleUpperCase();
+                if(keyboardLettersAlt.has(upper)||startLetters.has(upper)){
+                    txt.textContent=match[0];
                     txt.classList.add("locked");
                 }else if(!guessWord[i]){
                     txt.textContent="█";
                     txt.classList.add("hidden");
-                }else txt.textContent=v;
+                }else txt.textContent=match[0];
                 return txt;
             }));
         };
         /** ## updates the {@linkcode guesses} value */
         const updateFails=()=>{
             "use strict";
+            if(maxFails===-1){
+                guesses.textContent=`${fails}/∞`;
+                return;
+            }
             guesses.textContent=`${fails}/${maxFails}`;
             if(fails/maxFails<.3)guesses.style.color="";
             else if(fails/maxFails<.5)guesses.style.color="#F90";
@@ -572,9 +585,10 @@
          */
         const removeWordsWithChar=char=>{
             "use strict";
-            for(const container of settingsWordList.childNodes)
-                if(container?.firstChild?.textContent?.toLocaleUpperCase()?.includes(char)??false)
-                    container.remove();
+            for(let i=settingsWordList.childElementCount-1;i>=0;i--){
+                const container=settingsWordList.childNodes.item(i);
+                if(container?.firstChild?.textContent?.toLocaleUpperCase()?.includes(char)??false)container.remove();
+            }
             for(const word of confWordList)
                 if(word.toLocaleUpperCase().includes(char))confWordList.delete(word);
         }
@@ -675,8 +689,8 @@
             "use strict";
             settingsCharInput.setCustomValidity("");
             const char=settingsCharInput.value.toLocaleUpperCase();
-            if(char.length>1){
-                settingsCharInput.setCustomValidity("Can only be one character");
+            if(!unicodeRegExpSingle.test(char)){
+                settingsCharInput.setCustomValidity("Can only be one character, emoji, or Unicode symbol");
                 return;
             }
             if(confKeyboardLetters.has(char))settingsCharInput.setCustomValidity("Character already exist in list");
@@ -684,40 +698,57 @@
         settingsCharConfirm.addEventListener("click",()=>{
             "use strict";
             if(!settingsCharInput.reportValidity())return;
-            settingsAddChar(settingsCharInput.value,false);
+            if(settingsCharInput.value===""){
+                settingsCharInput.setCustomValidity("Must not be an empty string");
+                return;
+            }
+            settingsAddChar(settingsCharInput.value.toLocaleUpperCase(),false);
             settingsCharInput.value="";
         },{passive:true});
         settingsCharConfirmAlt.addEventListener("click",()=>{
             "use strict";
             if(!settingsCharInput.reportValidity())return;
-            settingsAddChar(settingsCharInput.value,true);
+            if(settingsCharInput.value===""){
+                settingsCharInput.setCustomValidity("Must not be an empty string");
+                return;
+            }
+            settingsAddChar(settingsCharInput.value.toLocaleUpperCase(),true);
             settingsCharInput.value="";
         },{passive:true});
         settingsWordInput.addEventListener("input",()=>{
             "use strict";
             settingsWordInput.setCustomValidity("");
             const word=settingsWordInput.value.toLocaleUpperCase();
-            for(const char of word){
+            for(const[char]of word.matchAll(unicodeRegExp)){
                 if(confKeyboardLetters.has(char))continue;
+                if(confKeyboardLettersAlt.has(char))continue;
                 settingsWordInput.setCustomValidity("Can only contain characters from the Alphabet list");
                 break;
             }
+            if(confWordList.has(settingsWordInput.value))settingsWordInput.setCustomValidity("Word already exist in list");
+            if([...confWordList].some(v=>v.toLocaleUpperCase()===word))settingsWordInput.setCustomValidity("Word already exist in list (with different capitalization)");
         },{passive:true});
         settingsWordConfirm.addEventListener("click",()=>{
             "use strict";
             if(!settingsWordInput.reportValidity())return;
+            if(settingsWordInput.value===""){
+                settingsWordInput.setCustomValidity("Must not be an empty string");
+                return;
+            }
             settingsAddWord(settingsWordInput.value);
             settingsWordInput.value="";
         },{passive:true});
         settingsCharRandomUnhide.addEventListener("input",()=>{
             "use strict";
             settingsCharRandomUnhide.setCustomValidity("");
-            if(!/^(0|[1-9][0-9]?)(\.[0-9]+)?$/.test(settingsCharRandomUnhide.value))settingsCharRandomUnhide.setCustomValidity("Must be a number from 0 to 99");
+            const num=Number(settingsCharRandomUnhide.value);
+            if(settingsCharRandomUnhide.value===""||Number.isNaN(num)||num<0||num>99)settingsCharRandomUnhide.setCustomValidity("Must be a number from 0 to 99");
         },{passive:true});
         settingsMaxFails.addEventListener("input",()=>{
             "use strict";
             settingsMaxFails.setCustomValidity("");
-            if(!/^(-1|0|[1-9][0-9]*)$/.test(settingsMaxFails.value))settingsMaxFails.setCustomValidity("Must be a whole number, larger or equal to -1");
+            const num=Number(settingsMaxFails.value);
+            if(settingsMaxFails.value===""||Number.isNaN(num)||num<-1||!Number.isSafeInteger(num))settingsMaxFails.setCustomValidity("Must be an integer larger or equal to -1");
         },{passive:true});
         settingsAbort.addEventListener("click",()=>{
             "use strict";
