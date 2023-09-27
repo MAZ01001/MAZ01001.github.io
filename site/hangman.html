@@ -68,6 +68,7 @@
             color: #000;
         }
         input[type="button"]{cursor: pointer;}
+        input[type="button"]:disabled{cursor: not-allowed;}
         dialog::backdrop{background-color: #0007;}
         dialog[open]{
             background-color: #444;
@@ -158,7 +159,6 @@
             background-color: #111;
             border-style: inset;
             color: #0A0;
-            cursor: not-allowed;
         }
         span#timer{
             grid-area: 2/2/3/3;
@@ -231,7 +231,8 @@
         dialog#finMenu>input{grid-area: 3/1/4/2;}
         span#finWord,
         span#finWordGuess,
-        span#finWordIni{
+        span#finWordIni,
+        span#finGuesses{
             display: inline-block;
             vertical-align: bottom;
             max-height: 5rem;
@@ -240,13 +241,15 @@
             word-break: break-all;
         }
         span#finWordGuess>span,
-        span#finWordIni>span{padding: 0 2px;}
+        span#finWordIni>span,
+        span#finGuesses>span{padding: 0 2px;}
         span#displayWord>span.locked,
         span#finWordGuess>span.locked,
         span#finWordIni>span.locked{color: #0A0;}
         span#displayWord>span.hidden,
         span#finWordGuess>span.hidden,
         span#finWordIni>span.hidden{color: #040;}
+        span#finGuesses>span.fail{color: #F44;}
     </style>
     <script>
         //@ts-check
@@ -264,6 +267,8 @@
             return set.values().next().value;
         };
         const
+            /** @type {string} prefix for {@linkcode localStorage} */
+            storagePrefix="HangmanGameSettings_",
             /** @type {RegExp} RegExp matching each (combined) unicode symbol/character/emoji consecutively */
             unicodeRegExp=/(?:\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*(?:\p{Join_Control}\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*)*|\s|.)\p{M}*/guy,
             /** @type {RegExp} RegExp matching one (combined) unicode symbol/character/emoji (does not match an empty string) */
@@ -286,15 +291,15 @@
                 ",",".","-"," "
             ]),
             /** @type {Set<string>} [settings] list of all words */
-            confWordList=new Set(wordList),
+            confWordList=new Set(),
             /** @type {Set<string>} [settings] list of all unique letters for guessing (locale uppercase) */
-            confKeyboardLetters=new Set(keyboardLetters),
+            confKeyboardLetters=new Set(),
             /** @type {Set<string>} [settings] list of all unique letters to always display (locale uppercase) */
-            confKeyboardLettersAlt=new Set(keyboardLettersAlt),
+            confKeyboardLettersAlt=new Set(),
             /** @type {Set<string>} letters that are revealed at the start of the round (if any) */
             startLetters=new Set(),
-            /** @type {boolean[]} guesses of the current word (same length as the current word) */
-            guessWord=[];
+            /** @type {Set<string>} letters guessed this round (locale uppercase) */
+            guessLetters=new Set();
         let
             /** @type {number} max allowed fails for each round */
             maxFails=8,
@@ -303,9 +308,9 @@
             /** @type {number} percentage of random letters to unhide at start of each round */
             rngUnhide=20,
             /** @type {number} timestamp at start of each round */
-            startTime=Date.now(),
+            startTime=NaN,
             /** @type {string} the current word to guess each round (from {@linkcode wordList}) */
-            secretWord=randomOfSet(wordList);
+            secretWord="";
         /** ## gets {@linkcode rngUnhide} % of random letters from current word ({@linkcode secretWord}) and add them to {@linkcode startLetters} (if any) */
         const setRngLetters=()=>{
             "use strict";
@@ -317,10 +322,8 @@
                 return Array.from(letterSet);
             })(new Set(Array.from(secretWord.toLocaleUpperCase().matchAll(unicodeRegExp),v=>v[0])));
             //~ now remove some random letters and also add them to startLetters
-            for(let i=Math.floor(wordLetters.length*rngUnhide*.01);i>0;i--){
-                const letter=wordLetters.splice(Math.floor(wordLetters.length*Math.random()),1)[0];
-                startLetters.add(letter);
-            }
+            for(let i=Math.floor(wordLetters.length*rngUnhide*.01);i>0;i--)
+                startLetters.add(wordLetters.splice(Math.floor(wordLetters.length*Math.random()),1)[0]);
         };
         /**
          * ## guess a letter of the current word
@@ -343,8 +346,7 @@
             secretWord=randomOfSet(wordList);
             startLetters.clear();
             setRngLetters();
-            guessWord.length=0;
-            for(const[char]of secretWord.toLocaleUpperCase().matchAll(unicodeRegExp))guessWord.push(keyboardLettersAlt.has(char)||startLetters.has(char));
+            guessLetters.clear();
             fails=0;
             startTime=Date.now();
         };
@@ -361,6 +363,199 @@
             if(hours>0)return`${hours.toString()}:${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
             return`${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
         };
+        /** ## save current settings to file (UTF-8 JSON) */
+        const saveToFile=()=>{
+            "use strict";
+            const blob=new Blob(
+                [JSON.stringify({
+                    "maxFails":maxFails,
+                    "rngUnhide":rngUnhide,
+                    "time":Date.now()-startTime,
+                    "secretWord":secretWord,
+                    "fails":fails,
+                    "guessLetters":[...guessLetters],
+                    "startLetters":[...startLetters],
+                    "keyboardLetters":[...keyboardLetters],
+                    "keyboardLettersAlt":[...keyboardLettersAlt],
+                    "wordList":[...wordList],
+                })],
+                {type:"application/json;charset=UTF-8;"}
+            );
+            const link=document.createElement("a"),
+                blobLink=URL.createObjectURL(blob);
+            link.href=blobLink;
+            link.download=`HangmanGameSettings-${Date.now()}.json`;
+            link.click();
+        };
+        /**
+         * ## validates and loads given parsed JSON data
+         * - ignores charcters/words that do not match
+         * - prioritizes characters over alternate characters
+         * - only uses words that use characters from the character lists
+         * - only overrides if data exists
+         * @param {any} _maxFails - parsed JSON data for {@linkcode maxFails} or `null` if not present
+         * @param {any} _rngUnhide - parsed JSON data for {@linkcode rngUnhide} or `null` if not present
+         * @param {any} _time - parsed JSON data for timer ({@linkcode startTime}) or `null` if not present
+         * @param {any} _secretWord - parsed JSON data for {@linkcode secretWord} or `null` if not present
+         * @param {any} _fails - parsed JSON data for {@linkcode fails} or `null` if not present
+         * @param {any} _guessLetters - parsed JSON data for {@linkcode guessLetters} or `null` if not present
+         * @param {any} _startLetters - parsed JSON data for {@linkcode startLetters} or `null` if not present
+         * @param {any} _keyboardLetters - parsed JSON data for {@linkcode keyboardLetters} or `null` if not present
+         * @param {any} _keyboardLettersAlt - parsed JSON data for {@linkcode keyboardLettersAlt} or `null` if not present
+         * @param {any} _wordList - parsed JSON data for {@linkcode wordList} or `null` if not present
+         */
+        const loadParsedJSON=(
+            _maxFails,
+            _rngUnhide,
+            _time,
+            _secretWord,
+            _fails,
+            _guessLetters,
+            _startLetters,
+            _keyboardLetters,
+            _keyboardLettersAlt,
+            _wordList,
+        )=>{
+            "use strict";
+            if(typeof _rngUnhide==="number"&&_rngUnhide>=0&&_rngUnhide<=99)rngUnhide=_rngUnhide;
+            if(typeof _maxFails==="number"&&Number.isSafeInteger(_maxFails)&&_maxFails>=-1)maxFails=_maxFails;
+            if(_keyboardLetters!=null){
+                if(Array.isArray(_keyboardLetters)&&_keyboardLetters.every(v=>typeof v==="string")){
+                    for(let i=_keyboardLetters.length-1;i>=0;i--){
+                        if(unicodeRegExpSingle.test(_keyboardLetters[i]))continue;
+                        _keyboardLetters.splice(i,1);
+                    }
+                    if(_keyboardLetters.length>0){
+                        keyboardLetters.clear();
+                        for(const char of _keyboardLetters)keyboardLetters.add(char.toLocaleUpperCase());
+                    }
+                }
+            }
+            if(_keyboardLettersAlt!=null){
+                if(Array.isArray(_keyboardLettersAlt)&&_keyboardLettersAlt.every(v=>typeof v==="string")){
+                    for(let i=_keyboardLettersAlt.length-1;i>=0;i--){
+                        if(
+                            unicodeRegExpSingle.test(_keyboardLettersAlt[i])
+                            &&!keyboardLetters.has(_keyboardLettersAlt[i].toLocaleUpperCase())
+                        )continue;
+                        _keyboardLettersAlt.splice(i,1);
+                    }
+                    if(_keyboardLettersAlt.length>0){
+                        keyboardLettersAlt.clear();
+                        for(const char of _keyboardLettersAlt)keyboardLettersAlt.add(char.toLocaleUpperCase());
+                    }
+                }
+            }
+            if(_wordList!=null){
+                if(Array.isArray(_wordList)&&_wordList.every(v=>typeof v==="string")){
+                    for(let i=_wordList.length-1;i>=0;i--){
+                        for(const[char]of _wordList[i].matchAll(unicodeRegExp)){
+                            if(
+                                keyboardLetters.has(char.toLocaleUpperCase())
+                                ||keyboardLettersAlt.has(char.toLocaleUpperCase())
+                            ){
+                                _wordList.splice(i,1);
+                                break;
+                            }
+                        }
+                    }
+                    if(_wordList.length>0){
+                        wordList.clear();
+                        for(const word of _wordList)wordList.add(word);
+                    }
+                }
+            }
+            //~ check saved round
+            if(typeof _secretWord!=="string"||!wordList.has(_secretWord))return;
+            if(!Array.isArray(_guessLetters)||_guessLetters.some(v=>typeof v!=="string"||!keyboardLetters.has(v)))return;
+            if(!Array.isArray(_startLetters)||_startLetters.some(v=>typeof v!=="string"||!keyboardLetters.has(v)))return;
+            if(typeof _time!=="number"||!Number.isInteger(_time)||_time<0)return;
+            if(typeof _fails!=="number"||!Number.isInteger(_fails)||_fails<0||(maxFails!==-1&&_fails>maxFails))return;
+            if([..._secretWord.toLocaleUpperCase().matchAll(unicodeRegExp)].every(([v])=>
+                _startLetters.includes(v)
+                ||_guessLetters.includes(v)
+                ||keyboardLettersAlt.has(v)
+            ))return;
+            //~ load saved round
+            fails=_fails;
+            startTime=Date.now()-_time;
+            secretWord=_secretWord;
+            startLetters.clear();
+            _startLetters.forEach(v=>startLetters.add(v));
+            guessLetters.clear();
+            _guessLetters.forEach(v=>guessLetters.add(v));
+        }
+        /**
+         * ## load previously saved settings from file (UTF-8 JSON)
+         * @param {File} file - a `HangmanGameSettings` JSON file (UTF-8)
+         */
+        const loadFromFile=file=>{
+            "use strict";
+            // FIXME does not seam to work ? saving to file does work
+            const fileReader=new FileReader();
+            fileReader.addEventListener("loadend",ev=>{
+                "use strict";
+                if(typeof fileReader.result!=="string")return;
+                let{
+                    _maxFails=null,
+                    _rngUnhide=null,
+                    _time=null,
+                    _secretWord=null,
+                    _fails=null,
+                    _guessLetters=null,
+                    _startLetters=null,
+                    _keyboardLetters=null,
+                    _keyboardLettersAlt=null,
+                    _wordList=null,
+                }=JSON.parse(fileReader.result);
+                loadParsedJSON(
+                    _maxFails,
+                    _rngUnhide,
+                    _time,
+                    _secretWord,
+                    _fails,
+                    _guessLetters,
+                    _startLetters,
+                    _keyboardLetters,
+                    _keyboardLettersAlt,
+                    _wordList,
+                );
+            });
+            fileReader.readAsText(file,"UTF-8");
+        };
+        /** ## saves current settings to {@linkcode localStorage} */
+        const updateLocalStorage=()=>{
+            "use strict";
+            localStorage.setItem(`${storagePrefix}maxFails`,JSON.stringify(maxFails));
+            localStorage.setItem(`${storagePrefix}rngUnhide`,JSON.stringify(rngUnhide));
+            localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
+            localStorage.setItem(`${storagePrefix}secretWord`,JSON.stringify(secretWord));
+            localStorage.setItem(`${storagePrefix}fails`,JSON.stringify(fails));
+            localStorage.setItem(`${storagePrefix}guessLetters`,JSON.stringify([...guessLetters]));
+            localStorage.setItem(`${storagePrefix}startLetters`,JSON.stringify([...startLetters]));
+            localStorage.setItem(`${storagePrefix}keyboardLetters`,JSON.stringify([...keyboardLetters]));
+            localStorage.setItem(`${storagePrefix}keyboardLettersAlt`,JSON.stringify([...keyboardLettersAlt]));
+            localStorage.setItem(`${storagePrefix}wordList`,JSON.stringify([...wordList]));
+        };
+        /** ## removes all stored data from {@linkcode localStorage} */
+        const clearLocalStorage=()=>{
+            "use strict";
+            for(const key in localStorage)
+                if(key.startsWith(storagePrefix))localStorage.removeItem(key);
+        };
+        //~ load settings from `localStorage`
+        loadParsedJSON(
+            JSON.parse(localStorage.getItem(`${storagePrefix}maxFails`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}rngUnhide`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}time`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}secretWord`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}fails`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}guessLetters`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}startLetters`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}keyboardLetters`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}keyboardLettersAlt`)??"null"),
+            JSON.parse(localStorage.getItem(`${storagePrefix}wordList`)??"null"),
+        );
     </script>
 </head>
 <body>
@@ -371,8 +566,11 @@
         <span id="guesses">-/-</span>
         <div id="letterButtons">loading...</div>
         <div id="options">
-            <input type="button" value="New round" id="retryButton">
-            <input type="button" value="Settings" id="settingsButton" autofocus>
+            <!-- TODO remove WIP -->
+            <input type="button" value="Import" id="importButton" title="open import menu [WIP]" disabled>
+            <input type="button" value="New round" id="retryButton" title="start a new round">
+            <input type="button" value="Settings" id="settingsButton" title="open settings menu" autofocus>
+            <input type="button" value="Export" id="exportButton" title="export current season and settings to file">
         </div>
     </div>
     <dialog id="settingsMenu">
@@ -384,6 +582,7 @@
                 <input type="text" id="settingsCharInput" placeholder="Add a character" title="Add a new character to the list above (case insensitive)">
                 <input type="button" id="settingsCharConfirm" value="+" title="Click to add the character to the list above">
                 <input type="button" id="settingsCharConfirmAlt" value="[+]" title="Click to add the character to the list above (not for guessing - will always show)">
+                <!-- TODO when adding chars that already exist override them → alt char get overriten with the normal add button (and vice versa) -->
             </div>
         </fieldset>
         <fieldset id="settingsWord">
@@ -392,6 +591,7 @@
             <div>
                 <input type="text" id="settingsWordInput" spellcheck="true" placeholder="Add a word" title="Add a new word to the list above">
                 <input type="button" id="settingsWordConfirm" value="+" title="Click to add the word to the list above">
+                <!-- TODO confirm where missing characters are automatically added to the alphabet (non alt characters) -->
             </div>
         </fieldset>
         <label for="settingsCharRandomUnhide" title="Percentage of letters of the guessing word to randomly unhide (for each round)">
@@ -404,9 +604,20 @@
             <input type="number" value="8" min="-1" step="1" id="settingsMaxFails">
         </label>
         <div id="settingsClosing">
-            <!-- TODO add [export] save-button and [import] file-input-field -->
             <input type="button" id="settingsConfirm" value="OK" title="confirm changes and start a new round">
             <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu" autofocus>
+        </div>
+    </dialog>
+    <dialog id="importMenu">
+        <h2>Import</h2>
+        <fieldset>
+            <legend title="WIP">WIP</legend>
+            <!-- TODO file input field / override or add / do nothing when encountering errors or load what is possible -->
+        </fieldset>
+        <!-- TODO show contents of file ? -->
+        <div id="importClosing">
+            <input type="button" id="importConfirm" value="OK" title="confirm changes and continue round">
+            <input type="button" id="omportAbort" value="Abort" title="revert changes and close menu" autofocus>
         </div>
     </dialog>
     <dialog id="finMenu">
@@ -417,7 +628,8 @@
             <div>Your guess: <span id="finWordGuess">________</span></div>
             <div>Initial word: <span id="finWordIni">________</span></div>
             <div>Time taken: <span id="finTime">--:--</span></div>
-            <div>Failed guesses: <span id="finFails">-</span> of max <span id="finFailsMax">-</span></div>
+            <div>Failed to guess: <span id="finFails">-</span> of max <span id="finFailsMax">-</span></div>
+            <div>All guesses: <span id="finGuesses">________</span></div>
         </fieldset>
         <input type="button" id="finAgain" value="Play again" autofocus>
     </dialog>
@@ -435,6 +647,14 @@
         const retryButton=document.getElementById("retryButton");
         /** @type {HTMLInputElement} button to open the {@linkcode settingsMenu} *///@ts-ignore element does exist in DOM
         const settingsButton=document.getElementById("settingsButton");
+        /** @type {HTMLInputElement} button to open the {@linkcode importMenu} *///@ts-ignore element does exist in DOM
+        const importButton=document.getElementById("importButton");
+        /** @type {HTMLInputElement} button to export current season and settings *///@ts-ignore element does exist in DOM
+        const exportButton=document.getElementById("exportButton");
+
+        /** @type {HTMLDialogElement} the import menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
+        const importMenu=document.getElementById("importMenu");
+        // TODO import menu elements
 
         /** @type {HTMLDialogElement} the settings menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
         const settingsMenu=document.getElementById("settingsMenu");
@@ -475,6 +695,8 @@
         const finTime=document.getElementById("finTime");
         /** @type {HTMLSpanElement} the total fails of this round *///@ts-ignore element does exist in DOM
         const finFails=document.getElementById("finFails");
+        /** @type {HTMLSpanElement} all guesses of this round *///@ts-ignore element does exist in DOM
+        const finGuesses=document.getElementById("finGuesses");
         /** @type {HTMLSpanElement} the max fails allowed for this round *///@ts-ignore element does exist in DOM
         const finFailsMax=document.getElementById("finFailsMax");
         /** @type {HTMLInputElement} button to close the {@linkcode finMenu} and start a new round *///@ts-ignore element does exist in DOM
@@ -494,7 +716,7 @@
                 const upper=match[0].toLocaleUpperCase(),
                     isLocked=keyboardLettersAlt.has(upper)||startLetters.has(upper),
                     txt=document.createElement("span");
-                if(!isLocked&&guessWord[i]){
+                if(!isLocked&&guessLetters.has(upper)){
                     txt.textContent=match[0];
                     return txt;
                 }
@@ -513,6 +735,13 @@
             }));
             finFails.textContent=fails.toString();
             finFailsMax.textContent=maxFails===-1?"∞":maxFails.toString();
+            finGuesses.replaceChildren(...Array.from(guessLetters,v=>{
+                "use strict";
+                const txt=document.createElement("span");
+                txt.textContent=v;
+                if([...secretWord.toLocaleUpperCase().matchAll(unicodeRegExp)].every(m=>m[0]!==v))txt.classList.add("fail");
+                return txt;
+            }));
             finMenu.showModal();
         };
         /**
@@ -521,16 +750,21 @@
          */
         const letterClick=letter=>{
             "use strict";
+            guessLetters.add(letter);
             const guessIndices=guess(letter);
             if(guessIndices.size===0){
                 if(++fails>maxFails&&maxFails!==-1)endRound(false);
                 updateFails();
+                updateLocalStorage();
                 return;
             }
-            for(let i=0;i<guessWord.length;i++)
-                if(guessIndices.has(i))guessWord[i]=true;
-            if(guessWord.every(v=>v))endRound(true);
+            if([...secretWord.toLocaleUpperCase().matchAll(unicodeRegExp)].every(m=>
+                guessLetters.has(m[0])
+                ||startLetters.has(m[0])
+                ||keyboardLettersAlt.has(m[0])
+            ))endRound(true);
             updateWord();
+            updateLocalStorage();
         }
         /** ## updates {@linkcode displayWord} with current settings ({@linkcode guessWord}) */
         const updateWord=()=>{
@@ -539,13 +773,14 @@
                 "use strict";
                 const txt=document.createElement("span"),
                     upper=match[0].toLocaleUpperCase();
-                if(keyboardLettersAlt.has(upper)||startLetters.has(upper)){
+                if(guessLetters.has(upper))txt.textContent=match[0];
+                else if(keyboardLettersAlt.has(upper)||startLetters.has(upper)){
                     txt.textContent=match[0];
                     txt.classList.add("locked");
-                }else if(!guessWord[i]){
+                }else{
                     txt.textContent="█";
                     txt.classList.add("hidden");
-                }else txt.textContent=match[0];
+                }
                 return txt;
             }));
         };
@@ -569,7 +804,7 @@
                 const letter=document.createElement("input");
                 letter.type="button";
                 letter.value=v;
-                if(startLetters.has(v))letter.disabled=true;
+                if(startLetters.has(v)||guessLetters.has(v))letter.disabled=true;
                 else letter.addEventListener("click",()=>{
                     "use strict";
                     letter.disabled=true;
@@ -646,9 +881,12 @@
                 container.remove();
             },{passive:true,once:true});
         }
-
         //~ add all event listeners
-        let timerInterval=setInterval(()=>timer.textContent=formatTimer((Date.now()-startTime)*.001),300);
+        let timerInterval=setInterval(()=>{
+            "use strict";
+            timer.textContent=formatTimer((Date.now()-startTime)*.001);
+            localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
+        },300);
         document.body.addEventListener("mousedown",()=>document.getSelection()?.empty(),{passive:true});
         document.body.addEventListener("keypress",ev=>{
             if(settingsMenu.open||finMenu.open)return;
@@ -669,6 +907,7 @@
             updateKeyboard();
             updateWord();
             updateFails();
+            updateLocalStorage();
         },{passive:true});
         settingsButton.addEventListener("click",()=>{
             "use strict";
@@ -684,7 +923,20 @@
             settingsMaxFails.value=maxFails.toString();
             settingsMenu.showModal();
         },{passive:true});
+        importButton.addEventListener("click",()=>{
+            "use strict";
+            // TODO reset import menu values ?
+            importMenu.showModal();
+        },{passive:true});
+        exportButton.addEventListener("click",()=>{
+            "use strict";
+            saveToFile();
+        },{passive:true});
 
+        settingsMenu.addEventListener("cancel",ev=>{
+            ev.preventDefault();
+            settingsAbort.click();
+        },{passive:false});
         settingsCharInput.addEventListener("input",()=>{
             "use strict";
             settingsCharInput.setCustomValidity("");
@@ -780,8 +1032,13 @@
             updateKeyboard();
             updateWord();
             updateFails();
+            updateLocalStorage();
         },{passive:true});
 
+        finMenu.addEventListener("cancel",ev=>{
+            ev.preventDefault();
+            finAgain.click();
+        },{passive:false});
         finAgain.addEventListener("click",()=>{
             "use strict";
             finMenu.close();
@@ -789,13 +1046,15 @@
             updateKeyboard();
             updateWord();
             updateFails();
+            updateLocalStorage();
         },{passive:true});
 
         //~ start the game
-        retry();
+        if(Number.isNaN(startTime))retry();
         updateKeyboard();
         updateWord();
         updateFails();
+        updateLocalStorage();
     </script>
 </body>
 </html>
