@@ -170,14 +170,26 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 > [view the live webpage](https://maz01001.github.io/site/hangman "open https://maz01001.github.io/site/hangman")
 >
 
-- A simple word guessing game
+- __A simple word guessing game__
 - _no graphics (no actual hangman)_
-- settings
-  - custom alphabet (keyboard)
-  - custom words (case insensitive)
-  - set maximum fails (or disable loosing)
-  - set a chance for how many letters are randomly uncovered at the start of each round (or disable this feature)
-- (__WIP__) save/load settings from a file
+- guessing is case insensitive
+- full Unicode support (allows for special symbols and Emojis)
+- when clicking on "new round" when over 20 seconds of progress, it shows a confirm dialog (YES/NO)
+- customization (settings)
+  - custom alphabet
+    - keys can be set to always show and not be on the "keyboard" (useful for spaces and punctuation)
+  - custom word list
+  - set maximum allowed fails (or disable loosing with `-1`)
+  - set a percentage for how many letters of the word are uncovered at the start of the round (`0%` to `99%`)
+  - clear stored settings and reload page (shows a confirm dialog (YES/NO))
+- current settings and progress is stored in browser local storage (reload does not start a new round or reset settings)
+- export current settings and progress to a JSON file
+- (__WIP__) import settings and progress from saved JSON file
+  - choose what to import of the save
+  - choose to override, ignore, or combine current alphabet / word list with the imported
+  - choose to override or ignore imported rng-unhide / max-fails value
+  - choose to continue with saved progress or start a new round (only previews time and fails)
+    - can only be continued if the guess-word with characters are present in final settings
 
 ----
 
