@@ -67,6 +67,12 @@
             background-color: #F90;
             color: #000;
         }
+        *:focus,
+        input#settingsCharAlt:focus+
+        label[for="settingsCharAlt"]{
+            outline: 1px solid #F90;
+            outline-offset: -1px;
+        }
         input[type="button"]{cursor: pointer;}
         input[type="button"]:disabled{cursor: not-allowed;}
         dialog::backdrop{background-color: #0007;}
@@ -191,19 +197,36 @@
         div#settingsWordList>div>input{float: right;}
         div#settingsWordList>div>span{
             display: inline-block;
-            width: 10.8rem;
+            width: 9rem;
             overflow: overlay;
             user-select: text;
         }
         input#settingsCharInput,
         input#settingsWordInput{width: 10rem;}
+        label[for="settingsCharAlt"]{
+            background-color: #111;
+            border: 2px outset #000;
+            border-radius: .4rem;
+            padding: 0 .3rem;
+            color: #0A0;
+        }
+        input#settingsCharAlt{
+            width: 0;
+            margin: 0;
+        }
+        input#settingsCharAlt:checked+
+        label[for="settingsCharAlt"]{
+            background-color: #222;
+            border-style: inset;
+            color: #0F0;
+        }
         div#settingsCharList{
             display: flex;
             flex-wrap: wrap;
             gap: .3rem;
             min-height: 1rem;
             max-height: 10rem;
-            max-width: 15rem;
+            max-width: 13rem;
             overflow: overlay;
             margin: .3rem 0;
         }
@@ -250,6 +273,61 @@
         span#finWordGuess>span.hidden,
         span#finWordIni>span.hidden{color: #040;}
         span#finGuesses>span.fail{color: #F44;}
+        div#importCharList{
+            display: flex;
+            flex-wrap: wrap;
+            gap: .3rem;
+            min-height: 1rem;
+            max-height: 10rem;
+            max-width: 13rem;
+            overflow: overlay;
+            margin: .3rem 0;
+        }
+        div#importCharList>span{
+            background-color: #000;
+            border: 2px outset #000;
+            border-radius: .4rem;
+            font-family: consolas, monospace;
+            font-size: medium;
+            padding: 0 .3rem;
+        }
+        div#importCharList>span.unhide{background-color: #333;}
+        div#importWordList{
+            display: flex;
+            flex-direction: column;
+            min-height: 1rem;
+            max-height: 10rem;
+            overflow: overlay;
+            margin: .3rem 0;
+        }
+        div#importWordList>div>span{
+            display: inline-block;
+            width: 9rem;
+            overflow: overlay;
+            user-select: text;
+        }
+        dialog#importMenu>fieldset:first-of-type{background-color: #111;}
+        fieldset#importDataView>div{
+            display: grid;
+            gap: .7rem;
+            place-items: safe center;
+            place-content: safe center;
+            grid-template-columns: auto auto;
+        }
+        fieldset#importDataView>div>span{
+            background-color: #222;
+            border: 2px groove #222;
+            border-radius: .5rem;
+            padding: .3rem .6rem;
+        }
+        fieldset#importDataView>div>span:last-of-type{grid-area: 3/1/4/3;}
+        fieldset#importDataOptions>div{
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: .4rem;
+        }
+        dialog#importMenu>fieldset:first-of-type:has(input#importFiles:invalid)~fieldset,
+        dialog#importMenu>fieldset:first-of-type:has(input#importFiles:invalid)~div>input#importConfirm{filter: brightness(.5) saturate(0);}
     </style>
     <script>
         //@ts-check
@@ -267,7 +345,7 @@
             return set.values().next().value;
         };
         const
-            /** @type {string} prefix for {@linkcode localStorage} */
+            /** @type {string} prefix for {@linkcode window.localStorage} */
             storagePrefix="HangmanGameSettings_",
             /** @type {RegExp} RegExp matching each (combined) unicode symbol/character/emoji consecutively */
             unicodeRegExp=/(?:\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*(?:\p{Join_Control}\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*)*|\s|.)\p{M}*/guy,
@@ -352,11 +430,12 @@
         };
         /**
          * ## format time for the timer
-         * @param {number} time - the current timer value in seconds
+         * @param {number} time - the current timer value in milliseconds
          * @returns {string} time in format `[H:]mm:ss`
          */
         const formatTimer=time=>{
             "use strict";
+            time*=.001;
             const hours=Math.floor(time/3600),
                 min=~~(time/60)%60,
                 sec=~~(time%60);
@@ -523,38 +602,38 @@
             });
             fileReader.readAsText(file,"UTF-8");
         };
-        /** ## saves current settings to {@linkcode localStorage} */
+        /** ## saves current settings to {@linkcode window.localStorage} */
         const updateLocalStorage=()=>{
             "use strict";
-            localStorage.setItem(`${storagePrefix}maxFails`,JSON.stringify(maxFails));
-            localStorage.setItem(`${storagePrefix}rngUnhide`,JSON.stringify(rngUnhide));
-            localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
-            localStorage.setItem(`${storagePrefix}secretWord`,JSON.stringify(secretWord));
-            localStorage.setItem(`${storagePrefix}fails`,JSON.stringify(fails));
-            localStorage.setItem(`${storagePrefix}guessLetters`,JSON.stringify([...guessLetters]));
-            localStorage.setItem(`${storagePrefix}startLetters`,JSON.stringify([...startLetters]));
-            localStorage.setItem(`${storagePrefix}keyboardLetters`,JSON.stringify([...keyboardLetters]));
-            localStorage.setItem(`${storagePrefix}keyboardLettersAlt`,JSON.stringify([...keyboardLettersAlt]));
-            localStorage.setItem(`${storagePrefix}wordList`,JSON.stringify([...wordList]));
+            window.localStorage.setItem(`${storagePrefix}maxFails`,JSON.stringify(maxFails));
+            window.localStorage.setItem(`${storagePrefix}rngUnhide`,JSON.stringify(rngUnhide));
+            window.localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
+            window.localStorage.setItem(`${storagePrefix}secretWord`,JSON.stringify(secretWord));
+            window.localStorage.setItem(`${storagePrefix}fails`,JSON.stringify(fails));
+            window.localStorage.setItem(`${storagePrefix}guessLetters`,JSON.stringify([...guessLetters]));
+            window.localStorage.setItem(`${storagePrefix}startLetters`,JSON.stringify([...startLetters]));
+            window.localStorage.setItem(`${storagePrefix}keyboardLetters`,JSON.stringify([...keyboardLetters]));
+            window.localStorage.setItem(`${storagePrefix}keyboardLettersAlt`,JSON.stringify([...keyboardLettersAlt]));
+            window.localStorage.setItem(`${storagePrefix}wordList`,JSON.stringify([...wordList]));
         };
-        /** ## removes all stored data from {@linkcode localStorage} */
+        /** ## removes all stored data from {@linkcode window.localStorage} */
         const clearLocalStorage=()=>{
             "use strict";
-            for(const key in localStorage)
-                if(key.startsWith(storagePrefix))localStorage.removeItem(key);
+            for(const key in window.localStorage)
+                if(key.startsWith(storagePrefix))window.localStorage.removeItem(key);
         };
-        //~ load settings from `localStorage`
+        //~ load settings from `window.localStorage`
         loadParsedJSON(
-            JSON.parse(localStorage.getItem(`${storagePrefix}maxFails`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}rngUnhide`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}time`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}secretWord`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}fails`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}guessLetters`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}startLetters`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}keyboardLetters`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}keyboardLettersAlt`)??"null"),
-            JSON.parse(localStorage.getItem(`${storagePrefix}wordList`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}maxFails`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}rngUnhide`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}time`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}secretWord`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}fails`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}guessLetters`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}startLetters`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}keyboardLetters`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}keyboardLettersAlt`)??"null"),
+            JSON.parse(window.localStorage.getItem(`${storagePrefix}wordList`)??"null"),
         );
     </script>
 </head>
@@ -580,19 +659,14 @@
             <div id="settingsCharList">Loading...</div>
             <div>
                 <input type="text" id="settingsCharInput" placeholder="Add a character" title="Add a new character to the list above (case insensitive)">
-                <input type="button" id="settingsCharConfirm" value="+" title="Click to add the character to the list above">
-                <input type="button" id="settingsCharConfirmAlt" value="[+]" title="Click to add the character to the list above (not for guessing - will always show)">
-                <!-- TODO when adding chars that already exist override them → alt char get overriten with the normal add button (and vice versa) -->
+                <input type="checkbox" id="settingsCharAlt">
+                <label for="settingsCharAlt" role="button" title="Toggle adding alternate characters (not for guessing - will always show)">Alt</label>
             </div>
         </fieldset>
         <fieldset id="settingsWord">
             <legend title="Word list for guessing (chooses a random word from this list) - case insensitive">Word list</legend>
             <div id="settingsWordList">Loading...</div>
-            <div>
-                <input type="text" id="settingsWordInput" spellcheck="true" placeholder="Add a word" title="Add a new word to the list above">
-                <input type="button" id="settingsWordConfirm" value="+" title="Click to add the word to the list above">
-                <!-- TODO confirm where missing characters are automatically added to the alphabet (non alt characters) -->
-            </div>
+            <input type="text" id="settingsWordInput" spellcheck="true" placeholder="Add a word" title="Add a new word to the list above">
         </fieldset>
         <label for="settingsCharRandomUnhide" title="Percentage of letters of the guessing word to randomly unhide (for each round)">
             Randomly unhide
@@ -604,6 +678,8 @@
             <input type="number" value="8" min="-1" step="1" id="settingsMaxFails">
         </label>
         <div id="settingsClosing">
+            <input type="button" id="settingsReset" value="Reset to default" title="delete saved settings and reload page">
+            &verbar;
             <input type="button" id="settingsConfirm" value="OK" title="confirm changes and start a new round">
             <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu" autofocus>
         </div>
@@ -611,12 +687,50 @@
     <dialog id="importMenu">
         <h2>Import</h2>
         <fieldset>
-            <legend title="WIP">WIP</legend>
-            <!-- TODO file input field / override or add / do nothing when encountering errors or load what is possible -->
+            <legend title="choose a JSON save file to import data from">import file</legend>
+            <input type="file" accept=".json" id="importFiles" required>
         </fieldset>
-        <!-- TODO show contents of file ? -->
+        <fieldset id="importDataView">
+            <legend title="imported data from file">import data</legend>
+            <div>
+                <fieldset>
+                    <legend title="Characters from imported file">Alphabet</legend>
+                    <div id="importCharList">[Empty]</div>
+                </fieldset>
+                <fieldset>
+                    <legend title="Words from imported file">Word list</legend>
+                    <div id="importWordList">[Empty]</div>
+                </fieldset>
+                <span>Randomly unhide <span id="importRngUnhide">--</span>% of letters</span>
+                <span>Max fails <span id="importMaxFails">--</span></span>
+                <span>Saved progress <span id="importProgressTime">--:--</span> with <span id="importProgressFails">-/-</span> fails</span>
+            </div>
+        </fieldset>
+        <fieldset id="importDataOptions">
+            <legend title="select import options">import options</legend>
+            <div>
+                <label for="importOptionChars">import characters</label>
+                <select id="importOptionChars" disabled>
+                    <option value="replace" title="replaces the current alphabet with the imported alphabet above">override</option>
+                    <option value="add" title="adds imported characters to the current alphabet">combine</option>
+                    <option value="exclude" title="do not import alphabet" selected>discard</option>
+                </select>
+                <label for="importOptionWords">import words</label>
+                <select id="importOptionWords" disabled>
+                    <option value="replace" title="replaces the current word list with the imported word list above">override</option>
+                    <option value="add" title="adds imported words to the current word list">combine</option>
+                    <option value="exclude" title="do not import words" selected>discard</option>
+                </select>
+                <label for="importOptionRngUnhide" title="use the imported rng-unhide value above (checked) or discard it (unchecked)">override unhide value</label>
+                <input type="checkbox" id="importOptionRngUnhide" disabled>
+                <label for="importOptionMaxFails" title="use the imported max-fails value above (checked) or discard it (unchecked)">override max fails value</label>
+                <input type="checkbox" id="importOptionMaxFails" disabled>
+                <label for="importOptionProgress" title="continue with imported progress (checked) or start a new round (unchecked)">continue progress</label>
+                <input type="checkbox" id="importOptionProgress" checked disabled>
+            </div>
+        </fieldset>
         <div id="importClosing">
-            <input type="button" id="importConfirm" value="OK" title="confirm changes and continue round">
+            <input type="button" id="importConfirm" value="OK" title="confirm changes and close menu" disabled>
             <input type="button" id="omportAbort" value="Abort" title="revert changes and close menu" autofocus>
         </div>
     </dialog>
@@ -631,7 +745,15 @@
             <div>Failed to guess: <span id="finFails">-</span> of max <span id="finFailsMax">-</span></div>
             <div>All guesses: <span id="finGuesses">________</span></div>
         </fieldset>
-        <input type="button" id="finAgain" value="Play again" autofocus>
+        <input type="button" id="finAgain" value="Play again" autofocus title="Start a new round">
+    </dialog>
+    <dialog id="confirmMenu">
+        <h2>Are you sure?</h2>
+        <span id="confirmText">________</span>
+        <div>
+            <input type="button" id="confirmConfirm" value="OK" title="confirm action">
+            <input type="button" id="confirmAbort" value="Abort" title="abort action" autofocus>
+        </div>
     </dialog>
     <script>
         //~ DOM elements
@@ -654,7 +776,34 @@
 
         /** @type {HTMLDialogElement} the import menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
         const importMenu=document.getElementById("importMenu");
-        // TODO import menu elements
+        /** @type {HTMLInputElement} the file input element *///@ts-ignore element does exist in DOM
+        const importFiles=document.getElementById("importFiles");
+        /** @type {HTMLDivElement} preview of the imported alphabet *///@ts-ignore element does exist in DOM
+        const importCharList=document.getElementById("importCharList");
+        /** @type {HTMLDivElement} preview of the imported word list *///@ts-ignore element does exist in DOM
+        const importWordList=document.getElementById("importWordList");
+        /** @type {HTMLSpanElement} preview of the imported rng-unhide value *///@ts-ignore element does exist in DOM
+        const importRngUnhide=document.getElementById("importRngUnhide");
+        /** @type {HTMLSpanElement} preview of the imported max-fails value *///@ts-ignore element does exist in DOM
+        const importMaxFails=document.getElementById("importMaxFails");
+        /** @type {HTMLSpanElement} preview of the imported progress (timer) *///@ts-ignore element does exist in DOM
+        const importProgressTime=document.getElementById("importProgressTime");
+        /** @type {HTMLSpanElement} preview of the imported progress (fails / max-fails) *///@ts-ignore element does exist in DOM
+        const importProgressFails=document.getElementById("importProgressFails");
+        /** @type {HTMLSelectElement} inport options (replace|add|exclude) for alphabet *///@ts-ignore element does exist in DOM
+        const importOptionChars=document.getElementById("importOptionChars");
+        /** @type {HTMLSelectElement} import options (replace|add|exclude) for word list *///@ts-ignore element does exist in DOM
+        const importOptionWords=document.getElementById("importOptionWords");
+        /** @type {HTMLInputElement} import option (checkbox - override?) for rng-unhide value *///@ts-ignore element does exist in DOM
+        const importOptionRngUnhide=document.getElementById("importOptionRngUnhide");
+        /** @type {HTMLInputElement} import option (checkbox - override?) for max-fails value *///@ts-ignore element does exist in DOM
+        const importOptionMaxFails=document.getElementById("importOptionMaxFails");
+        /** @type {HTMLInputElement} import option (checkbox - continue?) for saved progress *///@ts-ignore element does exist in DOM
+        const importOptionProgress=document.getElementById("importOptionProgress");
+        /** @type {HTMLInputElement} confirm button for {@linkcode importMenu} *///@ts-ignore element does exist in DOM
+        const importConfirm=document.getElementById("importConfirm");
+        /** @type {HTMLInputElement} abort button for {@linkcode importMenu} *///@ts-ignore element does exist in DOM
+        const omportAbort=document.getElementById("omportAbort");
 
         /** @type {HTMLDialogElement} the settings menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
         const settingsMenu=document.getElementById("settingsMenu");
@@ -662,20 +811,18 @@
         const settingsCharList=document.getElementById("settingsCharList");
         /** @type {HTMLInputElement} text input for adding characters to {@linkcode settingsCharList} *///@ts-ignore element does exist in DOM
         const settingsCharInput=document.getElementById("settingsCharInput");
-        /** @type {HTMLInputElement} button to confirm adding a character from {@linkcode settingsCharInput} to {@linkcode settingsCharList} *///@ts-ignore element does exist in DOM
-        const settingsCharConfirm=document.getElementById("settingsCharConfirm");
-        /** @type {HTMLInputElement} button to confirm adding a character from {@linkcode settingsCharInput} to {@linkcode settingsCharList} (with the `unhide` class) *///@ts-ignore element does exist in DOM
-        const settingsCharConfirmAlt=document.getElementById("settingsCharConfirmAlt");
+        /** @type {HTMLInputElement} toggle (checkbox) for adding alternate characters (or not) from {@linkcode settingsCharInput} to {@linkcode settingsCharList} *///@ts-ignore element does exist in DOM
+        const settingsCharAlt=document.getElementById("settingsCharAlt");
         /** @type {HTMLDivElement} the word list (list of `span` and `input[type=button]` within a `div` for each word) *///@ts-ignore element does exist in DOM
         const settingsWordList=document.getElementById("settingsWordList");
         /** @type {HTMLInputElement} text input for adding words to {@linkcode settingsWordList} *///@ts-ignore element does exist in DOM
         const settingsWordInput=document.getElementById("settingsWordInput");
-        /** @type {HTMLInputElement} button to confirm adding a word from {@linkcode settingsWordInput} to {@linkcode settingsWordList} *///@ts-ignore element does exist in DOM
-        const settingsWordConfirm=document.getElementById("settingsWordConfirm");
         /** @type {HTMLInputElement} number input for getting the "random unhide letters by percentage" value *///@ts-ignore element does exist in DOM
         const settingsCharRandomUnhide=document.getElementById("settingsCharRandomUnhide");
         /** @type {HTMLInputElement} number input for getting the "max failed attemps" value *///@ts-ignore element does exist in DOM
         const settingsMaxFails=document.getElementById("settingsMaxFails");
+        /** @type {HTMLInputElement} button to delete stored settings and reload the page *///@ts-ignore element does exist in DOM
+        const settingsReset=document.getElementById("settingsReset");
         /** @type {HTMLInputElement} button to confirm set settings and close {@linkcode settingsMenu} *///@ts-ignore element does exist in DOM
         const settingsConfirm=document.getElementById("settingsConfirm");
         /** @type {HTMLInputElement} button to abort and revert set settings and close {@linkcode settingsMenu} *///@ts-ignore element does exist in DOM
@@ -702,13 +849,22 @@
         /** @type {HTMLInputElement} button to close the {@linkcode finMenu} and start a new round *///@ts-ignore element does exist in DOM
         const finAgain=document.getElementById("finAgain");
 
+        /** @type {HTMLDialogElement} the confirm menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
+        const confirmMenu=document.getElementById("confirmMenu");
+        /** @type {HTMLInputElement} the text to confirm in the {@linkcode confirmMenu} *///@ts-ignore element does exist in DOM
+        const confirmText=document.getElementById("confirmText");
+        /** @type {HTMLInputElement} button to confirm action and close {@linkcode confirmMenu} *///@ts-ignore element does exist in DOM
+        const confirmConfirm=document.getElementById("confirmConfirm");
+        /** @type {HTMLInputElement} button to abort action and close {@linkcode confirmMenu} *///@ts-ignore element does exist in DOM
+        const confirmAbort=document.getElementById("confirmAbort");
+
         //~ game logic (after DOM loaded and elements exist as variables)
         /**
          * ## Ends the rund by showing the {@linkcode finMenu}
          * @param {boolean} win - `true` if this round was won and `false` if lost
          */
         const endRound=win=>{
-            finTime.textContent=formatTimer((Date.now()-startTime)*.001);
+            finTime.textContent=formatTimer(Date.now()-startTime);
             finMenuHeading.textContent=win?"Congratulations":"Game over";
             finWord.textContent=secretWord;
             finWordGuess.replaceChildren(...Array.from(secretWord.matchAll(unicodeRegExp),(match,i)=>{
@@ -813,10 +969,33 @@
                 return letter;
             }));
         };
+        /**
+         * ## shows a dialog that displays the {@linkcode action} to confirm
+         * does nothing if aborted
+         * @param {string} action - the action to confirm
+         * @param {(aborted:boolean)=>void} callback - a (strict, passive) function called when the {@linkcode action} was confirmed or aborted
+         */
+        const confirmDialog=(action,callback)=>{
+            "use strict";
+            if(action==null||callback==null)return;
+            confirmText.textContent=action;
+            const exit=aborted=>{
+                "use strict";
+                confirmMenu.close();
+                callback(aborted);
+                confirmConfirm.removeEventListener("click",()=>exit(false));
+                confirmAbort.removeEventListener("click",()=>exit(true));
+                confirmMenu.removeEventListener("close",()=>exit(true));
+            };
+            confirmConfirm.addEventListener("click",()=>exit(false),{passive:true});
+            confirmAbort.addEventListener("click",()=>exit(true),{passive:true});
+            confirmMenu.addEventListener("close",()=>exit(true),{passive:true});
+            confirmMenu.showModal();
+        }
 
         /**
          * ## removes all words from {@linkcode settingsWordList} and {@linkcode confWordList} that contain {@linkcode char}
-         * @param {string} char - a letter from the "Alphabet"
+         * @param {string} char - a letter from the alphabet
          */
         const removeWordsWithChar=char=>{
             "use strict";
@@ -829,7 +1008,7 @@
         }
         /**
          * ## adds {@linkcode char} to {@linkcode confKeyboardLetters} and as button to {@linkcode settingsCharList} (incl. event listener for removal)
-         * @param {string} char - a single letter for the "Alphabet"
+         * @param {string} char - a single letter for the alphabet
          * @param {boolean} alt - if `true` uses {@linkcode confKeyboardLettersAlt} instead and adds class "unhide" to button
          */
         const settingsAddChar=(char,alt)=>{
@@ -837,9 +1016,10 @@
             const letter=document.createElement("input");
             letter.type="button";
             letter.value=char;
+            letter.title="Click to remove this character and all words containing it";
             settingsCharList.insertBefore(letter,settingsCharList.firstChild);
             if(alt){
-                letter.title="(This character will always show) Click to remove this character and all words containing it";
+                letter.title=`(This character will always show) ${letter.title}`;
                 letter.classList.add("unhide");
                 confKeyboardLettersAlt.add(char);
                 letter.addEventListener("click",()=>{
@@ -849,7 +1029,6 @@
                     letter.remove();
                 },{passive:true,once:true});
             }else{
-                letter.title="Click to remove this character and all words containing it";
                 confKeyboardLetters.add(char);
                 letter.addEventListener("click",()=>{
                     "use strict";
@@ -857,6 +1036,30 @@
                     removeWordsWithChar(char);
                     letter.remove();
                 },{passive:true,once:true});
+            }
+        }
+        /**
+         * ## switches a character from alternate to normal (and vice versa)
+         * @param {string} char - the character
+         */
+        const settingsSwitchChar=char=>{
+            "use strict";
+            /** @type {[HTMLInputElement|null,HTMLInputElement|null]} [alt letter, letter] */
+            const letters=[null,null];
+            for(const letter of settingsCharList.children)
+                if(letter instanceof HTMLInputElement&&letter.value===char){
+                    if(letter.classList.contains("unhide"))letters[0]=letter;
+                    else letters[1]=letter;
+                    break;
+                }
+            if(letters[0]!=null){
+                letters[0].remove();
+                confKeyboardLettersAlt.delete(char);
+                settingsAddChar(char,false);
+            }else if(letters[1]!=null){
+                letters[1].remove();
+                confKeyboardLetters.delete(char);
+                settingsAddChar(char,true);
             }
         }
         /**
@@ -881,15 +1084,28 @@
                 container.remove();
             },{passive:true,once:true});
         }
+        /**
+         * ## change capitalization of an existing word in {@linkcode confWordList}
+         * @param {string} oldWord - the existing word
+         * @param {string} newWord - the newly capitalized word
+         */
+        const settingsCasingWord=(oldWord,newWord)=>{
+            for(const container of settingsWordList.children)
+                if(container.firstChild?.textContent===oldWord){
+                    container.remove();
+                    confWordList.delete(oldWord);
+                    settingsAddWord(newWord);
+                }
+        }
         //~ add all event listeners
         let timerInterval=setInterval(()=>{
             "use strict";
-            timer.textContent=formatTimer((Date.now()-startTime)*.001);
-            localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
+            timer.textContent=formatTimer(Date.now()-startTime);
+            window.localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
         },300);
         document.body.addEventListener("mousedown",()=>document.getSelection()?.empty(),{passive:true});
         document.body.addEventListener("keypress",ev=>{
-            if(settingsMenu.open||finMenu.open)return;
+            if(settingsMenu.open||finMenu.open||confirmMenu.open)return;
             const key=ev.key.toLocaleUpperCase();
             if(keyboardLetters.has(key)){
                 ev.preventDefault();
@@ -903,11 +1119,17 @@
 
         retryButton.addEventListener("click",()=>{
             "use strict";
-            retry();
-            updateKeyboard();
-            updateWord();
-            updateFails();
-            updateLocalStorage();
+            const confirmFnc=aborted=>{
+                "use strict";
+                if(aborted)return;
+                retry();
+                updateKeyboard();
+                updateWord();
+                updateFails();
+                updateLocalStorage();
+            };
+            if(Date.now()-startTime>20000)confirmDialog(`Abandon ${formatTimer(Date.now()-startTime)} of progress and start a new round?`,confirmFnc);
+            else confirmFnc(false);
         },{passive:true});
         settingsButton.addEventListener("click",()=>{
             "use strict";
@@ -923,69 +1145,67 @@
             settingsMaxFails.value=maxFails.toString();
             settingsMenu.showModal();
         },{passive:true});
+        exportButton.addEventListener("click",()=>saveToFile(),{passive:true});
         importButton.addEventListener("click",()=>{
             "use strict";
             // TODO reset import menu values ?
             importMenu.showModal();
         },{passive:true});
-        exportButton.addEventListener("click",()=>{
-            "use strict";
-            saveToFile();
-        },{passive:true});
+
+        /* TODO ↓
+            ~ add eventlisteners
+            ~ when file is selected try to load and generate preview (also remove disabled from elements then)
+            ~ when OK then import based on settings
+            ~ progress can only be continued if the guess-word with characters are present in final settings !?!
+
+            importMenu
+            importFiles
+            importCharList
+            importWordList
+            importRngUnhide
+            importMaxFails
+            importProgressTime
+            importProgressFails
+            importOptionChars
+            importOptionWords
+            importOptionRngUnhide
+            importOptionMaxFails
+            importOptionProgress
+            importConfirm
+            omportAbort
+        */
 
         settingsMenu.addEventListener("cancel",ev=>{
             ev.preventDefault();
             settingsAbort.click();
         },{passive:false});
-        settingsCharInput.addEventListener("input",()=>{
+        settingsCharInput.addEventListener("change",()=>{
             "use strict";
-            settingsCharInput.setCustomValidity("");
-            const char=settingsCharInput.value.toLocaleUpperCase();
-            if(!unicodeRegExpSingle.test(char)){
-                settingsCharInput.setCustomValidity("Can only be one character, emoji, or Unicode symbol");
-                return;
-            }
-            if(confKeyboardLetters.has(char))settingsCharInput.setCustomValidity("Character already exist in list");
-        },{passive:true});
-        settingsCharConfirm.addEventListener("click",()=>{
-            "use strict";
-            if(!settingsCharInput.reportValidity())return;
-            if(settingsCharInput.value===""){
-                settingsCharInput.setCustomValidity("Must not be an empty string");
-                return;
-            }
-            settingsAddChar(settingsCharInput.value.toLocaleUpperCase(),false);
+            for(const[char]of settingsCharInput.value.toLocaleUpperCase().matchAll(unicodeRegExp))
+                if(settingsCharAlt.checked){
+                    if(confKeyboardLettersAlt.has(char))continue;
+                    if(confKeyboardLetters.has(char))settingsSwitchChar(char);
+                    else settingsAddChar(char,true);
+                }else{
+                    if(confKeyboardLetters.has(char))continue;
+                    if(confKeyboardLettersAlt.has(char))settingsSwitchChar(char);
+                    else settingsAddChar(char,false);
+                }
             settingsCharInput.value="";
         },{passive:true});
-        settingsCharConfirmAlt.addEventListener("click",()=>{
+        settingsWordInput.addEventListener("change",()=>{
             "use strict";
-            if(!settingsCharInput.reportValidity())return;
-            if(settingsCharInput.value===""){
-                settingsCharInput.setCustomValidity("Must not be an empty string");
-                return;
-            }
-            settingsAddChar(settingsCharInput.value.toLocaleUpperCase(),true);
-            settingsCharInput.value="";
-        },{passive:true});
-        settingsWordInput.addEventListener("input",()=>{
-            "use strict";
-            settingsWordInput.setCustomValidity("");
-            const word=settingsWordInput.value.toLocaleUpperCase();
-            for(const[char]of word.matchAll(unicodeRegExp)){
+            if(confWordList.has(settingsWordInput.value))return;
+            const upper=settingsWordInput.value.toLocaleUpperCase();
+            for(const confWord of confWordList)
+                if(confWord.toLocaleUpperCase()===upper){
+                    settingsCasingWord(confWord,settingsWordInput.value);
+                    return;
+                }
+            for(const[char]of upper.matchAll(unicodeRegExp)){
                 if(confKeyboardLetters.has(char))continue;
                 if(confKeyboardLettersAlt.has(char))continue;
-                settingsWordInput.setCustomValidity("Can only contain characters from the Alphabet list");
-                break;
-            }
-            if(confWordList.has(settingsWordInput.value))settingsWordInput.setCustomValidity("Word already exist in list");
-            if([...confWordList].some(v=>v.toLocaleUpperCase()===word))settingsWordInput.setCustomValidity("Word already exist in list (with different capitalization)");
-        },{passive:true});
-        settingsWordConfirm.addEventListener("click",()=>{
-            "use strict";
-            if(!settingsWordInput.reportValidity())return;
-            if(settingsWordInput.value===""){
-                settingsWordInput.setCustomValidity("Must not be an empty string");
-                return;
+                settingsAddChar(char,settingsCharAlt.checked);
             }
             settingsAddWord(settingsWordInput.value);
             settingsWordInput.value="";
@@ -1033,6 +1253,15 @@
             updateWord();
             updateFails();
             updateLocalStorage();
+        },{passive:true});
+        settingsReset.addEventListener("click",()=>{
+            "use strict";
+            confirmDialog("Delete all settings and reload the page?",aborted=>{
+                "use strict";
+                if(aborted)return;
+                clearLocalStorage();
+                window.location.reload();
+            });
         },{passive:true});
 
         finMenu.addEventListener("cancel",ev=>{
