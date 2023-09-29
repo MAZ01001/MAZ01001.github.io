@@ -173,23 +173,24 @@ URL parameters can be in any order (_starting with `?` after the URL then parame
 - __A simple word guessing game__
 - _no graphics (no actual hangman)_
 - guessing is case insensitive
-- full Unicode support (allows for special symbols and Emojis)
+- full Unicode support (_allows for special symbols and Emojis_)
 - when clicking on "new round" when over 20 seconds of progress, it shows a confirm dialog (YES/NO)
-- customization (settings)
+- customization (_settings_)
   - custom alphabet
-    - keys can be set to always show and not be on the "keyboard" (useful for spaces and punctuation)
+    - keys can be set to always show and not be on the "keyboard" (_useful for spaces and punctuation_)
   - custom word list
-  - set maximum allowed fails (or disable loosing with `-1`)
+  - set maximum allowed fails (_or disable loosing with `-1`_)
   - set a percentage for how many letters of the word are uncovered at the start of the round (`0%` to `99%`)
-  - clear stored settings and reload page (shows a confirm dialog (YES/NO))
-- current settings and progress is stored in browser local storage (reload does not start a new round or reset settings)
+  - clear stored settings and reload page (_shows a confirm dialog (YES/NO)_)
+- current settings and progress is stored in browser local storage (_reload does not start a new round or reset settings_)
 - export current settings and progress to a JSON file
-- (__WIP__) import settings and progress from saved JSON file
-  - choose what to import of the save
+- import settings and progress from saved JSON file
+  - shows data preview of selected save file
+    - _only shows time and fails of progress preview_
   - choose to override, ignore, or combine current alphabet / word list with the imported
   - choose to override or ignore imported rng-unhide / max-fails value
-  - choose to continue with saved progress or start a new round (only previews time and fails)
-    - can only be continued if the guess-word with characters are present in final settings
+  - choose to continue with saved progress or start a new round
+    - _can only be continues if alphabet, word list, and max fails are also imported_
 
 ----
 
