@@ -73,8 +73,24 @@
             outline: 1px solid #F90;
             outline-offset: -1px;
         }
-        input[type="button"]{cursor: pointer;}
-        input[type="button"]:disabled{cursor: not-allowed;}
+        input:not(:disabled):hover,
+        select:not(:disabled):hover,
+        input#settingsCharAlt:hover+
+        label[for="settingsCharAlt"]{
+            outline: 1px solid #0A0;
+            outline-offset: -1px;
+        }
+        input[type="button"],
+        input[type="checkbox"],
+        select{cursor: pointer;}
+        input:disabled,
+        select:disabled{cursor: not-allowed;}
+        select{
+            background-color: #111;
+            color: #0F0;
+            border: 2px outset #000;
+            border-radius: .4rem;
+        }
         dialog::backdrop{background-color: #0007;}
         dialog[open]{
             background-color: #444;
@@ -273,7 +289,7 @@
         span#finWordGuess>span.hidden,
         span#finWordIni>span.hidden{color: #040;}
         span#finGuesses>span.fail{color: #F44;}
-        div#importCharList{
+        div#importViewCharList{
             display: flex;
             flex-wrap: wrap;
             gap: .3rem;
@@ -283,16 +299,18 @@
             overflow: overlay;
             margin: .3rem 0;
         }
-        div#importCharList>span{
+        div#importViewCharList>span{
             background-color: #000;
             border: 2px outset #000;
             border-radius: .4rem;
             font-family: consolas, monospace;
             font-size: medium;
             padding: 0 .3rem;
+            user-select: text;
+            white-space: pre;
         }
-        div#importCharList>span.unhide{background-color: #333;}
-        div#importWordList{
+        div#importViewCharList>span.unhide{background-color: #333;}
+        div#importViewWordList{
             display: flex;
             flex-direction: column;
             min-height: 1rem;
@@ -300,11 +318,12 @@
             overflow: overlay;
             margin: .3rem 0;
         }
-        div#importWordList>div>span{
+        div#importViewWordList>div>span{
             display: inline-block;
             width: 9rem;
             overflow: overlay;
             user-select: text;
+            white-space: pre;
         }
         dialog#importMenu>fieldset:first-of-type{background-color: #111;}
         fieldset#importDataView>div{
@@ -326,8 +345,8 @@
             grid-template-columns: auto auto;
             gap: .4rem;
         }
-        dialog#importMenu>fieldset:first-of-type:has(input#importFiles:invalid)~fieldset,
-        dialog#importMenu>fieldset:first-of-type:has(input#importFiles:invalid)~div>input#importConfirm{filter: brightness(.5) saturate(0);}
+        dialog#importMenu.blocked>fieldset:not(:first-of-type),
+        dialog#importMenu.blocked>div>input#importConfirm{filter: brightness(.5) saturate(0);}
     </style>
     <script>
         //@ts-check
@@ -351,7 +370,7 @@
             unicodeRegExp=/(?:\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*(?:\p{Join_Control}\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*)*|\s|.)\p{M}*/guy,
             /** @type {RegExp} RegExp matching one (combined) unicode symbol/character/emoji (does not match an empty string) */
             unicodeRegExpSingle=/^(?:\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*(?:\p{Join_Control}\p{Extended_Pictographic}[\p{Emoji_Modifier}\p{M}]*)*|\s|.)\p{M}*$/u,
-            /** @type {Set<string>} list of all words (locale case inseneitive) */
+            /** @type {Set<string>} list of all words (different capitalization) */
             wordList=new Set([
                 "Unguessable","Inexpensive","Paste","Neighbor","Knock",
                 "Calculus","Stone","Pretending","Warning","Recognize",
@@ -368,16 +387,26 @@
             keyboardLettersAlt=new Set([
                 ",",".","-"," "
             ]),
-            /** @type {Set<string>} [settings] list of all words */
+            /** @type {Set<string>} letters that are revealed at the start of the round (if any - locale uppercase) */
+            startLetters=new Set(),
+            /** @type {Set<string>} letters guessed this round (locale uppercase) */
+            guessLetters=new Set(),
+            /** @type {Set<string>} [settings] list of all words (different capitalization) */
             confWordList=new Set(),
             /** @type {Set<string>} [settings] list of all unique letters for guessing (locale uppercase) */
             confKeyboardLetters=new Set(),
             /** @type {Set<string>} [settings] list of all unique letters to always display (locale uppercase) */
             confKeyboardLettersAlt=new Set(),
-            /** @type {Set<string>} letters that are revealed at the start of the round (if any) */
-            startLetters=new Set(),
-            /** @type {Set<string>} letters guessed this round (locale uppercase) */
-            guessLetters=new Set();
+            /** @type {Set<string>} [import] letters guessed this round (locale uppercase) */
+            importGuessLetters=new Set(),
+            /** @type {Set<string>} [import] letters that where revealed at the start of this round (if any - locale uppercase) */
+            importStartLetters=new Set(),
+            /** @type {Set<string>} [import] list of all unique letters for guessing (locale uppercase) */
+            importKeyboardLetters=new Set(),
+            /** @type {Set<string>} [import] list of all unique letters to always display (locale uppercase) */
+            importKeyboardLettersAlt=new Set(),
+            /** @type {Set<string>} [import] list of all words (different capitalization) */
+            importWordList=new Set();
         let
             /** @type {number} max allowed fails for each round */
             maxFails=8,
@@ -388,7 +417,17 @@
             /** @type {number} timestamp at start of each round */
             startTime=NaN,
             /** @type {string} the current word to guess each round (from {@linkcode wordList}) */
-            secretWord="";
+            secretWord="",
+            /** @type {number} [import] max allowed fails for each round */
+            importMaxFails=NaN,
+            /** @type {number} [import] number of fails for this round */
+            importFails=NaN,
+            /** @type {number} [import] percentage of random letters to unhide at start of this round */
+            importRngUnhide=NaN,
+            /** @type {number} [import] progress time in milliseconds */
+            importTime=NaN,
+            /** @type {string} [import] the current word to guess (must be present in final word list) */
+            importSecretWord="";
         /** ## gets {@linkcode rngUnhide} % of random letters from current word ({@linkcode secretWord}) and add them to {@linkcode startLetters} (if any) */
         const setRngLetters=()=>{
             "use strict";
@@ -457,7 +496,7 @@
                     "keyboardLetters":[...keyboardLetters],
                     "keyboardLettersAlt":[...keyboardLettersAlt],
                     "wordList":[...wordList],
-                })],
+                },null,4)],
                 {type:"application/json;charset=UTF-8;"}
             );
             const link=document.createElement("a"),
@@ -472,6 +511,7 @@
          * - prioritizes characters over alternate characters
          * - only uses words that use characters from the character lists
          * - only overrides if data exists
+         * @param {boolean} importVar - if `true` uses the `import*` variables otherwise the real ones
          * @param {any} _maxFails - parsed JSON data for {@linkcode maxFails} or `null` if not present
          * @param {any} _rngUnhide - parsed JSON data for {@linkcode rngUnhide} or `null` if not present
          * @param {any} _time - parsed JSON data for timer ({@linkcode startTime}) or `null` if not present
@@ -482,8 +522,10 @@
          * @param {any} _keyboardLetters - parsed JSON data for {@linkcode keyboardLetters} or `null` if not present
          * @param {any} _keyboardLettersAlt - parsed JSON data for {@linkcode keyboardLettersAlt} or `null` if not present
          * @param {any} _wordList - parsed JSON data for {@linkcode wordList} or `null` if not present
+         * @throws {TypeError} if {@linkcode importVar} is not a boolean
          */
         const loadParsedJSON=(
+            importVar,
             _maxFails,
             _rngUnhide,
             _time,
@@ -496,111 +538,125 @@
             _wordList,
         )=>{
             "use strict";
-            if(typeof _rngUnhide==="number"&&_rngUnhide>=0&&_rngUnhide<=99)rngUnhide=_rngUnhide;
-            if(typeof _maxFails==="number"&&Number.isSafeInteger(_maxFails)&&_maxFails>=-1)maxFails=_maxFails;
+            if(typeof importVar!=="boolean")throw new TypeError("[loadParsedJSON] importVar is not a boolean");
+            if(typeof _rngUnhide==="number"&&_rngUnhide>=0&&_rngUnhide<=99)importVar?importRngUnhide=_rngUnhide:rngUnhide=_rngUnhide;
+            if(typeof _maxFails==="number"&&Number.isSafeInteger(_maxFails)&&_maxFails>=-1)importVar?importMaxFails=_maxFails:maxFails=_maxFails;
             if(_keyboardLetters!=null){
                 if(Array.isArray(_keyboardLetters)&&_keyboardLetters.every(v=>typeof v==="string")){
-                    for(let i=_keyboardLetters.length-1;i>=0;i--){
-                        if(unicodeRegExpSingle.test(_keyboardLetters[i]))continue;
-                        _keyboardLetters.splice(i,1);
-                    }
+                    for(let i=_keyboardLetters.length-1;i>=0;i--)
+                        if(!unicodeRegExpSingle.test(_keyboardLetters[i]))_keyboardLetters.splice(i,1);
                     if(_keyboardLetters.length>0){
-                        keyboardLetters.clear();
-                        for(const char of _keyboardLetters)keyboardLetters.add(char.toLocaleUpperCase());
+                        if(importVar){
+                            importKeyboardLetters.clear();
+                            for(const char of _keyboardLetters)importKeyboardLetters.add(char.toLocaleUpperCase());
+                        }else{
+                            keyboardLetters.clear();
+                            for(const char of _keyboardLetters)keyboardLetters.add(char.toLocaleUpperCase());
+                        }
                     }
                 }
             }
             if(_keyboardLettersAlt!=null){
                 if(Array.isArray(_keyboardLettersAlt)&&_keyboardLettersAlt.every(v=>typeof v==="string")){
-                    for(let i=_keyboardLettersAlt.length-1;i>=0;i--){
+                    for(let i=_keyboardLettersAlt.length-1;i>=0;i--)
                         if(
-                            unicodeRegExpSingle.test(_keyboardLettersAlt[i])
-                            &&!keyboardLetters.has(_keyboardLettersAlt[i].toLocaleUpperCase())
-                        )continue;
-                        _keyboardLettersAlt.splice(i,1);
-                    }
+                            !unicodeRegExpSingle.test(_keyboardLettersAlt[i])
+                            ||(
+                                importVar?
+                                importKeyboardLetters.has(_keyboardLettersAlt[i].toLocaleUpperCase()):
+                                keyboardLetters.has(_keyboardLettersAlt[i].toLocaleUpperCase())
+                            )
+                        )_keyboardLettersAlt.splice(i,1);
                     if(_keyboardLettersAlt.length>0){
-                        keyboardLettersAlt.clear();
-                        for(const char of _keyboardLettersAlt)keyboardLettersAlt.add(char.toLocaleUpperCase());
+                        if(importVar){
+                            importKeyboardLettersAlt.clear();
+                            for(const char of _keyboardLettersAlt)importKeyboardLettersAlt.add(char.toLocaleUpperCase());
+                        }else{
+                            keyboardLettersAlt.clear();
+                            for(const char of _keyboardLettersAlt)keyboardLettersAlt.add(char.toLocaleUpperCase());
+                        }
                     }
                 }
             }
             if(_wordList!=null){
                 if(Array.isArray(_wordList)&&_wordList.every(v=>typeof v==="string")){
-                    for(let i=_wordList.length-1;i>=0;i--){
-                        for(const[char]of _wordList[i].matchAll(unicodeRegExp)){
+                    for(let i=_wordList.length-1;i>=0;i--)
+                        for(const[char]of _wordList[i].matchAll(unicodeRegExp))
                             if(
-                                keyboardLetters.has(char.toLocaleUpperCase())
-                                ||keyboardLettersAlt.has(char.toLocaleUpperCase())
+                                importVar?
+                                !(importKeyboardLetters.has(char.toLocaleUpperCase())||importKeyboardLettersAlt.has(char.toLocaleUpperCase())):
+                                !(keyboardLetters.has(char.toLocaleUpperCase())||keyboardLettersAlt.has(char.toLocaleUpperCase()))
                             ){
                                 _wordList.splice(i,1);
                                 break;
                             }
-                        }
-                    }
                     if(_wordList.length>0){
-                        wordList.clear();
-                        for(const word of _wordList)wordList.add(word);
+                        if(importVar){
+                            importWordList.clear();
+                            for(const word of _wordList)importWordList.add(word);
+                        }else{
+                            wordList.clear();
+                            for(const word of _wordList)wordList.add(word);
+                        }
                     }
                 }
             }
             //~ check saved round
-            if(typeof _secretWord!=="string"||!wordList.has(_secretWord))return;
-            if(!Array.isArray(_guessLetters)||_guessLetters.some(v=>typeof v!=="string"||!keyboardLetters.has(v)))return;
-            if(!Array.isArray(_startLetters)||_startLetters.some(v=>typeof v!=="string"||!keyboardLetters.has(v)))return;
+            if(typeof _secretWord!=="string"||!(importVar?importWordList.has(_secretWord):wordList.has(_secretWord)))return;
+            if(!Array.isArray(_guessLetters)||_guessLetters.some(v=>typeof v!=="string"||!(importVar?importKeyboardLetters.has(v):keyboardLetters.has(v))))return;
+            if(!Array.isArray(_startLetters)||_startLetters.some(v=>typeof v!=="string"||!(importVar?importKeyboardLetters.has(v):keyboardLetters.has(v))))return;
             if(typeof _time!=="number"||!Number.isInteger(_time)||_time<0)return;
-            if(typeof _fails!=="number"||!Number.isInteger(_fails)||_fails<0||(maxFails!==-1&&_fails>maxFails))return;
+            if(typeof _fails!=="number"||!Number.isInteger(_fails)||_fails<0||(importVar?(importMaxFails!==-1&&_fails>importMaxFails):(maxFails!==-1&&_fails>maxFails)))return;
             if([..._secretWord.toLocaleUpperCase().matchAll(unicodeRegExp)].every(([v])=>
                 _startLetters.includes(v)
                 ||_guessLetters.includes(v)
-                ||keyboardLettersAlt.has(v)
+                ||(importVar?importKeyboardLettersAlt.has(v):keyboardLettersAlt.has(v))
             ))return;
             //~ load saved round
-            fails=_fails;
-            startTime=Date.now()-_time;
-            secretWord=_secretWord;
-            startLetters.clear();
-            _startLetters.forEach(v=>startLetters.add(v));
-            guessLetters.clear();
-            _guessLetters.forEach(v=>guessLetters.add(v));
+            if(importVar){
+                importFails=_fails;
+                importTime=_time;
+                importSecretWord=_secretWord;
+                importStartLetters.clear();
+                _startLetters.forEach(v=>importStartLetters.add(v));
+                importGuessLetters.clear();
+                _guessLetters.forEach(v=>importGuessLetters.add(v));
+            }else{
+                fails=_fails;
+                startTime=Date.now()-_time;
+                secretWord=_secretWord;
+                startLetters.clear();
+                _startLetters.forEach(v=>startLetters.add(v));
+                guessLetters.clear();
+                _guessLetters.forEach(v=>guessLetters.add(v));
+            }
         }
         /**
-         * ## load previously saved settings from file (UTF-8 JSON)
+         * ## [async] load previously saved settings from file (UTF-8 JSON)
+         * loads values into `import*` variables
          * @param {File} file - a `HangmanGameSettings` JSON file (UTF-8)
+         * @returns {Promise<boolean>} whether loading was successful or not
          */
-        const loadFromFile=file=>{
+        const loadFromFile=async file=>{
             "use strict";
-            // FIXME does not seam to work ? saving to file does work
-            const fileReader=new FileReader();
-            fileReader.addEventListener("loadend",ev=>{
-                "use strict";
-                if(typeof fileReader.result!=="string")return;
-                let{
-                    _maxFails=null,
-                    _rngUnhide=null,
-                    _time=null,
-                    _secretWord=null,
-                    _fails=null,
-                    _guessLetters=null,
-                    _startLetters=null,
-                    _keyboardLetters=null,
-                    _keyboardLettersAlt=null,
-                    _wordList=null,
-                }=JSON.parse(fileReader.result);
-                loadParsedJSON(
-                    _maxFails,
-                    _rngUnhide,
-                    _time,
-                    _secretWord,
-                    _fails,
-                    _guessLetters,
-                    _startLetters,
-                    _keyboardLetters,
-                    _keyboardLettersAlt,
-                    _wordList,
-                );
-            });
-            fileReader.readAsText(file,"UTF-8");
+            const text=await file.text().catch(()=>null);
+            if(text==null)return false;
+            const parsed=JSON.parse(text);
+            if(parsed==null||!(parsed instanceof Object))return false;
+            loadParsedJSON(
+                true,
+                parsed?.maxFails,
+                parsed?.rngUnhide,
+                parsed?.time,
+                parsed?.secretWord,
+                parsed?.fails,
+                parsed?.guessLetters,
+                parsed?.startLetters,
+                parsed?.keyboardLetters,
+                parsed?.keyboardLettersAlt,
+                parsed?.wordList,
+            );
+            return true;
         };
         /** ## saves current settings to {@linkcode window.localStorage} */
         const updateLocalStorage=()=>{
@@ -624,6 +680,7 @@
         };
         //~ load settings from `window.localStorage`
         loadParsedJSON(
+            false,
             JSON.parse(window.localStorage.getItem(`${storagePrefix}maxFails`)??"null"),
             JSON.parse(window.localStorage.getItem(`${storagePrefix}rngUnhide`)??"null"),
             JSON.parse(window.localStorage.getItem(`${storagePrefix}time`)??"null"),
@@ -645,8 +702,7 @@
         <span id="guesses">-/-</span>
         <div id="letterButtons">loading...</div>
         <div id="options">
-            <!-- TODO remove WIP -->
-            <input type="button" value="Import" id="importButton" title="open import menu [WIP]" disabled>
+            <input type="button" value="Import" id="importButton" title="open import menu">
             <input type="button" value="New round" id="retryButton" title="start a new round">
             <input type="button" value="Settings" id="settingsButton" title="open settings menu" autofocus>
             <input type="button" value="Export" id="exportButton" title="export current season and settings to file">
@@ -684,54 +740,54 @@
             <input type="button" id="settingsAbort" value="Abort" title="revert changes and close menu" autofocus>
         </div>
     </dialog>
-    <dialog id="importMenu">
+    <dialog id="importMenu" class="blocked">
         <h2>Import</h2>
         <fieldset>
             <legend title="choose a JSON save file to import data from">import file</legend>
-            <input type="file" accept=".json" id="importFiles" required>
+            <input type="file" accept=".json" id="importFile">
         </fieldset>
         <fieldset id="importDataView">
             <legend title="imported data from file">import data</legend>
             <div>
                 <fieldset>
                     <legend title="Characters from imported file">Alphabet</legend>
-                    <div id="importCharList">[Empty]</div>
+                    <div id="importViewCharList">[Empty]</div>
                 </fieldset>
                 <fieldset>
                     <legend title="Words from imported file">Word list</legend>
-                    <div id="importWordList">[Empty]</div>
+                    <div id="importViewWordList">[Empty]</div>
                 </fieldset>
-                <span>Randomly unhide <span id="importRngUnhide">--</span>% of letters</span>
-                <span>Max fails <span id="importMaxFails">--</span></span>
-                <span>Saved progress <span id="importProgressTime">--:--</span> with <span id="importProgressFails">-/-</span> fails</span>
+                <span>Randomly unhide <span id="importViewRngUnhide">--</span>% of letters</span>
+                <span>Max fails <span id="importViewMaxFails">--</span></span>
+                <span>Saved <span id="importViewProgressTime">--:--</span> of progress with <span id="importViewProgressFails">--</span> fail/s</span>
             </div>
         </fieldset>
         <fieldset id="importDataOptions">
             <legend title="select import options">import options</legend>
             <div>
-                <label for="importOptionChars">import characters</label>
-                <select id="importOptionChars" disabled>
+                <label for="importOptionChars" title="import options for the alphabet above (hover over options to get more info)">import characters</label>
+                <select id="importOptionChars" title="import options for the alphabet above (hover over options to get more info)" disabled>
                     <option value="replace" title="replaces the current alphabet with the imported alphabet above">override</option>
                     <option value="add" title="adds imported characters to the current alphabet">combine</option>
                     <option value="exclude" title="do not import alphabet" selected>discard</option>
                 </select>
-                <label for="importOptionWords">import words</label>
-                <select id="importOptionWords" disabled>
+                <label for="importOptionWords" title="import options for the word list above (hover over options to get more info)">import words</label>
+                <select id="importOptionWords" title="import options for the word list above (hover over options to get more info)" disabled>
                     <option value="replace" title="replaces the current word list with the imported word list above">override</option>
                     <option value="add" title="adds imported words to the current word list">combine</option>
                     <option value="exclude" title="do not import words" selected>discard</option>
                 </select>
                 <label for="importOptionRngUnhide" title="use the imported rng-unhide value above (checked) or discard it (unchecked)">override unhide value</label>
-                <input type="checkbox" id="importOptionRngUnhide" disabled>
+                <input type="checkbox" id="importOptionRngUnhide" title="use the imported rng-unhide value above (checked) or discard it (unchecked)" disabled>
                 <label for="importOptionMaxFails" title="use the imported max-fails value above (checked) or discard it (unchecked)">override max fails value</label>
-                <input type="checkbox" id="importOptionMaxFails" disabled>
+                <input type="checkbox" id="importOptionMaxFails" title="use the imported max-fails value above (checked) or discard it (unchecked)" disabled>
                 <label for="importOptionProgress" title="continue with imported progress (checked) or start a new round (unchecked)">continue progress</label>
-                <input type="checkbox" id="importOptionProgress" checked disabled>
+                <input type="checkbox" id="importOptionProgress" title="continue with imported progress (checked) or start a new round (unchecked)" disabled>
             </div>
         </fieldset>
         <div id="importClosing">
-            <input type="button" id="importConfirm" value="OK" title="confirm changes and close menu" disabled>
-            <input type="button" id="omportAbort" value="Abort" title="revert changes and close menu" autofocus>
+            <input type="button" id="importConfirm" value="OK" title="confirm options and import data" disabled>
+            <input type="button" id="importAbort" value="Abort" title="abort import and close menu" autofocus>
         </div>
     </dialog>
     <dialog id="finMenu">
@@ -777,19 +833,19 @@
         /** @type {HTMLDialogElement} the import menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
         const importMenu=document.getElementById("importMenu");
         /** @type {HTMLInputElement} the file input element *///@ts-ignore element does exist in DOM
-        const importFiles=document.getElementById("importFiles");
+        const importFile=document.getElementById("importFile");
         /** @type {HTMLDivElement} preview of the imported alphabet *///@ts-ignore element does exist in DOM
-        const importCharList=document.getElementById("importCharList");
+        const importViewCharList=document.getElementById("importViewCharList");
         /** @type {HTMLDivElement} preview of the imported word list *///@ts-ignore element does exist in DOM
-        const importWordList=document.getElementById("importWordList");
+        const importViewWordList=document.getElementById("importViewWordList");
         /** @type {HTMLSpanElement} preview of the imported rng-unhide value *///@ts-ignore element does exist in DOM
-        const importRngUnhide=document.getElementById("importRngUnhide");
+        const importViewRngUnhide=document.getElementById("importViewRngUnhide");
         /** @type {HTMLSpanElement} preview of the imported max-fails value *///@ts-ignore element does exist in DOM
-        const importMaxFails=document.getElementById("importMaxFails");
+        const importViewMaxFails=document.getElementById("importViewMaxFails");
         /** @type {HTMLSpanElement} preview of the imported progress (timer) *///@ts-ignore element does exist in DOM
-        const importProgressTime=document.getElementById("importProgressTime");
+        const importViewProgressTime=document.getElementById("importViewProgressTime");
         /** @type {HTMLSpanElement} preview of the imported progress (fails / max-fails) *///@ts-ignore element does exist in DOM
-        const importProgressFails=document.getElementById("importProgressFails");
+        const importViewProgressFails=document.getElementById("importViewProgressFails");
         /** @type {HTMLSelectElement} inport options (replace|add|exclude) for alphabet *///@ts-ignore element does exist in DOM
         const importOptionChars=document.getElementById("importOptionChars");
         /** @type {HTMLSelectElement} import options (replace|add|exclude) for word list *///@ts-ignore element does exist in DOM
@@ -803,7 +859,7 @@
         /** @type {HTMLInputElement} confirm button for {@linkcode importMenu} *///@ts-ignore element does exist in DOM
         const importConfirm=document.getElementById("importConfirm");
         /** @type {HTMLInputElement} abort button for {@linkcode importMenu} *///@ts-ignore element does exist in DOM
-        const omportAbort=document.getElementById("omportAbort");
+        const importAbort=document.getElementById("importAbort");
 
         /** @type {HTMLDialogElement} the settings menu element (use this to open or close dialog box) *///@ts-ignore element does exist in DOM
         const settingsMenu=document.getElementById("settingsMenu");
@@ -979,17 +1035,21 @@
             "use strict";
             if(action==null||callback==null)return;
             confirmText.textContent=action;
+            /**
+             * ## close the {@linkcode confirmMenu} and call the {@linkcode callback} function
+             * @param {boolean} aborted - value for the {@linkcode callback} (`true` means aborted)
+             */
             const exit=aborted=>{
                 "use strict";
                 confirmMenu.close();
                 callback(aborted);
                 confirmConfirm.removeEventListener("click",()=>exit(false));
                 confirmAbort.removeEventListener("click",()=>exit(true));
-                confirmMenu.removeEventListener("close",()=>exit(true));
+                confirmMenu.removeEventListener("cancel",ev=>{"use strict";ev.preventDefault();confirmAbort.click();});
             };
             confirmConfirm.addEventListener("click",()=>exit(false),{passive:true});
             confirmAbort.addEventListener("click",()=>exit(true),{passive:true});
-            confirmMenu.addEventListener("close",()=>exit(true),{passive:true});
+            confirmMenu.addEventListener("cancel",ev=>{"use strict";ev.preventDefault();confirmAbort.click();},{passive:false});
             confirmMenu.showModal();
         }
 
@@ -1146,34 +1206,181 @@
             settingsMenu.showModal();
         },{passive:true});
         exportButton.addEventListener("click",()=>saveToFile(),{passive:true});
+
+        /**
+         * ## resets values and variables of the import menu
+         * @param {boolean} removeFile - if `true` also removes any file from {@linkcode importFile}
+         */
+        const importMenuReset=removeFile=>{
+            "use strict";
+            importMenu.classList.add("blocked");
+            if(removeFile)importFile.value="";
+            importViewCharList.replaceChildren("[Empty]");
+            importViewWordList.replaceChildren("[Empty]");
+            importViewRngUnhide.textContent="--";
+            importViewMaxFails.textContent="--";
+            importViewProgressTime.textContent="--:--";
+            importViewProgressFails.textContent="--";
+            importGuessLetters.clear();
+            importStartLetters.clear();
+            importKeyboardLetters.clear();
+            importKeyboardLettersAlt.clear();
+            importWordList.clear();
+            importMaxFails=NaN;
+            importFails=NaN;
+            importRngUnhide=NaN;
+            importTime=NaN;
+            importSecretWord="";
+            importOptionChars.value="exclude";
+            importOptionChars.disabled=true;
+            importOptionWords.value="exclude";
+            importOptionWords.disabled=true;
+            importOptionRngUnhide.checked=false;
+            importOptionRngUnhide.disabled=true;
+            importOptionMaxFails.checked=false;
+            importOptionMaxFails.disabled=true;
+            importOptionProgress.checked=false;
+            importOptionProgress.disabled=true;
+            importConfirm.disabled=true;
+        };
         importButton.addEventListener("click",()=>{
             "use strict";
-            // TODO reset import menu values ?
             importMenu.showModal();
         },{passive:true});
-
-        /* TODO ↓
-            ~ add eventlisteners
-            ~ when file is selected try to load and generate preview (also remove disabled from elements then)
-            ~ when OK then import based on settings
-            ~ progress can only be continued if the guess-word with characters are present in final settings !?!
-
-            importMenu
-            importFiles
-            importCharList
-            importWordList
-            importRngUnhide
-            importMaxFails
-            importProgressTime
-            importProgressFails
-            importOptionChars
-            importOptionWords
-            importOptionRngUnhide
-            importOptionMaxFails
-            importOptionProgress
-            importConfirm
-            omportAbort
-        */
+        importAbort.addEventListener("click",()=>{
+            "use strict";
+            importMenu.close();
+            importMenuReset(true);
+        },{passive:true});
+        importMenu.addEventListener("cancel",ev=>{
+            "use strict";
+            ev.preventDefault();
+            importAbort.click();
+        },{passive:false});
+        importConfirm.addEventListener("click",()=>{
+            "use strict";
+            switch(importOptionChars.value){
+                case"replace":
+                    keyboardLetters.clear();
+                    keyboardLettersAlt.clear();
+                    //! fall through
+                case"add":
+                    for(const char of importKeyboardLetters)keyboardLetters.add(char);
+                    for(const char of importKeyboardLettersAlt)keyboardLettersAlt.add(char);
+                break;
+                case"exclude":break;
+            }
+            switch(importOptionWords.value){
+                case"replace":
+                    wordList.clear();
+                    //! fall through
+                case"add":
+                    for(const word of importWordList)wordList.add(word);
+                break;
+                case"exclude":break;
+            }
+            if(importOptionRngUnhide.checked)rngUnhide=importRngUnhide;
+            if(importOptionMaxFails.checked)maxFails=importMaxFails;
+            if(importOptionProgress.checked){
+                fails=importFails;
+                startTime=Date.now()-importTime;
+                secretWord=importSecretWord;
+                startLetters.clear();
+                for(const char of importStartLetters)startLetters.add(char);
+                guessLetters.clear();
+                for(const char of importGuessLetters)guessLetters.add(char);
+            }
+            importMenu.close();
+            importMenuReset(true);
+            updateKeyboard();
+            updateWord();
+            updateFails();
+            updateLocalStorage();
+        },{passive:true});
+        importFile.addEventListener("change",async()=>{
+            "use strict";
+            importMenuReset(false);
+            if(importFile.files?.length===1){
+                if(await loadFromFile(importFile.files[0])){
+                    if(importKeyboardLetters.size+importKeyboardLettersAlt.size>0){
+                        importViewCharList.replaceChildren();
+                        for(const char of importKeyboardLettersAlt){
+                            const key=document.createElement("span");
+                            key.textContent=char;
+                            key.classList.add("unhide");
+                            importViewCharList.append(key);
+                        }
+                        for(const char of importKeyboardLetters){
+                            const key=document.createElement("span");
+                            key.textContent=char;
+                            importViewCharList.append(key);
+                        }
+                        importOptionChars.value="replace";
+                        importOptionChars.disabled=false;
+                    }
+                    if(importWordList.size>0){
+                        importViewWordList.replaceChildren();
+                        for(const word of importWordList){
+                            const container=document.createElement("div"),
+                            txt=document.createElement("span");
+                            txt.textContent=word;
+                            container.append(txt);
+                            importViewWordList.append(container);
+                        }
+                        importOptionWords.value="replace";
+                        importOptionWords.disabled=false;
+                    }
+                    if(!Number.isNaN(importRngUnhide)){
+                        importViewRngUnhide.textContent=importRngUnhide.toString();
+                        importOptionRngUnhide.checked=true;
+                        importOptionRngUnhide.disabled=false;
+                    }
+                    if(!Number.isNaN(importMaxFails)){
+                        importViewMaxFails.textContent=importMaxFails===-1?"∞":importMaxFails.toString();
+                        importOptionMaxFails.checked=true;
+                        importOptionMaxFails.disabled=false;
+                    }
+                    if(importSecretWord!==""){
+                        importViewProgressTime.textContent=formatTimer(importTime);
+                        importViewProgressFails.textContent=importFails.toString();
+                        importOptionProgress.checked=true;
+                        importOptionProgress.disabled=false;
+                    }
+                    importConfirm.disabled=false;
+                    importMenu.classList.remove("blocked");
+                }
+            }
+        },{passive:true});
+        importOptionChars.addEventListener("change",()=>{
+            "use strict";
+            if(importWordList.size>0){
+                if(importOptionChars.value==="exclude"){
+                    importOptionWords.disabled=true;
+                    importOptionWords.value="exclude";
+                }else importOptionWords.disabled=false;
+            }
+            if(importSecretWord==="")return;
+            if(importOptionChars.value==="exclude"||importOptionWords.value==="exclude"||!importOptionMaxFails.checked){
+                importOptionProgress.disabled=true;
+                importOptionProgress.checked=false;
+            }else importOptionProgress.disabled=false;
+        },{passive:true});
+        importOptionWords.addEventListener("change",()=>{
+            "use strict";
+            if(importSecretWord==="")return;
+            if(importOptionChars.value==="exclude"||importOptionWords.value==="exclude"||!importOptionMaxFails.checked){
+                importOptionProgress.disabled=true;
+                importOptionProgress.checked=false;
+            }else importOptionProgress.disabled=false;
+        },{passive:true});
+        importOptionMaxFails.addEventListener("change",()=>{
+            "use strict";
+            if(importSecretWord==="")return;
+            if(importOptionChars.value==="exclude"||importOptionWords.value==="exclude"||!importOptionMaxFails.checked){
+                importOptionProgress.disabled=true;
+                importOptionProgress.checked=false;
+            }else importOptionProgress.disabled=false;
+        },{passive:true});
 
         settingsMenu.addEventListener("cancel",ev=>{
             ev.preventDefault();
