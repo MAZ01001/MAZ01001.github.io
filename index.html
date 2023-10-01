@@ -7,13 +7,11 @@
 +   |  _  ||  __|| |    | |   | | | |    | | |  _  ||  __||    /|  __|
 +   | | | || |___| |____| |___\ \_/ /    | | | | | || |___| |\ \| |___
 +   \_| |_/\____/\_____/\_____/\___/     \_/ \_| |_/\____/\_| \_\____/
-+
-+   [ RM-click for hidden example-sites ]
 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MAZ Coding Projects - MIT open source single HTML file websites - [ JS | HTML | CSS | P5.js ]">
+    <meta name="description" content="MAZ Coding Projects - MIT open source single HTML file websites - [ JS | CSS | HTML ]">
     <meta name="author" content="MAZ01001">
     <meta name="google-site-verification" content="xgp2ouF9vphtNJPm6oTOWvFEyCTiC-ARtJP_-VSc3eg">
     <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png">
@@ -21,41 +19,45 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon-16x16.png">
     <link rel="manifest" href="./img/site.webmanifest">
-    <link rel="mask-icon" href="./img/safari-pinned-tab.svg" color="#ff9900">
+    <link rel="mask-icon" href="./img/safari-pinned-tab.svg" color="#F90">
     <link rel="shortcut icon" href="./img/favicon.ico">
-    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileColor" content="#DA532C">
     <meta name="msapplication-config" content="./img/browserconfig.xml">
-    <meta name="theme-color" content="#ff9900">
+    <meta name="theme-color" content="#FF9900">
     <title>MAZ01001 Homepage</title>
     <script>//! [ CSS.registerProperty() ] Chromium only (https://developer.mozilla.org/en-US/docs/Web/API/CSS/RegisterProperty#browser_compatibility)
         CSS.registerProperty({name:'--barsplus',syntax:'<length>',initialValue:'0px',inherits:false});
         CSS.registerProperty({name:'--rainbowanglecolor',syntax:'<angle>',initialValue:'120deg',inherits:false});
-        CSS.registerProperty({name:'--textshadowcolorglow',syntax:'<color>',initialValue:'#0f0',inherits:false});
+        CSS.registerProperty({name:'--textshadowcolorglow',syntax:'<color>',initialValue:'#0F0',inherits:false});
     </script>
     <style>
         body{
-            background-color:#000f;
-            color:#0f0f;
-            height:100vh;
-            width:100vw;
-            padding:0;
-            margin:0;
+            background-color: #000;
+            color: #0F0;
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
             overflow: hidden;
         }
         @keyframes bars{to{--barsplus:39px;}}
         div#box{
-            --barsc1: #ff0;
+            --barsc1: #FF0;
             --barsc2: #000;
             --barsplus:0px;
-            background-color: #000b;
+            display: grid;
+            place-content: safe center;
+            place-items: safe center;
+            background-color: #000B;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             height: max-content;
             width: max-content;
-            max-height: calc(100vh - 80px);
-            max-width: calc(100vw - 80px);
+            box-sizing: border-box;
+            max-height: 100vh;
+            max-width: 100vw;
             overflow: overlay;
             padding: 20px;
             border: 20px solid black;
@@ -64,8 +66,8 @@
                 var(--barsc2) 0,var(--barsc2) calc(39px + var(--barsplus))
             ) 20;/* same as border width (px only !) */
             animation: bars 1.84s linear infinite reverse running;
-            box-shadow: 4px 4px 8px 8px #ff01,
-                inset 4px 4px 8px 8px #ff02;
+            box-shadow: 4px 4px 8px 8px #FF01,
+                inset 4px 4px 8px 8px #FF02;
             white-space: nowrap;
             text-align: center;
             vertical-align: middle;
@@ -73,292 +75,207 @@
         @keyframes shadowcolor{to{--rainbowanglecolor:360deg;}}
         body>img{
             --rainbowanglecolor:0deg;
+            --shadow: .4rem;
             position: fixed;
             top: 50%;
             left: 50%;
             overflow: hidden;
             transform: translate(-50%, -50%);
             height: max(100vh,1000px);
-            pointer-events: none;
-            --shadow: 0.4em;
             filter: drop-shadow(0px 0px var(--shadow,20px) hsl(var(--rainbowanglecolor),100%,50%));
             animation: shadowcolor 5s linear -1s infinite normal backwards running;
+            user-select: none;
+            pointer-events: none;
         }
         @keyframes textflicker{
-            0% {--textshadowcolorglow: #0f02;}
-            1% {--textshadowcolorglow: #0f0c;}
-            2.5% {--textshadowcolorglow: #0f04;}
-            4.5% {--textshadowcolorglow: #0f0a;}
-            30% {--textshadowcolorglow: #0f06;}
-            50% {--textshadowcolorglow: #0f0b;}
-            70% {--textshadowcolorglow: #0f08;}
-            95% {--textshadowcolorglow: #0f0e;}
-            100% {--textshadowcolorglow: #4f4f;}
+            0% {--textshadowcolorglow: #0F02;}
+            1% {--textshadowcolorglow: #0F0C;}
+            2.5% {--textshadowcolorglow: #0F04;}
+            4.5% {--textshadowcolorglow: #0F0A;}
+            30% {--textshadowcolorglow: #0F06;}
+            50% {--textshadowcolorglow: #0F0B;}
+            70% {--textshadowcolorglow: #0F08;}
+            95% {--textshadowcolorglow: #0F0E;}
+            100% {--textshadowcolorglow: #4F4;}
         }
-        .sitelink>a:link{
-            color: #0f0;
-            --textshadowcolorglow:#0f07;
-            text-decoration: none;
-            text-shadow: 0.013em 0.013em #000,
-                -0.013em 0.013em #000,
-                -0.013em -0.013em #000,
-                0.013em -0.01em #000,
-                0em 0.013em #000,
-                0em -0.013em #000,
-                0.013em 0em #000,
-                -0.013em 0em #000,
-                5px 3px 10px #080;
+        div#projects{
+            display: flex;
+            flex-direction: column;
+            place-items: safe center;
+        }
+        div#projects>a{
             --shadow: 10px;
-            filter: drop-shadow(0px 0px var(--shadow,10px) var(--textshadowcolorglow));
+            --textshadowcolorglow:#0F07;
+            color: #0F0;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+            text-shadow: .04rem .04rem #000,
+                .04rem -.04rem #000,
+                -.04rem .04rem #000,
+                -.04rem -.04rem #000,
+                0 .04rem #000,
+                0 -.04rem #000,
+                .04rem 0 #000,
+                -.04rem 0 #000,
+                5px 3px 10px #0F0;
+            filter: drop-shadow(0px 0px var(--shadow,10px) var(--textshadowcolorglow,#0F07));
             animation: textflicker 5s linear 0s infinite running;
         }
-        .sitelink:nth-child(5n+2)>a:link{
+        div#projects>a:not(:last-child)::after{
+            display: block;
+            content: "\204C   \1F666   \204D";
+            white-space: pre;
+            padding: .2rem 0;
+            font-size: .8rem;
+            text-shadow: none;
+            color: #0A0;
+        }
+        div#projects>a:nth-child(5n+2){
             animation-delay: 4s;
             animation-duration: 7s;
         }
-        .sitelink:nth-child(3n+4)>a:link{
+        div#projects>a:nth-child(3n+4){
             animation-delay: 1s;
             animation-duration: 6s;
         }
-        .sitelink:nth-child(7n+6)>a:link{animation-delay: 3s;}
-        .sitelink.hidden>a:link{text-decoration: solid line-through #0f0 4px !important;}
-        .sitelink.hidden{display: none;}
-        .sitelink.hidden+br{display: none;}
-        .sitelink>a[href]:visited{color: #0f0b;}/* can't edit more (https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector) */
-        .sitelink>a:link:hover,
-        .sitelink>a:link:active{
-            text-shadow: 0.013em 0.013em #000,
-                -0.013em 0.013em #000,
-                -0.013em -0.013em #000,
-                0.013em -0.01em #000,
-                0em 0.013em #000,
-                0em -0.013em #000,
-                0.013em 0em #000,
-                -0.013em 0em #000,
-                5px 3px 10px #0f0;
-            --shadow: 10px;
-            filter: drop-shadow(0px 0px var(--shadow,10px) #0f0);
+        div#projects>a:nth-child(7n+6){animation-delay: 3s;}
+        div#projects>a:visited{color: #0A0;}/* can't edit more (https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector) */
+        div#projects>a:hover,
+        div#projects>a:active{filter: drop-shadow(0px 0px var(--shadow,10px) #0F0);}
+        div#social{
+            padding: 5px 15px 8px;
+            border: 1px solid #0A0;
+            border-radius: 2rem;
         }
-        div#social>a:link{
-            color: #0af;
+        div#social>a{
+            color: #0AF;
             text-decoration: none;
         }
-        div#social>a[href]:visited{color: #05f;}
-        div#social>a:link:hover,
-        div#social>a:link:active{
-            color: #0ff;
-            text-shadow: 0px 0px 15px #00f,
-                0px 0px 15px #00f,
-                0px 0px 15px #00f;
+        div#social>a:not(:first-child):not(hr+*)::before{
+            content: "\7C  ";
+            color: #0A0;
+            font-weight: bold;
         }
-        @keyframes textglow{to{--textshadowcolorglow:#f90f;}}
-        #title{
-            --textshadowcolorglow: #f908;
-            font-style: italic;
-            font-size: 3.33em;
-            margin-block-start: 0.2em;
-            margin-block-end: 0.8em;
+        div#social>a:visited{color: #05F;}
+        div#social>a:hover,
+        div#social>a:active{
+            color: #0FF;
+            text-shadow: 0px 0px 15px #00F,
+                0px 0px 15px #00F,
+                0px 0px 15px #00F;
+        }
+        hr{
+            border: none;
+            border-top: .1rem ridge #0A0;
+            border-radius: .1rem;
+        }
+        @keyframes textglow{to{--textshadowcolorglow:#F90;}}
+        h1,h2{
+            --textshadowcolorglow: #F908;
             font-family: 'Times New Roman', Times, serif;
             text-shadow: 0px 0px 20px var(--textshadowcolorglow),
                 0px 0px 20px var(--textshadowcolorglow),
                 3px 3px 10px var(--textshadowcolorglow),
                 3px 3px 10px var(--textshadowcolorglow);
-            animation: textglow 2s cubic-bezier(0.45,0.05,0.55,0.95) 0s infinite alternate running;
+            animation: textglow 2s cubic-bezier(.45,.05,.55,.95) 0s infinite alternate running;
         }
-        .sitelink{
-            display: inline;
-            font-size: 3em;
-            margin-block-start: 0.4em;
-            margin-block-end: 0.1em;
-            font-family: 'Times New Roman', Times, serif;
+        h1{
+            margin-block-start: .4rem;
+            font-size: 3rem;
         }
-        div#social{
-            display: inline-block;
-            padding: 5px 15px 8px;
-            border: 1px solid #0a0;
-            border-radius: 2em;
-        }
-        div#social>span{
-            color: #0a0;
-            font-size: larger;
-        }
-        div#rmenu {
-            opacity: 0;
-            position: fixed;
-            top: -2em;
-            left: -2em;
-            transform: translate(-100%,-100%);
-            overflow: overlay;
-            max-width: max-content;
-            max-height: 100vh;
-            transition: opacity 500ms ease-in 500ms,
-                top 0s linear 1s,
-                left 0s linear 1s,
-                transform 0s linear 1s,
-                border-color 255ms ease-in 0s;
-            border: 5px solid #000;
-            border-radius: 10px;
-            background: #000;
-            height: fit-content;
-            width: fit-content;
-        }
-        div#rmenu.visible {
-            opacity: 1;
-            transition: opacity 0s linear 0s,
-                top 0s linear 0s,
-                left 0s linear 0s,
-                transform 0s linear 0s,
-                border-color 50ms ease-in 0s;
-        }
-        div#rmenu:hover{border-color: #333;}
-        div#rmenu>div{
-            padding: 3px 3px 3px 4px;
-            display: inline-block;
-            background-color: #222;
+        h1::before{content: "\A9C1  ";}
+        h1::after{content: " \A9C2";}
+        h1::before,
+        h1::after{
             font-size: large;
+            vertical-align: text-top;
         }
-        ::-webkit-scrollbar{width: 1.2rem;height: 1.2rem;}
+        h2{font-size: 2.5rem;}
+        h2::before{content: "\FF1C  ";}
+        h2::after{content: " \FF0F\FF1E";}
+        ::-webkit-scrollbar{
+            width: 1.2rem;
+            height: 1.2rem;
+        }
         ::-webkit-scrollbar-thumb:vertical:window-inactive{border-right-style: dashed;}
         ::-webkit-scrollbar-thumb:horizontal:window-inactive{border-bottom-style: dashed;}
         ::-webkit-scrollbar-thumb:vertical{
-            background-color: #0000;
-            border-right: 0.2rem solid #000F;
+            background: transparent;
+            border-right: .2rem solid #000;
             border-radius: 0;
         }
         ::-webkit-scrollbar-thumb:hover:vertical,
         :hover::-webkit-scrollbar-thumb:vertical{
-            background-color: #000F;
-            box-shadow: inset 0.4rem 0 0.4rem 0 #0A0F;
+            background-color: #000;
+            box-shadow: inset .4rem 0 .4rem 0 #0A0;
             border: none;
             border-top-left-radius: 1.4rem;
             border-bottom-left-radius: 1.4rem;
         }
         ::-webkit-scrollbar-thumb:horizontal{
-            background-color: #0000;
-            border-bottom: 0.2rem solid #000F;
+            background: transparent;
+            border-bottom: .2rem solid #000;
             border-radius: 0;
         }
         ::-webkit-scrollbar-thumb:hover:horizontal,
         :hover::-webkit-scrollbar-thumb:horizontal{
-            background-color: #000F;
-            box-shadow: inset 0 0.4rem 0.4rem 0 #0A0F;
+            background-color: #000;
+            box-shadow: inset 0 .4rem .4rem 0 #0A0;
             border: none;
             border-top-left-radius: 1.4rem;
             border-top-right-radius: 1.4rem;
         }
         ::-webkit-scrollbar-thumb:hover:vertical,
-        :hover::-webkit-scrollbar-thumb:hover:vertical{box-shadow: inset 0.4rem 0 0.4rem 0 #0F0F;}
+        :hover::-webkit-scrollbar-thumb:hover:vertical{box-shadow: inset .4rem 0 .4rem 0 #0F0;}
         ::-webkit-scrollbar-thumb:hover:horizontal,
-        :hover::-webkit-scrollbar-thumb:hover:horizontal{box-shadow: inset 0 0.4rem 0.4rem 0 #0F0F;}
+        :hover::-webkit-scrollbar-thumb:hover:horizontal{box-shadow: inset 0 .4rem .4rem 0 #0F0;}
         ::-webkit-scrollbar-track,
         ::-webkit-scrollbar-track-piece,
-        ::-webkit-scrollbar-corner{display: none;background-color: #0000;}
+        ::-webkit-scrollbar-button,
+        ::-webkit-scrollbar-corner{background: transparent;}
     </style>
 </head>
 <body>
     <img src="./img/MA_logo.svg" alt="MA logo">
     <div id="box">
-        <h1 id="title">&lt;MAZ Coding Projects&gt;</h1>
-        <h3 class="sitelink" style="font-size:2em!important;"><a href="./site/satisfactory_u3_flowchart" target="_self" rel="noopener noreferrer" title="Unofficial Satisfactory U3 Flow Chart">Unofficial Satisfactory U3 Flow Chart</a></h3>
-        <br><h2 class="sitelink"><a href="./site/canvas_ball" target="_self" rel="noopener noreferrer" title="Ball Screensaver">Ball Screensaver</a></h2>
-        <br><h2 class="sitelink"><a href="./site/dice" target="_self" rel="noopener noreferrer" title="Small Dice">Small Dice</a></h2>
-        <br><h2 class="sitelink"><a href="./site/pascals_triangle" target="_self" rel="noopener noreferrer" title="Pascal's Triangle">Pascals Triangle</a></h2>
-        <br><h2 class="sitelink"><a href="./site/math_function_drawer" target="_self" rel="noopener noreferrer" title="Math Function Drawer">Math Function Drawer</a></h2>
-        <br><h2 class="sitelink"><a href="./site/code_error_correction" target="_self" rel="noopener noreferrer" title="Error Correction Codes">Error Correction Codes</a></h2>
-        <br><h2 class="sitelink"><a href="./site/enigma" target="_self" rel="noopener noreferrer" title="Enigma">Enigma</a></h2>
-        <br><h2 class="sitelink"><a href="./site/vector_field" target="_self" rel="noopener noreferrer" title="Vector Field">Vector Field</a></h2>
-        <br><h2 class="hidden sitelink"><a href="./site/context_menu_example" target="_self" rel="noopener noreferrer" title="Context menu example">Context menu example</a></h2>
-        <br><h2 class="hidden sitelink"><a href="./site/pi_day_2021" target="_self" rel="noopener noreferrer" title="4 PI-Day 2021">4 PI-Day 2021</a></h2>
-        <br><h2 class="sitelink"><a href="./site/snake" target="_self" rel="noopener noreferrer" title="ASCII Snake">ASCII Snake</a></h2>
-        <br><h2 class="hidden sitelink"><a href="./site/touch_example" target="_self" rel="noopener noreferrer" title="Touch example">Touch example</a></h2>
-        <br><h2 class="hidden sitelink"><a href="./site/3d_card_example" target="_self" rel="noopener noreferrer" title="3D-Card example">3D-Card example</a></h2>
-        <br><h2 class="sitelink"><a href="./site/biginttype_calc" target="_self" rel="noopener noreferrer" title="Calculator for arbitrary-length-integers">Arbitrary-integer calculator</a></h2>
-        <br><h2 class="sitelink"><a href="./site/hangman" target="_self" rel="noopener noreferrer" title="A simple word guessing game">Hangman</a></h2>
-        <br><br>
+        <h1>MAZ<small>01001</small></h1>
         <div id="social">
-            <a href="https://www.youtube.com/@MAZ01001" target="_blank" rel="noopener noreferrer" title="MAZ">YouTube</a>
-            <span>&verbar;</span> <a href="https://www.twitch.tv/maz01001" target="_blank" rel="noopener noreferrer" title="MAZ01001">Twitch</a>
-            <span>&verbar;</span> <a href="https://steamcommunity.com/id/MAZ01001" target="_blank" rel="noopener noreferrer" title="MAZ01001">Steam</a>
-            <span>&verbar;</span> <a href="https://soundcloud.com/maz00101/likes" target="_blank" rel="noopener noreferrer" title="MAZ (Likes)">SoundCloud</a>
-            <span>&verbar;</span> <a href="https://maz10001.newgrounds.com/" target="_blank" rel="noopener noreferrer" title="MAZ10001">NewGrounds</a>
-            <span>&verbar;</span> <a href="https://coub.com/maz00101" target="_blank" rel="noopener noreferrer" title="MAZ">Coub</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ01001"title="MAZ">YouTube</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/maz01001"title="MAZ01001">Twitch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ_VOD"title="YouTube/MAZ_VOD">VOD</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://steamcommunity.com/id/MAZ01001"title="MAZ01001">Steam</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://soundcloud.com/maz00101/likes"title="MAZ (Likes)">SoundCloud</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://maz10001.newgrounds.com/"title="MAZ10001">NewGrounds</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://coub.com/maz00101"title="MAZ">Coub</a>
             <hr>
-            <a href="https://github.com/MAZ01001" target="_blank" rel="noopener noreferrer" title="MAZ01001">GitHub</a>
-            <span>&verbar;</span> <a href="https://maz01001.itch.io/" target="_blank" rel="noopener noreferrer" title="MAZ01001">Itch</a>
-            <span>&verbar;</span> <a href="https://scratch.mit.edu/users/MAZ01001/" target="_blank" rel="noopener noreferrer" title="MAZ01001">Scratch</a>
-            <span>&verbar;</span> <a href="https://www.construct.net/en/users/198467/maz01001" target="_blank" rel="noopener noreferrer" title="MAZ01001">Construct</a>
-            <span>&verbar;</span> <a href="https://www.instagram.com/maz01001/" target="_blank" rel="noopener noreferrer" title="@maz01001">Instagram</a>
-            <span>&verbar;</span> <a href="https://www.deviantart.com/maz00001" target="_blank" rel="noopener noreferrer" title="MAZ00001">DeviantArt</a>
-            <span>&verbar;</span> <a href="https://www.reddit.com/user/MAZ00101" target="_blank" rel="noopener noreferrer" title="u/MAZ00101">Reddit</a>
-            <span>&verbar;</span> <a href="https://twitter.com/MAZ_01001" target="_blank" rel="noopener noreferrer" title="@MAZ_01001">Twitter</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/MAZ01001"title="MAZ01001">GitHub</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://maz01001.itch.io/"title="MAZ01001">Itch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://scratch.mit.edu/users/MAZ01001/"title="MAZ01001">Scratch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.construct.net/en/users/198467/maz01001"title="MAZ01001">Construct</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/maz01001/"title="@maz01001">Instagram</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.deviantart.com/maz00001"title="MAZ00001">DeviantArt</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.reddit.com/user/MAZ00101"title="u/MAZ00101">Reddit</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/MAZ_01001"title="@MAZ_01001">Twitter</a>
+        </div>
+        <h2>CodingProjects</h2>
+        <div id="projects">
+            <a target="_self" rel="noopener noreferrer" href="./site/hangman"title="A simple word guessing game">Hangman</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/snake"title="Snake game with ASCII graphics">ASCII Snake</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/enigma"title="The Enigma cipher machine">Enigma</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/biginttype_calc"title="Calculator for arbitrary-length-integers">Arbitrary-integer calculator</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/code_error_correction"title="ECC encoding (self correcting messages)">Error correction codes</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/satisfactory_u3_flowchart"title="Unofficial flowchart for Satisfactory U3">Satisfactory U3 flowchart</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/dice"title="A simple random number generator">Dice</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/canvas_ball"title="Simple screensaver with a bouncing ball">Ball screensaver</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/vector_field"title="A colorful vector field [P5.js]">Vector field</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/math_function_drawer"title="Polynomial visualizer [P5.js]">Math Function Drawer</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/3d_card_example"title="CSS 3D-Card example">3D-Card example</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/context_menu_example"title="HTML/JS Context menu example">Context menu example</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/touch_example"title="JS Touch example">Touch example</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/pascals_triangle"title="Prints out Pascal's Triangle">Pascals Triangle</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/pi_day_2021"title="Approximating PI with 100'000 random numbers and GCD for PI day 2021 [P5.js]">PI-Day 2021</a>
         </div>
     </div>
-    <div id="rmenu">
-        <div>
-            <label for="unhide">show hidden sites</label>
-            <input type="checkbox" id="unhide">
-        </div>
-    </div>
-    <script>// <<Context Menu Listeners>>
-        const rmenu=document.getElementById('rmenu'),
-            unhide=document.getElementById('unhide');
-            let remenudelay=0;
-        document.getElementById('box').addEventListener('contextmenu',event=>{
-            clearTimeout(remenudelay);
-            if(event.composedPath().includes(rmenu)){return;}
-            if(rmenu.classList.contains('visible')){return;}
-            event.preventDefault();
-            rmenu.style.setProperty('display','');
-            rmenu.dataset.top=event.pageY+'px';
-            rmenu.dataset.left=event.pageX+'px';
-            const _BCR=rmenu.getBoundingClientRect();
-            if(_BCR.height>(window.innerHeight-event.pageY)){
-                if(_BCR.height>window.innerHeight){
-                    if(_BCR.width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(-100%,-'+event.pageY+'px)';}
-                    else{rmenu.dataset.transform='translate(0,-'+event.pageY+'px)';}
-                }else{
-                    if(_BCR.width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(-100%,-'+(_BCR.height-(window.innerHeight-event.pageY))+'px)';}
-                    else{rmenu.dataset.transform='translate(0,-'+(_BCR.height-(window.innerHeight-event.pageY))+'px)';}
-                }
-            }else{
-                if(_BCR.width>(window.innerWidth-event.pageX)&&event.pageX>(window.innerWidth-event.pageX)){rmenu.dataset.transform='translate(-100%,0)';}
-                else{rmenu.dataset.transform='translate(0,0)';}
-            }
-            rmenu.style.setProperty('top',rmenu.dataset.top);
-            rmenu.style.setProperty('left',rmenu.dataset.left);
-            rmenu.style.setProperty('transform',rmenu.dataset.transform);
-            rmenu.classList.add('visible');
-            remenudelay=setTimeout(()=>rmenu.classList.remove('visible'),500);
-        },{passive:false});
-        rmenu.addEventListener('mouseleave',event=>{
-            clearTimeout(remenudelay);
-            rmenu.classList.remove('visible');
-            rmenu.style.setProperty('top','-2em');
-            rmenu.style.setProperty('left','-2em');
-            rmenu.style.setProperty('transform','translate(-100%,-100%)');
-        });
-        rmenu.addEventListener('mouseover',event=>{
-            clearTimeout(remenudelay);
-            rmenu.style.setProperty('display','');
-            rmenu.classList.add('visible');
-            rmenu.style.setProperty('top',rmenu.dataset.top);
-            rmenu.style.setProperty('left',rmenu.dataset.left);
-            rmenu.style.setProperty('transform',rmenu.dataset.transform);
-        });
-        document.body.addEventListener('click',event=>{
-            clearTimeout(remenudelay);
-            if(event.composedPath().includes(rmenu)){return;}
-            rmenu.style.setProperty('display','none');
-            rmenu.classList.remove('visible');
-            rmenu.style.setProperty('top','-2em');
-            rmenu.style.setProperty('left','-2em');
-            rmenu.style.setProperty('transform','translate(-100%,-100%)');
-        },{passive:true});
-        unhide.addEventListener('change',event=>{
-            const r=Array.from(document.querySelectorAll('.sitelink.hidden')).concat(Array.from(document.querySelectorAll('.sitelink.hidden+br'))),
-                str=unhide.checked?'initial':'none';
-            for(el of r){el.style.setProperty('display',str);}
-        },{passive:true});
-    </script>
 </body>
 </html>
