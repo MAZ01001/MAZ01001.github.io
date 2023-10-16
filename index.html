@@ -28,27 +28,27 @@
     <script>//! [ CSS.registerProperty() ] Chromium only (https://developer.mozilla.org/en-US/docs/Web/API/CSS/RegisterProperty#browser_compatibility)
         CSS.registerProperty({name:'--barsplus',syntax:'<length>',initialValue:'0px',inherits:false});
         CSS.registerProperty({name:'--rainbowanglecolor',syntax:'<angle>',initialValue:'120deg',inherits:false});
-        CSS.registerProperty({name:'--textshadowcolorglow',syntax:'<color>',initialValue:'#0F0',inherits:false});
+        CSS.registerProperty({name:'--textshadowcolorglow',syntax:'<color>',initialValue:'#070',inherits:false});
     </script>
     <style>
         body{
             background-color: #000;
-            color: #0F0;
+            color: #0C0;
             height: 100vh;
             width: 100vw;
             padding: 0;
             margin: 0;
             overflow: hidden;
         }
-        @keyframes bars{to{--barsplus:39px;}}
+        @keyframes bars{to{--barsplus: 39px;}}
         div#box{
-            --barsc1: #FF0;
+            --barsc1: #CC0;
             --barsc2: #000;
-            --barsplus:0px;
+            --barsplus: 0px;
             display: grid;
             place-content: safe center;
             place-items: safe center;
-            background-color: #000B;
+            background-color: #0008;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -60,43 +60,42 @@
             max-width: 100vw;
             overflow: overlay;
             padding: 20px;
-            border: 20px solid black;
+            border: 20px solid #000;
             border-image: repeating-linear-gradient(-45deg,
                 var(--barsc1) calc(0px + var(--barsplus)),var(--barsc1) calc(18px + var(--barsplus)),
                 var(--barsc2) 0,var(--barsc2) calc(39px + var(--barsplus))
             ) 20;/* same as border width (px only !) */
             animation: bars 1.84s linear infinite reverse running;
-            box-shadow: 4px 4px 8px 8px #FF01,
-                inset 4px 4px 8px 8px #FF02;
+            box-shadow: 4px 4px 8px 8px #CC02,
+                inset 4px 4px 8px 8px #CC02;
             white-space: nowrap;
             text-align: center;
             vertical-align: middle;
         }
-        @keyframes shadowcolor{to{--rainbowanglecolor:360deg;}}
+        @keyframes shadowcolor{to{--rainbowanglecolor: 360deg;}}
         body>img{
-            --rainbowanglecolor:0deg;
-            --shadow: .4rem;
+            --rainbowanglecolor: 0deg;
             position: fixed;
             top: 50%;
             left: 50%;
             overflow: hidden;
             transform: translate(-50%, -50%);
             height: max(100vh,1000px);
-            filter: drop-shadow(0px 0px var(--shadow,20px) hsl(var(--rainbowanglecolor),100%,50%));
-            animation: shadowcolor 5s linear -1s infinite normal backwards running;
+            filter: drop-shadow(0px 0px .4rem oklch(75% 0.127 var(--rainbowanglecolor)));
+            animation: shadowcolor 3s linear -1s infinite normal backwards running;
             user-select: none;
             pointer-events: none;
         }
         @keyframes textflicker{
-            0% {--textshadowcolorglow: #0F02;}
-            1% {--textshadowcolorglow: #0F0C;}
-            2.5% {--textshadowcolorglow: #0F04;}
-            4.5% {--textshadowcolorglow: #0F0A;}
-            30% {--textshadowcolorglow: #0F06;}
-            50% {--textshadowcolorglow: #0F0B;}
-            70% {--textshadowcolorglow: #0F08;}
-            95% {--textshadowcolorglow: #0F0E;}
-            100% {--textshadowcolorglow: #4F4;}
+            0%   {--textshadowcolorglow: #020;}
+            1%   {--textshadowcolorglow: #0C0;}
+            2.5% {--textshadowcolorglow: #040;}
+            4.5% {--textshadowcolorglow: #090;}
+            30%  {--textshadowcolorglow: #060;}
+            50%  {--textshadowcolorglow: #0A0;}
+            70%  {--textshadowcolorglow: #080;}
+            95%  {--textshadowcolorglow: #0C0;}
+            100% {--textshadowcolorglow: #0F0;}
         }
         div#projects{
             display: flex;
@@ -104,22 +103,13 @@
             place-items: safe center;
         }
         div#projects>a{
-            --shadow: 10px;
-            --textshadowcolorglow:#0F07;
-            color: #0F0;
+            --textshadowcolorglow:#070;
+            color: #0C0;
             font-size: 2rem;
             font-weight: bold;
             text-decoration: none;
-            text-shadow: .04rem .04rem #000,
-                .04rem -.04rem #000,
-                -.04rem .04rem #000,
-                -.04rem -.04rem #000,
-                0 .04rem #000,
-                0 -.04rem #000,
-                .04rem 0 #000,
-                -.04rem 0 #000,
-                5px 3px 10px #0F0;
-            filter: drop-shadow(0px 0px var(--shadow,10px) var(--textshadowcolorglow,#0F07));
+            text-shadow: .2rem .3rem .2rem #000;
+            filter: drop-shadow(0px 0px 10px var(--textshadowcolorglow));
             animation: textflicker 5s linear 0s infinite running;
         }
         div#projects>a:not(:last-child)::after{
@@ -129,7 +119,7 @@
             padding: .2rem 0;
             font-size: .8rem;
             text-shadow: none;
-            color: #0A0;
+            color: #070;
         }
         div#projects>a:nth-child(5n+2){
             animation-delay: 4s;
@@ -140,12 +130,15 @@
             animation-duration: 6s;
         }
         div#projects>a:nth-child(7n+6){animation-delay: 3s;}
-        div#projects>a:visited{color: #0A0;}/* can't edit more (https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector) */
+        div#projects>a:visited{color: #090;}/* can't edit more (https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector) */
         div#projects>a:hover,
-        div#projects>a:active{filter: drop-shadow(0px 0px var(--shadow,10px) #0F0);}
+        div#projects>a:active{
+            color: #0F0;
+            filter: drop-shadow(0px 0px 10px #0F0);
+        }
         div#social{
             padding: 5px 15px 8px;
-            border: 1px solid #0A0;
+            border: .15rem solid #070;
             border-radius: 2rem;
         }
         div#social>a{
@@ -154,8 +147,8 @@
         }
         div#social>a:not(:first-child):not(hr+*)::before{
             content: "\7C  ";
-            color: #0A0;
-            font-weight: bold;
+            color: #070;
+            font-weight: 800;
         }
         div#social>a:visited{color: #05F;}
         div#social>a:hover,
@@ -167,17 +160,16 @@
         }
         hr{
             border: none;
-            border-top: .1rem ridge #0A0;
+            border-top: .1rem ridge #070;
             border-radius: .1rem;
         }
-        @keyframes textglow{to{--textshadowcolorglow:#F90;}}
+        @keyframes textglow{to{--textshadowcolorglow: #F90;}}
         h1,h2{
-            --textshadowcolorglow: #F908;
+            --textshadowcolorglow: #D60;
+            color: #F90;
             font-family: 'Times New Roman', Times, serif;
-            text-shadow: 0px 0px 20px var(--textshadowcolorglow),
-                0px 0px 20px var(--textshadowcolorglow),
-                3px 3px 10px var(--textshadowcolorglow),
-                3px 3px 10px var(--textshadowcolorglow);
+            text-shadow: .2rem .3rem .2rem #000;
+            filter: drop-shadow(0px 0px 15px var(--textshadowcolorglow));
             animation: textglow 2s cubic-bezier(.45,.05,.55,.95) 0s infinite alternate running;
         }
         h1{
@@ -194,6 +186,11 @@
         h2{font-size: 2.5rem;}
         h2::before{content: "\FF1C  ";}
         h2::after{content: " \FF0F\FF1E";}
+        ::selection{
+            background-color: #222;
+            color: #0F0;
+        }
+        ::selection:window-inactive{color: #0A0;}
         ::-webkit-scrollbar{
             width: 1.2rem;
             height: 1.2rem;
@@ -235,6 +232,48 @@
         ::-webkit-scrollbar-button,
         ::-webkit-scrollbar-corner{background: transparent;}
     </style>
+    <script>
+        //~ update padding of `div#box` when the window size changes to keep content centered even when `-webkit-scrollbar` appears
+        /**
+         * ## pads overflow of {@linkcode el} (pad left/top the same as the width/height of `-webkit-scrollbar`)
+         * @param {HTMLElement} el - the element to pad (according to overflow and sizes of `-webkit-scrollbar`)
+         * @example
+         * //~ to automatically update element "ID" when document loads and on every resize of the browser window
+         * window.addEventListener("resize",()=>PadOverflowFor(document.getElementById("ID")),{passive:true});
+         * window.addEventListener("load",()=>PadOverflowFor(document.getElementById("ID")),{passive:true,once:true});
+         */
+        const PadOverflowFor=el=>{
+            "use strict";
+            if(!(el instanceof HTMLElement))return;
+            const[x,y]=(({clientWidth,clientHeight,scrollWidth,scrollHeight})=>[scrollWidth>clientWidth,scrollHeight>clientHeight])(el),
+                {width:scW,height:scH}=window.getComputedStyle(el,"-webkit-scrollbar"),
+                {paddingLeft:pl,paddingTop:pt}=window.getComputedStyle(el);
+            if(el.dataset.ox==="1"){
+                if(!x){
+                    //~ horizontal scrollbar disappears (no X-overflow)
+                    el.style.paddingTop=`calc(${pt} - ${scH})`;
+                    el.dataset.ox="0";
+                }
+            }else if(x){
+                //~ horizontal scrollbar appears (X-overflow)
+                el.style.paddingTop=`calc(${pt} + ${scH})`;
+                el.dataset.ox="1";
+            }
+            if(el.dataset.oy==="1"){
+                if(!y){
+                    //~ vertical scrollbar disappears (no Y-overflow)
+                    el.style.paddingLeft=`calc(${pl} - ${scW})`;
+                    el.dataset.oy="0";
+                }
+            }else if(y){
+                //~ vertical scrollbar appears (Y-overflow)
+                el.style.paddingLeft=`calc(${pl} + ${scW})`;
+                el.dataset.oy="1";
+            }
+        }
+        window.addEventListener("resize",()=>PadOverflowFor(document.getElementById("box")),{passive:true});
+        window.addEventListener("load",()=>PadOverflowFor(document.getElementById("box")),{passive:true,once:true});
+    </script>
 </head>
 <body>
     <img src="./img/MA_logo.svg" alt="MA logo">
