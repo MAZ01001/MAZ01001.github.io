@@ -45,10 +45,20 @@
             --barsc1: #CC0;
             --barsc2: #000;
             --barsplus: 0px;
+            --scroll-shadow-top: transparent;
+            --scroll-shadow-left: transparent;
+            --scroll-shadow-bottom: transparent;
+            --scroll-shadow-right: transparent;
+            --scroll-shadow-size: 2.5rem;
             display: grid;
             place-content: safe center;
             place-items: safe center;
-            background-color: #0008;
+            background:
+                scroll radial-gradient(farthest-side at 50% 0, var(--scroll-shadow-top), var(--scroll-shadow-top), transparent) center top / 100% var(--scroll-shadow-size) no-repeat,
+                scroll radial-gradient(farthest-side at 0 50%, var(--scroll-shadow-left), var(--scroll-shadow-left), transparent) center left / var(--scroll-shadow-size) 100% no-repeat,
+                scroll radial-gradient(farthest-side at 50% 100%, var(--scroll-shadow-bottom), var(--scroll-shadow-bottom), transparent) center bottom / 100% var(--scroll-shadow-size) no-repeat,
+                scroll radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow-right), var(--scroll-shadow-right), transparent) center right / var(--scroll-shadow-size) 100% no-repeat,
+                #0008;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -59,12 +69,17 @@
             max-height: 100vh;
             max-width: 100vw;
             overflow: overlay;
+            scrollbar-gutter: stable both-edges;
             padding: 20px;
-            border: 20px solid #000;
-            border-image: repeating-linear-gradient(-45deg,
-                var(--barsc1) calc(0px + var(--barsplus)),var(--barsc1) calc(18px + var(--barsplus)),
-                var(--barsc2) 0,var(--barsc2) calc(39px + var(--barsplus))
-            ) 20;/* same as border width (px only !) */
+            border: 20px solid #CC0;
+            border-image: repeating-linear-gradient(
+                -45deg,
+                var(--barsc1) var(--barsplus),
+                var(--barsc1) calc(18px + var(--barsplus)),
+                var(--barsc2) 0,
+                var(--barsc2) calc(39px + var(--barsplus))
+            ) 20;/* same as border-size */
+            border-radius: 20px;
             animation: bars 1.84s linear infinite reverse running;
             box-shadow: 4px 4px 8px 8px #CC02,
                 inset 4px 4px 8px 8px #CC02;
@@ -137,7 +152,7 @@
             filter: drop-shadow(0px 0px 10px #0F0);
         }
         div#social{
-            padding: 5px 15px 8px;
+            padding: 5px 20px 10px;
             border: .15rem solid #070;
             border-radius: 2rem;
         }
@@ -160,7 +175,7 @@
         }
         hr{
             border: none;
-            border-top: .1rem ridge #070;
+            border-top: .1rem solid #070;
             border-radius: .1rem;
         }
         @keyframes textglow{to{--textshadowcolorglow: #F90;}}
@@ -233,46 +248,35 @@
         ::-webkit-scrollbar-corner{background: transparent;}
     </style>
     <script>
-        //~ update padding of `div#box` when the window size changes to keep content centered even when `-webkit-scrollbar` appears
         /**
-         * ## pads overflow of {@linkcode el} (pad left/top the same as the width/height of `-webkit-scrollbar`)
-         * @param {HTMLElement} el - the element to pad (according to overflow and sizes of `-webkit-scrollbar`)
-         * @example
-         * //~ to automatically update element "ID" when document loads and on every resize of the browser window
-         * window.addEventListener("resize",()=>PadOverflowFor(document.getElementById("ID")),{passive:true});
-         * window.addEventListener("load",()=>PadOverflowFor(document.getElementById("ID")),{passive:true,once:true});
+         * # clamps {@linkcode n} between 0 and 1
+         * @param {number} n - a number
+         * @returns {number} the clamped number
          */
-        const PadOverflowFor=el=>{
+        const clamp01=n=>n>1?1:n<0?0:n;
+        /**
+         * ## set CSS variables `--scroll-shadow-top`, `-left`, `-bottom`, and `-right` of {@linkcode el} when it overflows
+         * @param {HTMLElement} el - An HTML element
+         * @param {number} blendStart - minimum scroll distance (in pixels) at which to start blending out the alpha of {@linkcode colorRGB} (from {@linkcode alphaMax} to 0)
+         * @param {readonly[number,number,number]} colorRGB - RGB color `[ R, G, B ]` (integer 0 to 255 inclusive)
+         * @param {number} alphaMax - max value for the alpha of {@linkcode colorRGB} (float 0 to 1 inclusive)
+         */
+        const StyleOverflowFor=(el,blendStart,colorRGB,alphaMax)=>{
             "use strict";
-            if(!(el instanceof HTMLElement))return;
-            const[x,y]=(({clientWidth,clientHeight,scrollWidth,scrollHeight})=>[scrollWidth>clientWidth,scrollHeight>clientHeight])(el),
-                {width:scW,height:scH}=window.getComputedStyle(el,"-webkit-scrollbar"),
-                {paddingLeft:pl,paddingTop:pt}=window.getComputedStyle(el);
-            if(el.dataset.ox==="1"){
-                if(!x){
-                    //~ horizontal scrollbar disappears (no X-overflow)
-                    el.style.paddingTop=`calc(${pt} - ${scH})`;
-                    el.dataset.ox="0";
-                }
-            }else if(x){
-                //~ horizontal scrollbar appears (X-overflow)
-                el.style.paddingTop=`calc(${pt} + ${scH})`;
-                el.dataset.ox="1";
-            }
-            if(el.dataset.oy==="1"){
-                if(!y){
-                    //~ vertical scrollbar disappears (no Y-overflow)
-                    el.style.paddingLeft=`calc(${pl} - ${scW})`;
-                    el.dataset.oy="0";
-                }
-            }else if(y){
-                //~ vertical scrollbar appears (Y-overflow)
-                el.style.paddingLeft=`calc(${pl} + ${scW})`;
-                el.dataset.oy="1";
-            }
-        }
-        window.addEventListener("resize",()=>PadOverflowFor(document.getElementById("box")),{passive:true});
-        window.addEventListener("load",()=>PadOverflowFor(document.getElementById("box")),{passive:true,once:true});
+            el.style.setProperty("--scroll-shadow-top",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01(el.scrollTop/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-left",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01(el.scrollLeft/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-bottom",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01((el.scrollHeight-(el.scrollTop+el.clientHeight))/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-right",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01((el.scrollWidth-(el.scrollLeft+el.clientWidth))/blendStart)})`);
+        };
+        window.addEventListener("load",()=>{
+            "use strict";
+            const
+                container=document.getElementById("box"),
+                containerOverflowStyleArgs=Object.freeze([0xC8,Object.freeze([204,204,0]),2/3]);
+            StyleOverflowFor(container,...containerOverflowStyleArgs);
+            container.addEventListener("scroll",()=>StyleOverflowFor(container,...containerOverflowStyleArgs),{passive:true});
+            window.addEventListener("resize",()=>StyleOverflowFor(container,...containerOverflowStyleArgs),{passive:true});
+        },{passive:true,once:true});
     </script>
 </head>
 <body>
@@ -281,16 +285,17 @@
         <h1>MAZ<small>01001</small></h1>
         <div id="social">
             <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ01001"title="MAZ">YouTube</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/MAZ01001"title="MAZ01001">GitHub</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://steamcommunity.com/id/MAZ01001"title="MAZ01001">Steam</a>
             <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/maz01001"title="MAZ01001">Twitch</a>
             <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ_VOD"title="YouTube/MAZ_VOD">VOD</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://steamcommunity.com/id/MAZ01001"title="MAZ01001">Steam</a>
             <a target="_blank" rel="noopener noreferrer" href="https://soundcloud.com/maz00101/likes"title="MAZ (Likes)">SoundCloud</a>
             <a target="_blank" rel="noopener noreferrer" href="https://maz10001.newgrounds.com/"title="MAZ10001">NewGrounds</a>
             <a target="_blank" rel="noopener noreferrer" href="https://coub.com/maz00101"title="MAZ">Coub</a>
             <hr>
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/MAZ01001"title="MAZ01001">GitHub</a>
             <a target="_blank" rel="noopener noreferrer" href="https://maz01001.itch.io/"title="MAZ01001">Itch</a>
             <a target="_blank" rel="noopener noreferrer" href="https://scratch.mit.edu/users/MAZ01001/"title="MAZ01001">Scratch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://stackoverflow.com/users/13282166/maz"title="MAZ">Stack Overflow</a>
             <a target="_blank" rel="noopener noreferrer" href="https://www.construct.net/en/users/198467/maz01001"title="MAZ01001">Construct</a>
             <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/maz01001/"title="@maz01001">Instagram</a>
             <a target="_blank" rel="noopener noreferrer" href="https://www.deviantart.com/maz00001"title="MAZ00001">DeviantArt</a>
