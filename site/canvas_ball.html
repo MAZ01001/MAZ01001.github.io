@@ -35,22 +35,18 @@
         //~ | |\ \| |\  | |_\ \
         //~ \_| \_\_| \_/\____/
         /**
-         * __a class to get random numbers like `Math.random` but seed-able__ \
+         * # A class to get random numbers like `Math.random` but seed-able
          * uses `MurmurHash3` for initial seed and `sfc32` for generating values
          * @example new RNG("seed").value; //=> 0.8370377509475307
          * @author MAZ <https://MAZ01001.GitHub.io/>
          */
         const RNG=Object.freeze(class RNG{
-            /**@type {number} - [private] first internal rng value*/
-            _a_=0;
-            /**@type {number} - [private] second internal rng value*/
-            _b_=0;
-            /**@type {number} - [private] third internal rng value*/
-            _c_=0;
-            /**@type {number} - [private] fourth internal rng value*/
-            _d_=0;
+            /**@type {number} - [Private] First  internal rng value*/_a_=0;
+            /**@type {number} - [Private] Second internal rng value*/_b_=0;
+            /**@type {number} - [Private] Third  internal rng value*/_c_=0;
+            /**@type {number} - [Private] Fourth internal rng value*/_d_=0;
             /**
-             * __get the current state__ \
+             * ## Get the current state
              * four 32bit numbers (one 128bit number)
              * @returns {readonly[number,number,number,number]} current state as four 32bit numbers (one 128bit number)
              */
@@ -59,40 +55,43 @@
                 return Object.freeze([this._a_,this._b_,this._c_,this._d_]);
             }
             /**
-             * __create a new `RNG` object__
+             * ## Create a new {@linkcode RNG} object
              * @param {string?} seed - a string used as the seed (via `cyrb128`) - defaults to current timestamp (in hex)
-             * @returns {RNG} a new `RNG` object with the given seed
+             * @returns {RNG} a new {@linkcode RNG} object with the given seed
              * @example new RNG("seed").value; //=> 0.8370377509475307
-             * @throws {TypeError} - if `seedString` is not a string (not when it is null/undefined)
+             * @throws {TypeError} - if {@linkcode seed} is not a string (not when it is null/undefined)
              */
             constructor(seed){
                 "use strict";
                 if(seed==null)seed=Date.now().toString(0x10);
-                if(typeof seed!=="string")throw new TypeError("[RNG::constructor] seedString is not a string");
+                else if(typeof seed!=="string")throw new TypeError("[RNG::constructor] seedString is not a string");
                 [this._a_,this._b_,this._c_,this._d_]=RNG._generateSeed_(seed);
                 return Object.preventExtensions(this);
             }
             /**
-             * __creates a new `RNG` object with given state__
+             * ## Creates a new {@linkcode RNG} object with given state
              * @param {[number,number,number,number]} state - custom state (for sfc32) - must be four 32bit numbers
-             * @returns {RNG} new `RNG` object with given state
+             * @returns {RNG} new {@linkcode RNG} object with given state
+             * @throws {TypeError} if {@linkcode state} is not an array with four 32bit integers
              */
             static from(state){
                 "use strict";
                 if(!Array.isArray(state))throw new TypeError("[RNG::from] state is not an array");
                 if(state.length!==4)throw new TypeError("[RNG::from] state is not an array with four values");
-                if(state.some(v=>typeof v!=="number"))throw new TypeError("[RNG::from] state is not an array with four numbers");
-                if(state.some(v=>v<0||v>0xFFFFFFFF))throw new TypeError("[RNG::from] state is not an array with four 32bit numbers");
+                for(const num of state){
+                    if(typeof num!=="number")throw new TypeError("[RNG::from] state is not an array with four numbers");
+                    if(num<0||num>0xFFFFFFFF||!Number.isInteger(num))throw new TypeError("[RNG::from] state is not an array with four 32bit integers");
+                }
                 const rng=new RNG("");
                 [rng._a_,rng._b_,rng._c_,rng._d_]=state;
                 return rng;
             }
             /**
-             * __[private] creates a 128 bit seed from the given string__ \
+             * ## [Private] Creates a 128 bit seed from the given string
              * using `MurmurHash3`
              * @param {string} str - a string
              * @returns {readonly[number,number,number,number]} an array of four 32bit integers (one 128bit integer seed)
-             * @throws {TypeError} - if `str` is not a string
+             * @throws {TypeError} - if {@linkcode str} is not a string
              */
             static _generateSeed_(str){
                 "use strict";
@@ -106,6 +105,7 @@
                 }
                 h^=str.length;
                 const seed=()=>{
+                    "use strict";
                     h^=h>>>0x10;
                     h=Math.imul(h,0x85EBCA6B);
                     h^=h>>>0xD;
@@ -116,7 +116,7 @@
                 return Object.freeze([seed(),seed(),seed(),seed()]);
             }
             /**
-             * __get the next random 32bit value__ \
+             * ## Get the next random 32bit value
              * using `sfc32`
              * @returns {number} a random 32bit unsigned integer
              */
@@ -126,7 +126,7 @@
                 this._b_|=0;
                 this._c_|=0;
                 this._d_|=0;
-                let val=(((this._a_+this._b_)|0)+this._d_)|0;
+                const val=(((this._a_+this._b_)|0)+this._d_)|0;
                 this._d_=(++this._d_)|0;
                 this._a_=this._b_^(this._b_>>>9);
                 this._b_=(this._c_+(this._c_<<3))|0;
@@ -135,15 +135,23 @@
                 return val>>>0;
             }
             /**
-             * __get the next random value__
+             * ## Get the next random value
              * @returns {number} a random value between 0 and 1 (inclusive)
              */
-            get value(){
+            get val(){
                 "use strict";
                 return this.value32bit/0xFFFFFFFF;
             }
             /**
-             * __get a random boolean value__
+             * ## Get the next random decimal value
+             * @returns {number} a random decimal value between 0 and 1 (0 inclusive and 1 exclusive)
+             */
+            get dec(){
+                "use strict";
+                return this.value32bit/0x100000000;
+            }
+            /**
+             * ## Get a random boolean value
              * @returns {boolean} a random boolean value
              */
             get bool(){
@@ -151,17 +159,19 @@
                 return this.value32bit<0x10000;
             }
             /**
-             * __get the next random value and translate it to given range__ \
+             * ## Get the next random value and translate it to given range
              * _range is inclusive and gives a float_
              * @param {number} min - lower bound (inclusive)
              * @param {number} max - upper bound (inclusive)
-             * @returns {number} random value within set range
-             * @throws {TypeError} - if `min` or `max` are not finite numbers
+             * @returns {number} random value within set range (if {@linkcode min} is not finite, returns {@linkcode min} and, if {@linkcode max} is not finite, returns {@linkcode max})
+             * @throws {TypeError} - if {@linkcode min} or {@linkcode max} are not numbers
              */
             range(min,max){
                 "use strict";
-                if(!((typeof min==="number")&&Number.isFinite(min)))throw new TypeError("[RNG::range] min is not a finite number");
-                if(!((typeof max==="number")&&Number.isFinite(max)))throw new TypeError("[RNG::range] max is not a finite number");
+                if(typeof min!=="number")throw new TypeError("[RNG::range] min is not a number");
+                if(typeof max!=="number")throw new TypeError("[RNG::range] max is not a number");
+                if(!Number.isFinite(min))return min;
+                if(!Number.isFinite(max))return max;
                 if(min===max)return min;
                 return(this.value32bit*(max-min)+0xFFFFFFFF*min)/0xFFFFFFFF;
             }
