@@ -13,7 +13,7 @@
 - [Unofficial Satisfactory U3 Flow Chart](#unofficial-satisfactory-u3-flow-chart)
 - [Small Dice](#small-dice)
 - [Ball Screensaver](#ball-screensaver)
-  - [[Ball Screensaver] available URL parameters](#ball-screensaver-available-url-parameters)
+  - [\[Ball Screensaver\] available URL parameters](#ball-screensaver-available-url-parameters)
 - [Vector Field](#vector-field)
 - [Math Function Drawer](#math-function-drawer)
 - [3D-Card example](#3d-card-example)
@@ -145,27 +145,37 @@ Scroll [TOP](#maz01001githubio)
 >
 
 - a ball that moves diagonally across the screen and changes color
-- using only javascript (HTML5 canvas)
+- using only javascript (visuals via HTML5 canvas)
 
 ### [Ball Screensaver] available URL parameters
 
-URL parameters can be in any order (_starting with `?` after the URL then parameters in format `PARAMETER=VALUE` with `&` between each parameter_)
+URL parameters can be in any order starting with `?` after the URL, then parameters in the format `PARAMETER=VALUE` with `&` between each parameter (_values must be encoded URI components_)
 
-<details open><summary>click to hide table</summary>
+<details open><summary>Click to hide table</summary>
 
-| parameter         | description                                               | default value           | possible values                                              |
-| ----------------- | --------------------------------------------------------- | ----------------------- | ------------------------------------------------------------ |
-| `transparent`     | make the background of the website transparent            | `0`                     | `0` or `1`                                                   |
-| `fpsView`         | show fps                                                  | `1`                     | `0` or `1`                                                   |
-| `clearCanvas`     | clears the canvas every frame                             | `1`                     | `0` or `1`                                                   |
-| `ballOutline`     | give the ball/image drawn a black outline                 | `1`                     | `0` or `1`                                                   |
-| `seed`            | set the seed for RNG                                      | minute timestamp in hex | anything                                                     |
-| `ballSize`        | set the ball size (%) relative to the smaller window size | `0.2`                   | `0` to `1`                                                   |
-| `ballSpeed`       | set the speed of the ball in pixels per second            | `240`                   | positive decimal number <br> (supports scientific notation) |
-| `colorSpeed`      | set the speed of the color shift in degrees per second    | `60`                    | positive decimal number <br> (supports scientific notation) |
-| `img`             | put an image on the ball                                  | none                    | HTML image source (URL) <br> (encoded URI component)        |
-| `imgPixelArt`     | enable better renderer for pixel art                      | `0`                     | `0` or `1`                                                   |
-| `imgOverrideBall` | when active replaces the ball with the image              | `1`                     | `0` or `1`                                                   |
+| parameter         | description                                                                              | default value                     | possible values                                             |
+| ----------------- | ---------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------- |
+| `transparent`     | make the background of the website transparent                                           | `0`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `clearCanvas`     | clears the canvas every frame                                                            | `1`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `fpsView`         | show fps                                                                                 | `1`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `seed`            | set the seed for RNG                                                                     | minute timestamp in hex           | anything (even nothing)                                     |
+| `ballSize`        | set the ball size (%) relative to the smaller window size                                | `0.2`                             | `0` to `1`  (`1` for on and `0` for off)                    |
+| `ballSpeed`       | set the speed of the ball in pixels per second                                           | `240`                             | decimal number <br> (supports scientific notation)          |
+| `ballOutline`     | give the ball/image drawn a black outline                                                | `1`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `colorSpeed`      | set the speed of the color shift in degrees per second                                   | `60`                              | decimal number <br> (supports scientific notation)          |
+| `img`             | put an image over the ball                                                               | none                              | HTML image source (URL)                                     |
+| `imgPixelArt`     | enable better renderer for pixel art                                                     | `0`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `imgOverrideBall` | if set, replaces the ball with `img`                                                     | `1`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `txt`             | (single line) text to put over the ball/image                                            | none                              | single line text                                            |
+| `txtHeight`       | set the `txt` size (height) relative to the size of the ball                             | `0.4`                             | positive decimal number <br> (supports scientific notation) |
+| `txtFill`         | `txt` fill color (CSS color, canvas gradient/pattern)                                    | `#0F0` (green)                    | CSS color / canvas gradient or pattern                      |
+| `txtLine`         | `txt` outline color (CSS color, canvas gradient/pattern)                                 | `#000` (black)                    | CSS color / canvas gradient or pattern                      |
+| `txtLineWidth`    | set the width of `txt` outline relative to `txtHeight`                                   | `1`                               | positive decimal number <br> (supports scientific notation) |
+| `txtFont`         | set the font of the `txt` (CSS font family)                                              | `"Times New Roman", Times, serif` | CSS font-family, like `sans-serif`                          |
+| `txtWeight`       | set the boldness of the `txt`                                                            | `normal`                          | CSS font-weight, like `bold` or `1` to `1000` (inclusive)   |
+| `txtSmallCaps`    | if set, uses small-caps for the `txt` <br> (scaled down uppercase for lowercase letters) | `0`                               | `0` or `1`  (`1` for on and `0` for off)                    |
+| `txtStyle`        | set the font style of the `txt` (italic/oblique)                                         | `normal`                          | CSS font-style, like `italic` or `oblique`                  |
+| `txtStretch`      | set the horizontal stretch of the `txt`                                                  | `normal`                          | CSS font-stretch, but only keywords and not percentages     |
 
 </details>
 
