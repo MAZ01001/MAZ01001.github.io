@@ -347,7 +347,7 @@
                 if(yFields&1===0)position[1]=window.innerHeight-position[1];
                 direction[1]=true;
             }
-            // FAV add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
+            // TODO add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
             //~ draw ball &/ img
             if(ballSizePercent>0){
                 const[imgW,imgH]=(()=>{
@@ -380,7 +380,7 @@
                 }
             }
             //~ draw text on ball/img (or only draw text when ballSizePercent is 0 or below)
-            // FAV add support for multiline text ("\n") - get default line-height via canvasHTMLCSS (live computed style map of canvasHTML) and add URL param for line-height (percent of ball-text-font-size)
+            // TODO add support for multiline text ("\n") - get default line-height via canvasHTMLCSS (live computed style map of canvasHTML) and add URL param for line-height (percent of ball-text-font-size)
             if(ballText!==""){
                 canvas.beginPath();
                 const ballTextFontSize=ballRadius*2*ballTextHeight;
