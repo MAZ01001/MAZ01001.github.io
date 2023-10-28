@@ -16,12 +16,20 @@
     <meta name="msapplication-config" content="../img/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     <title>Screensaver</title>
+    <script>CSS?.registerProperty?.({name:"--rainbowanglecolor",syntax:"<angle>",inherits:false,initialValue:"120deg"});</script>
     <style>
+        @keyframes rainbowcolor{
+            from{--rainbowanglecolor: 0deg;}
+            to{--rainbowanglecolor: 360deg;}
+        }
         body{
+            --rainbowanglecolor: 120deg;
+            /* background-color: oklch(75% 0.127 var(--rainbowanglecolor)); */
             background-color: #222;
             padding: 0;
             margin: 0 auto;
             overflow: hidden;
+            animation: rainbowcolor 6s linear 0s infinite normal none paused;
         }
     </style>
 </head>
@@ -184,88 +192,66 @@
         //~  \___/\_| \_\_____/ \_| |_/_|  \__, |\__,_|_| |_| |_|\___|_| |_|\__|___/
         //~                                 __/ |
         //~                                |___/
-        // FAV add URL param for html bgcolor (CSS color or "rainbow(n)" → OKLCH color hue animation with optional speed n)
-        // TODO const[...]=(()=>{...;return[...];})();
-        let _fpsView_=null,
-            _clearCanvas_=null,
-            _ballOutline_=null,
-            _ballSize_=null,
-            _ballSpeed_=null,
-            _colorSpeed_=null,
-            _img_=null,
-            _imgPixelArt_=null,
-            _imgReplace_=null,
-            _txt_=null,
-            _txtFill_=null,
-            _txtLine_=null,
-            _txtLineWidth_=null,
-            _txtHeight_=null,
-            _txtFont_=null,
-            _txtStyle_=null,
-            _txtSmallCaps_=null,
-            _txtWeight_=null,
-            _txtStretch_=null,
-            _seed_=null,
-            _tmp_num_=NaN;
-        const args=window.location.search;
-        if(args.length>1)
-            for(const arg of args.substring(1).split('&'))
-                switch(true){
-                    case arg==="transparent=1":document.body.style.backgroundColor="transparent";break;
-                    case /^fpsView=[01]$/.test(arg):_fpsView_=arg.charAt(8)==='1';break;
-                    case /^clearCanvas=[01]$/.test(arg):_clearCanvas_=arg.charAt(0xC)==='1';break;
-                    case /^ballOutline=[01]$/.test(arg):_ballOutline_=arg.charAt(0xC)==='1';break;
-                    case /^ballSize=(?:[01]|0?\.[0-9]*[1-9])$/.test(arg):if(!Number.isNaN(Number(arg.substring(9))))_ballSize_=Number(arg.substring(9));break;
-                    case /^ballSpeed=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):
-                        _tmp_num_=Number(arg.substring(0xA));
-                        if(Number.isFinite(_tmp_num_))_ballSpeed_=_tmp_num_;
-                    break;
-                    case /^colorSpeed=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):
-                        _tmp_num_=Number(arg.substring(0xB));
-                        if(Number.isFinite(_tmp_num_))_colorSpeed_=_tmp_num_;
-                    break;
-                    case arg.startsWith("seed="):_seed_=decodeURIComponent(arg.substring(5));break;
-                    case (arg.startsWith("img=")&&arg.length>4):_img_=decodeURIComponent(arg.substring(4));break;
-                    case /^imgPixelArt=[01]$/.test(arg):_imgPixelArt_=arg.charAt(0xC)==='1';break;
-                    case /^imgOverrideBall=[01]$/.test(arg):_imgReplace_=arg.charAt(0x10)==='1';break;
-                    case (arg.startsWith("txt=")&&arg.length>4):_txt_=decodeURIComponent(arg.substring(4));break;
-                    case (arg.startsWith("txtFill=")&&arg.length>8):_txtFill_=decodeURIComponent(arg.substring(8));break;
-                    case (arg.startsWith("txtLine=")&&arg.length>8):_txtLine_=decodeURIComponent(arg.substring(8));break;
-                    case /^txtLineWidth=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):
-                        _tmp_num_=Number(arg.substring(0xD));
-                        if(Number.isFinite(_tmp_num_)&&_tmp_num_>=0)_txtLineWidth_=_tmp_num_;
-                    break;
-                    case /^txtHeight=(?:0|[1-9][0-9]*|(?:0|[1-9][0-9]*)?\.[0-9]*(?:[eE][+-]?[1-9][0-9]*)?)$/.test(arg):
-                        _tmp_num_=Number(arg.substring(0xA));
-                        if(Number.isFinite(_tmp_num_)&&_tmp_num_>=0)_txtHeight_=_tmp_num_;
-                    break;
-                    case (arg.startsWith("txtFont=")&&arg.length>8):_txtFont_=decodeURIComponent(arg.substring(8));break;
-                    case (arg.startsWith("txtStyle=")&&arg.length>9):_txtStyle_=decodeURIComponent(arg.substring(9));break;
-                    case /^txtSmallCaps=[01]$/.test(arg):_txtSmallCaps_=arg.charAt(0xD)==='1';break;
-                    case /^txtWeight=(?:[a-zA-Z-]+|[1-9][0-9]{0,2}|1000)$/.test(arg):_txtWeight_=decodeURIComponent(arg.substring(0xA));break;
-                    case /^txtStretch=[a-zA-Z-]+$/.test(arg):_txtStretch_=arg.substring(0xB);break;
-                }
-        _tmp_num_=NaN;
-        const showFPS=_fpsView_??true,
-            clearCanvas=_clearCanvas_??true,
-            ballOutline=_ballOutline_??true,
-            ballSizePercent=_ballSize_??.2,
-            ballSpeed=_ballSpeed_??0xF0,
-            colorSpeed=_colorSpeed_??0x3C,
-            ballImg=_img_,
-            ballImgPixelArt=_imgPixelArt_??false,
-            ballImgReplace=_imgReplace_??true,
-            ballText=_txt_??"",
-            ballTextFill=_txtFill_??"#0f0",
-            ballTextStroke=_txtLine_??"#000",
-            ballTextStrokeWidth=_txtLineWidth_??1,
-            ballTextHeight=_txtHeight_??.4,
-            ballTextFontFamily=_txtFont_??"\"Times New Roman\", Times, serif",
-            ballTextFontStyle=_txtStyle_??"normal",
-            ballTextFontSmallCaps=_txtSmallCaps_??false,
-            ballTextFontWeight=_txtWeight_??"normal",
-            ballTextFontStretch=_txtStretch_??"normal",
-            rng=new RNG(_seed_??Math.floor(Date.now()/0xEA60).toString(0x10));
+        const[//~ defaults
+            clearCanvas=true,
+            showFPS=true,
+            rng=new RNG(Math.trunc(Date.now()/0xEA60).toString(0x10)),
+            ballOutline=true,
+            ballSizePercent=.2,
+            ballSpeed=0xF0,
+            colorSpeed=0x3C,
+            ballImg=null,
+            ballImgPixelArt=false,
+            ballImgReplace=true,
+            ballText="",
+            ballTextFill="#0f0",
+            ballTextStroke="#000",
+            ballTextStrokeWidth=1,
+            ballTextHeight=.4,
+            ballTextFontFamily="\"Times New Roman\", Times, serif",
+            ballTextFontStyle="normal",
+            ballTextFontSmallCaps=false,
+            ballTextFontWeight="normal",
+            ballTextFontStretch="normal",
+        ]=(()=>{//~ overrides (fallback to default via undefined)
+            "use strict";
+            const args=new URLSearchParams(window.location.search);
+            let _tmpVal_=null,
+                _tmpNum_=NaN;
+            if((_tmpVal_=args.get("bgColor"))!=null){
+                if(_tmpVal_.startsWith("rainbow")){
+                    document.body.style.backgroundColor="oklch(75% 0.127 var(--rainbowanglecolor))";
+                    document.body.style.animationPlayState="running";
+                    const rainbowMatch=_tmpVal_.match(/^rainbow\(([+-]?)([1-9][0-9]*)(s|ms)?\)$/);
+                    if(rainbowMatch){
+                        if(rainbowMatch[1]==='-')document.body.style.animationDirection="reverse";
+                        if(Number.isFinite(Number(rainbowMatch[2])))document.body.style.animationDuration=rainbowMatch[2]+(rainbowMatch[3]??"s");
+                    }
+                }else document.body.style.backgroundColor=_tmpVal_;
+            }
+            return Object.freeze([
+                (_tmpVal_=args.get("clearCanvas"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
+                (_tmpVal_=args.get("fpsView"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
+                (_tmpVal_=args.get("seed"))==null?undefined:new RNG(_tmpVal_),
+                (_tmpVal_=args.get("ballOutline"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
+                (_tmpVal_=args.get("ballSize"))==null?undefined:(Number.isNaN(_tmpNum_=Number(_tmpVal_))||_tmpNum_>1||_tmpNum_<0?undefined:_tmpNum_),
+                (_tmpVal_=args.get("ballSpeed"))==null?undefined:(Number.isNaN(_tmpNum_=Number(_tmpVal_))||!Number.isFinite(_tmpNum_)?undefined:_tmpNum_),
+                (_tmpVal_=args.get("colorSpeed"))==null?undefined:(Number.isNaN(_tmpNum_=Number(_tmpVal_))||!Number.isFinite(_tmpNum_)?undefined:_tmpNum_),
+                (_tmpVal_=args.get("img"))==null?undefined:(_tmpVal_.length>0?_tmpVal_:undefined),
+                (_tmpVal_=args.get("imgPixelArt"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
+                (_tmpVal_=args.get("imgReplace"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
+                (_tmpVal_=args.get("txt"))==null?undefined:(_tmpVal_.length>0?_tmpVal_:undefined),
+                (_tmpVal_=args.get("txtFill"))==null?undefined:(_tmpVal_.length>0?_tmpVal_:undefined),
+                (_tmpVal_=args.get("txtLine"))==null?undefined:(_tmpVal_.length>0?_tmpVal_:undefined),
+                (_tmpVal_=args.get("txtLineWidth"))==null?undefined:(Number.isNaN(_tmpNum_=Number(_tmpVal_))||!Number.isFinite(_tmpNum_)||_tmpNum_<0?undefined:_tmpNum_),
+                (_tmpVal_=args.get("txtHeight"))==null?undefined:(Number.isNaN(_tmpNum_=Number(_tmpVal_))||!Number.isFinite(_tmpNum_)||_tmpNum_<0?undefined:_tmpNum_),
+                (_tmpVal_=args.get("txtFont"))==null?undefined:(_tmpVal_.length>0?_tmpVal_:undefined),
+                (_tmpVal_=args.get("txtStyle"))==null?undefined:(_tmpVal_.length>0?_tmpVal_:undefined),
+                (_tmpVal_=args.get("txtSmallCaps"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
+                (_tmpVal_=args.get("txtWeight"))==null?undefined:(/^(?:[a-zA-Z-]+|[1-9][0-9]{0,2}|1000)$/.test(_tmpVal_)?_tmpVal_:undefined),
+                (_tmpVal_=args.get("txtStretch"))==null?undefined:(/^[a-zA-Z-]+$/.test(_tmpVal_)?_tmpVal_:undefined)
+            ]);
+        })();
         //~  _____      _
         //~ /  ___|    | |
         //~ \ `--.  ___| |_ _   _ _ __
@@ -319,44 +305,44 @@
         const draw=deltaTime=>{
             "use strict";
             if(clearCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
+            const ballRadius=((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*(ballSizePercent>0?ballSizePercent:.2))*0.5;
+            //~ ball position (possibly overshoot)
+            if(ballSizePercent===1&&window.innerWidth<window.innerHeight)position[0]=ballRadius;
+            else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
+            if(ballSizePercent===1&&window.innerHeight<window.innerWidth)position[1]=ballRadius;
+            else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
+            //~ ball trajectory calculation (clamp position)
+            const limitRight=window.innerWidth-ballRadius,
+                limitDown=window.innerHeight-ballRadius,
+                boundWidth=window.innerWidth-(ballRadius*2),
+                boundHeight=window.innerHeight-(ballRadius*2);
+            //~ X overshoot right/left
+            if(position[0]>=limitRight){
+                const xFields=Math.floor((position[0]-ballRadius)/boundWidth);
+                position[0]=ballRadius+((position[0]-ballRadius)%boundWidth);
+                if(xFields&1===1)position[0]=window.innerWidth-position[0];
+                direction[0]=false;
+            }else if(position[0]<=ballRadius){
+                const xFields=Math.floor((ballRadius-position[0])/boundWidth);
+                position[0]=ballRadius+((ballRadius-position[0])%boundWidth);
+                if(xFields&1===0)position[0]=window.innerWidth-position[0];
+                direction[0]=true;
+            }
+            //~ Y overshoot down/up
+            if(position[1]>=limitDown){
+                const yFields=Math.floor((position[1]-ballRadius)/boundHeight);
+                position[1]=ballRadius+((position[1]-ballRadius)%boundHeight);
+                if(yFields&1===1)position[1]=window.innerHeight-position[1];
+                direction[1]=false;
+            }else if(position[1]<=ballRadius){
+                const yFields=Math.floor((ballRadius-position[1])/boundHeight);
+                position[1]=ballRadius+((ballRadius-position[1])%boundHeight);
+                if(yFields&1===0)position[1]=window.innerHeight-position[1];
+                direction[1]=true;
+            }
+            // FAV add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
+            //~ draw ball &/ img
             if(ballSizePercent>0){
-                const ballRadius=((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent)*0.5;
-                //~ ball position (possibly overshoot)
-                if(ballSizePercent===1&&window.innerWidth<window.innerHeight)position[0]=ballRadius;
-                else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
-                if(ballSizePercent===1&&window.innerHeight<window.innerWidth)position[1]=ballRadius;
-                else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
-                //~ ball trajectory calculation (clamp position)
-                const limitRight=window.innerWidth-ballRadius,
-                    limitDown=window.innerHeight-ballRadius,
-                    boundWidth=window.innerWidth-(ballRadius*2),
-                    boundHeight=window.innerHeight-(ballRadius*2);
-                //~ X overshoot right/left
-                if(position[0]>=limitRight){
-                    const xFields=Math.floor((position[0]-ballRadius)/boundWidth);
-                    position[0]=ballRadius+((position[0]-ballRadius)%boundWidth);
-                    if(xFields&1===1)position[0]=window.innerWidth-position[0];
-                    direction[0]=false;
-                }else if(position[0]<=ballRadius){
-                    const xFields=Math.floor((ballRadius-position[0])/boundWidth);
-                    position[0]=ballRadius+((ballRadius-position[0])%boundWidth);
-                    if(xFields&1===0)position[0]=window.innerWidth-position[0];
-                    direction[0]=true;
-                }
-                //~ Y overshoot down/up
-                if(position[1]>=limitDown){
-                    const yFields=Math.floor((position[1]-ballRadius)/boundHeight);
-                    position[1]=ballRadius+((position[1]-ballRadius)%boundHeight);
-                    if(yFields&1===1)position[1]=window.innerHeight-position[1];
-                    direction[1]=false;
-                }else if(position[1]<=ballRadius){
-                    const yFields=Math.floor((ballRadius-position[1])/boundHeight);
-                    position[1]=ballRadius+((ballRadius-position[1])%boundHeight);
-                    if(yFields&1===0)position[1]=window.innerHeight-position[1];
-                    direction[1]=true;
-                }
-                // FAV add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
-                //~ draw ball &/ img
                 const[imgW,imgH]=(()=>{
                     if(img.width>img.height)return[ballRadius,ballRadius*(img.height/img.width)];
                     if(img.width<img.height)return[ballRadius*(img.width/img.height),ballRadius];
@@ -388,10 +374,10 @@
                 }
             }
             //~ draw text on ball/img (or only draw text when ballSizePercent is 0 or below)
+            // FAV add support for multiline text ("\n") - get default line-height via canvasHTMLCSS (live computed style map of canvasHTML) and add URL param for line-height (percent of ball-text-font-size)
             if(ballText!==""){
                 canvas.beginPath();
-                // FAV add support for multiline text ("\n") - get default line-height via canvasHTMLCSS (live computed style map of canvasHTML) and add URL param for line-height (percent of ball-text-font-size)
-                const ballTextFontSize=(canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*(ballSizePercent>0?ballSizePercent:1)*ballTextHeight;
+                const ballTextFontSize=ballRadius*2*ballTextHeight;
                 canvas.font=`${ballTextFontStyle} ${ballTextFontSmallCaps?"small-caps":"normal"} ${ballTextFontWeight} ${ballTextFontStretch} ${ballTextFontSize+"px"} ${ballTextFontFamily}`;
                 const textX=position[0]-(canvas.measureText(ballText).width*.5),
                     textY=position[1]+(ballTextFontSize/3);
@@ -452,41 +438,43 @@
                 "You might need to expand the console window to see the entire table.\n%c%s",
                 "background-color:#000;color:#0F0;font-family:consolas,monospace;white-space:pre;",
                 [
-                    "+-------------------+--------------------------------------------------------------+-----------------------------------+-----------------------------------------------------------+",
-                    "| parameter         | description                                                  | default value                     | possible values                                           |",
-                    "+-------------------+--------------------------------------------------------------+-----------------------------------+-----------------------------------------------------------+",
-                    "| `transparent`     | make the background of the website transparent               | `0`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "| `clearCanvas`     | clears the canvas every frame                                | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "| `fpsView`         | show fps                                                     | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "| `seed`            | set the seed for RNG                                         | minute timestamp in hex           | anything (even nothing)                                   |",
-                    "| ----------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
-                    "| `ballSize`        | set the ball size (%) relative to the smaller window size    | `0.2`                             | `0` to `1`  (`1` for on and `0` for off)                  |",
-                    "| `ballSpeed`       | set the speed of the ball in pixels per second               | `240`                             | decimal number                                            |",
-                    "|                   |                                                              |                                   | (supports scientific notation)                            |",
-                    "| `ballOutline`     | give the ball/image drawn a black outline                    | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "| ----------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
-                    "| `colorSpeed`      | set the speed of the color shift in degrees per second       | `60`                              | decimal number                                            |",
-                    "|                   |                                                              |                                   | (supports scientific notation)                            |",
-                    "| ----------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
-                    "| `img`             | put an image over the ball                                   | none                              | HTML image source (URL)                                   |",
-                    "| `imgPixelArt`     | enable better renderer for pixel art                         | `0`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "| `imgOverrideBall` | if set, replaces the ball with `img`                         | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "| ----------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
-                    "| `txt`             | (single line) text to put over the ball/image                | none                              | single line text                                          |",
-                    "| `txtHeight`       | set the `txt` size (height) relative to the size of the ball | `0.4`                             | positive decimal number                                   |",
-                    "|                   |                                                              |                                   | (supports scientific notation)                            |",
-                    "| `txtFill`         | `txt` fill color (CSS color, canvas gradient/pattern)        | `#0F0` (green)                    | CSS color / canvas gradient or pattern                    |",
-                    "| `txtLine`         | `txt` outline color (CSS color, canvas gradient/pattern)     | `#000` (black)                    | CSS color / canvas gradient or pattern                    |",
-                    "| `txtLineWidth`    | set the width of `txt` outline relative to `txtHeight`       | `1`                               | positive decimal number                                   |",
-                    "|                   |                                                              |                                   | (supports scientific notation)                            |",
-                    "| ----------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
-                    '| `txtFont`         | set the font of the `txt` (CSS font family)                  | `"Times New Roman", Times, serif` | CSS font-family, like `sans-serif`                        |',
-                    "| `txtWeight`       | set the boldness of the `txt`                                | `normal`                          | CSS font-weight, like `bold` or `1` to `1000` (inclusive) |",
-                    "| `txtSmallCaps`    | if set, uses small-caps for the `txt`                        | `0`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
-                    "|                   | (scaled down uppercase for lowercase letters)                |                                   |                                                           |",
-                    "| `txtStyle`        | set the font style of the `txt` (italic/oblique)             | `normal`                          | CSS font-style, like `italic` or `oblique`                |",
-                    "| `txtStretch`      | set the horizontal stretch of the `txt`                      | `normal`                          | CSS font-stretch, but only keywords and not percentages   |",
-                    "+-------------------+--------------------------------------------------------------+-----------------------------------+-----------------------------------------------------------+",
+                    "+----------------+--------------------------------------------------------------+-----------------------------------+-----------------------------------------------------------+",
+                    "| parameter      | description                                                  | default value                     | possible values                                           |",
+                    "+----------------+--------------------------------------------------------------+-----------------------------------+-----------------------------------------------------------+",
+                    "| `bgColor`      | set the background color of the page (can be transparent)    | `#222` (dark grey)                | CSS color like `black` or `transparent`                   |",
+                    "|                | or a rainbow color animation                                 | (rainbow default speed is `6s`)   | or `rainbow` or `rainbow([+|-]speed[s|ms])`               |",
+                    "|                | with the speed in seconds or milliseconds as parameter       |                                   | (`speed` is a finite integer)                             |",
+                    "| `clearCanvas`  | clears the canvas every frame                                | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
+                    "| `fpsView`      | show fps                                                     | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
+                    "| `seed`         | set the seed for RNG                                         | minute timestamp in hex           | anything (even nothing)                                   |",
+                    "| -------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
+                    "| `ballSize`     | set the ball size (%) relative to the smaller window size    | `0.2`                             | `0` to `1`  (`1` for on and `0` for off)                  |",
+                    "| `ballSpeed`    | set the speed of the ball in pixels per second               | `240`                             | decimal number                                            |",
+                    "|                |                                                              |                                   | (supports scientific notation)                            |",
+                    "| `ballOutline`  | give the ball/image drawn a black outline                    | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
+                    "| -------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
+                    "| `colorSpeed`   | set the speed of the color shift in degrees per second       | `60`                              | decimal number                                            |",
+                    "|                |                                                              |                                   | (supports scientific notation)                            |",
+                    "| -------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
+                    "| `img`          | put an image over the ball                                   | none                              | HTML image source (URL)                                   |",
+                    "| `imgPixelArt`  | enable better renderer for pixel art                         | `0`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
+                    "| `imgReplace`   | if set, replaces the ball with `img`                         | `1`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
+                    "| -------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
+                    "| `txt`          | (single line) text to put over the ball/image                | none                              | single line text                                          |",
+                    "| `txtHeight`    | set the `txt` size (height) relative to the size of the ball | `0.4`                             | positive decimal number                                   |",
+                    "|                | with no ball/image it is relative to the smaller window size |                                   | (supports scientific notation)                            |",
+                    "| `txtFill`      | `txt` fill color (CSS color, canvas gradient/pattern)        | `#0F0` (green)                    | CSS color / canvas gradient or pattern                    |",
+                    "| `txtLine`      | `txt` outline color (CSS color, canvas gradient/pattern)     | `#000` (black)                    | CSS color / canvas gradient or pattern                    |",
+                    "| `txtLineWidth` | set the width of `txt` outline relative to `txtHeight`       | `1`                               | positive decimal number                                   |",
+                    "|                |                                                              |                                   | (supports scientific notation)                            |",
+                    "| -------------- | ------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------- |",
+                    '| `txtFont`      | set the font of the `txt` (CSS font family)                  | `"Times New Roman", Times, serif` | CSS font-family, like `sans-serif`                        |',
+                    "| `txtWeight`    | set the boldness of the `txt`                                | `normal`                          | CSS font-weight, like `bold` or `1` to `1000` (inclusive) |",
+                    "| `txtSmallCaps` | if set, uses small-caps for the `txt`                        | `0`                               | `0` or `1`  (`1` for on and `0` for off)                  |",
+                    "|                | (scaled down uppercase for lowercase letters)                |                                   |                                                           |",
+                    "| `txtStyle`     | set the font style of the `txt` (italic/oblique)             | `normal`                          | CSS font-style, like `italic` or `oblique`                |",
+                    "| `txtStretch`   | set the horizontal stretch of the `txt`                      | `normal`                          | CSS font-stretch, but only keywords and not percentages   |",
+                    "+----------------+--------------------------------------------------------------+-----------------------------------+-----------------------------------------------------------+",
                 ].join('\n')
             );
         console.groupEnd();
