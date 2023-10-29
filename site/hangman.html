@@ -1079,6 +1079,37 @@
                 else letter.addEventListener("click",()=>{
                     "use strict";
                     letter.disabled=true;
+                    let focus=letter.nextElementSibling;
+                    while(
+                        focus!=null
+                        &&(focus instanceof HTMLInputElement)
+                        &&focus.type==="button"
+                        &&focus.disabled
+                        &&keyboardLetters.has(focus.value)
+                    )focus=focus.nextElementSibling;
+                    if(
+                        (focus instanceof HTMLInputElement)
+                        &&focus.type==="button"
+                        &&!focus.disabled
+                        &&keyboardLetters.has(focus.value)
+                    )focus.focus();
+                    else{
+                        focus=letter.previousElementSibling;
+                        while(
+                            focus!=null
+                            &&(focus instanceof HTMLInputElement)
+                            &&focus.type==="button"
+                            &&focus.disabled
+                            &&keyboardLetters.has(focus.value)
+                        )focus=focus.previousElementSibling;
+                        if(
+                            (focus instanceof HTMLInputElement)
+                            &&focus.type==="button"
+                            &&!focus.disabled
+                            &&keyboardLetters.has(focus.value)
+                        )focus.focus();
+                        else retryButton.focus();
+                    }
                     letterClick(letter.value);
                 },{passive:true,once:true});
                 return letter;
@@ -1117,6 +1148,21 @@
                     "use strict";
                     confKeyboardLettersAlt.delete(char);
                     removeWordsWithChar(char);
+                    let focus=letter.nextElementSibling;
+                    if(
+                        (focus instanceof HTMLInputElement)
+                        &&focus.type==="button"
+                        &&(confKeyboardLetters.has(focus.value)||confKeyboardLettersAlt.has(focus.value))
+                    )focus.focus();
+                    else{
+                        focus=letter.previousElementSibling;
+                        if(
+                            (focus instanceof HTMLInputElement)
+                            &&focus.type==="button"
+                            &&(confKeyboardLetters.has(focus.value)||confKeyboardLettersAlt.has(focus.value))
+                        )focus.focus();
+                        else settingsCharInput.focus();
+                    }
                     letter.remove();
                 },{passive:true,once:true});
             }else{
@@ -1125,6 +1171,21 @@
                     "use strict";
                     confKeyboardLetters.delete(char);
                     removeWordsWithChar(char);
+                    let focus=letter.nextElementSibling;
+                    if(
+                        (focus instanceof HTMLInputElement)
+                        &&focus.type==="button"
+                        &&(confKeyboardLetters.has(focus.value)||confKeyboardLettersAlt.has(focus.value))
+                    )focus.focus();
+                    else{
+                        focus=letter.previousElementSibling;
+                        if(
+                            (focus instanceof HTMLInputElement)
+                            &&focus.type==="button"
+                            &&(confKeyboardLetters.has(focus.value)||confKeyboardLettersAlt.has(focus.value))
+                        )focus.focus();
+                        else settingsCharInput.focus();
+                    }
                     letter.remove();
                 },{passive:true,once:true});
             }
@@ -1172,6 +1233,21 @@
             btn.addEventListener("click",()=>{
                 "use strict";
                 confWordList.delete(word);
+                let focus=container.nextElementSibling;
+                if(
+                    (focus instanceof HTMLDivElement)
+                    &&((focus=focus.lastElementChild) instanceof HTMLInputElement)
+                    &&focus.value==="x"
+                )focus.focus();
+                else{
+                    focus=container.previousElementSibling;
+                    if(
+                        (focus instanceof HTMLDivElement)
+                        &&((focus=focus.lastElementChild) instanceof HTMLInputElement)
+                        &&focus.value==="x"
+                    )focus.focus();
+                    else settingsWordInput.focus();
+                }
                 container.remove();
             },{passive:true,once:true});
         }
@@ -1516,6 +1592,21 @@
             updateWord();
             updateFails();
             updateLocalStorage();
+            let focus=letterButtons.firstElementChild;
+            while(
+                focus!=null
+                &&(focus instanceof HTMLInputElement)
+                &&focus.type==="button"
+                &&focus.disabled
+                &&keyboardLetters.has(focus.value)
+            )focus=focus.nextElementSibling;
+            if(
+                (focus instanceof HTMLInputElement)
+                &&focus.type==="button"
+                &&!focus.disabled
+                &&keyboardLetters.has(focus.value)
+            )focus.focus();
+            else retryButton.focus();
         },{passive:true});
 
         //~ start the game
@@ -1524,6 +1615,24 @@
         updateWord();
         updateFails();
         updateLocalStorage();
+        (()=>{//~ focus the first available letter or the retry button
+            "use strict";
+            let focus=letterButtons.firstElementChild;
+            while(
+                focus!=null
+                &&(focus instanceof HTMLInputElement)
+                &&focus.type==="button"
+                &&focus.disabled
+                &&keyboardLetters.has(focus.value)
+            )focus=focus.nextElementSibling;
+            if(
+                (focus instanceof HTMLInputElement)
+                &&focus.type==="button"
+                &&!focus.disabled
+                &&keyboardLetters.has(focus.value)
+            )focus.focus();
+            else retryButton.focus();
+        })();
     </script>
 </body>
 </html>
