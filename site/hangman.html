@@ -58,7 +58,7 @@
             color: #0f0;
             padding: 0;
             margin: 0;
-            overflow: visible;
+            overflow: hidden;
             font-family: 'Times New Roman', Times, serif;
             font-size: large;
         }
@@ -130,7 +130,8 @@
             padding: 0 .5rem 1rem .5rem;
             max-width: calc(100vw - calc(1rem + 4px));
             max-height: calc(100vh - calc(1rem + 4px));
-            overflow: overlay;
+            overflow: auto;
+            scrollbar-gutter: stable both-edges;
             background-color:#222;
             border-radius: 1rem;
             text-align: center;
@@ -208,7 +209,8 @@
             flex-direction: column;
             min-height: 1rem;
             max-height: 10rem;
-            overflow: overlay;
+            overflow: auto;
+            scrollbar-gutter: stable;
             margin: .3rem 0;
         }
         div#settingsWordList>div>input{float: right;}
@@ -216,7 +218,8 @@
         div#importViewWordList>div>span{
             display: inline-block;
             width: 9rem;
-            overflow: overlay;
+            overflow: auto;
+            scrollbar-gutter: stable;
             user-select: text;
         }
         div#importViewWordList>div>span{white-space: pre;}
@@ -244,10 +247,11 @@
             display: flex;
             flex-wrap: wrap;
             gap: .3rem;
-            min-height: 1rem;
+            min-height: 1.5rem;
             max-height: 10rem;
-            max-width: 13rem;
-            overflow: overlay;
+            max-width: 13.5rem;
+            overflow: auto;
+            scrollbar-gutter: stable;
             margin: .3rem 0;
         }
         div#settingsCharList>input{
@@ -290,7 +294,8 @@
             display: inline-block;
             vertical-align: bottom;
             max-height: 5rem;
-            overflow: overlay;
+            overflow: auto;
+            scrollbar-gutter: stable;
             font-size: larger;
             word-break: break-all;
         }
