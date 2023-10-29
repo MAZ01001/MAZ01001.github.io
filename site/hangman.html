@@ -914,6 +914,81 @@
         /** @type {HTMLInputElement} button to abort action and close {@linkcode confirmMenu} *///@ts-ignore element does exist in DOM
         const confirmAbort=document.getElementById("confirmAbort");
 
+        //~ confirm dialog box
+        const confirmDialog=Object.seal(new class ConfirmDialog{
+            /** @type {((aborted:boolean)=>Promise<void>|void)|null} [Private] Current callback when dialog is closed (can be async) */
+            static _callback_=null;
+            /** @type {HTMLDialogElement} [Private] The dialog HTML element to open/close */
+            static _dialog_;
+            /** @type {HTMLSpanElement} [Private] The text HMTL element of {@linkcode _dialog_} to show a confirm message */
+            static _title_;
+            /** @type {HTMLInputElement} [Private] The confirm button HMTL element of {@linkcode _dialog_} */
+            static _confirm_;
+            /** @type {HTMLInputElement} [Private] The abort button HMTL element of {@linkcode _dialog_} */
+            static _abort_;
+            /** @type {boolean} [Private] If a dialog is currently still pending (can't open another one) */
+            static _running_=false;
+            /** @type {boolean} If a dialog is currently still pending (can't open another one) */
+            get Running(){return ConfirmDialog._running_;}
+            /**
+             * ## Initializes {@linkcode ConfirmDialog} object
+             * @param {HTMLDialogElement} dialog - the confirm HMTL dialog element
+             * @param {HTMLSpanElement} text - the HTML text element of {@linkcode dialog} to show a confirm message
+             * @param {HTMLInputElement} confirm - the confirm button of {@linkcode dialog}
+             * @param {HTMLInputElement} abort - the abort button of {@linkcode dialog}
+             */
+            constructor(dialog,text,confirm,abort){
+                ConfirmDialog._title_=text;
+                ConfirmDialog._dialog_=dialog;
+                ConfirmDialog._confirm_=confirm;
+                ConfirmDialog._abort_=abort;
+                ConfirmDialog._dialog_.addEventListener("cancel",async ev=>{"use strict";ev.preventDefault();ConfirmDialog._abort_.click();},{passive:false});
+                ConfirmDialog._confirm_.addEventListener("click",async()=>ConfirmDialog._exit_(false),{passive:true});
+                ConfirmDialog._abort_.addEventListener("click",async()=>ConfirmDialog._exit_(true),{passive:true});
+            }
+            /**
+             * ## [Private, async] Called by an event listener when the dialog was closed
+             * @param {boolean} aborted - if the dialog was aborted (`true`) or confirmed (`false`)
+             */
+            static async _exit_(aborted){
+                "use strict";
+                ConfirmDialog._dialog_.close();
+                const call=ConfirmDialog._callback_;
+                ConfirmDialog._callback_=null;
+                ConfirmDialog._running_=false;
+                await call?.(aborted);
+            };
+            /**
+             * ## Shows a dialog that displays the {@linkcode action} to confirm
+             * check if another dialog is still pending via {@linkcode Running}
+             * @param {string} action - the action to confirm
+             * @param {(aborted:boolean)=>Promise<void>|void} callback - a (strict, passive, optionally async) function, called when the {@linkcode action} was confirmed (param `false`) or aborted (param `true`)
+             * @throws {Error} if another dialog is still pending
+             */
+            Setup(action,callback){
+                if(ConfirmDialog._running_)throw new Error("[ConfirmDialog:setup] another dialog is still pending");
+                ConfirmDialog._title_.textContent=action;
+                ConfirmDialog._callback_=callback;
+                ConfirmDialog._dialog_.showModal();
+            }
+            /**
+             * ## Removes event listeners from `dialog`, `confirm`, and `abort` HTML elements (only call before deleting object)
+             * check if a dialog is still pending via {@linkcode Running}
+             * @param {boolean} [force] - [Optional] if `true` forces a pending dialog to abort
+             * @throws {TypeError} if {@linkcode force} is set, but not a boolean
+             * @throws {Error} if a dialog is still pending
+             */
+            static async RemoveListeners(force){
+                if(force!=null&&typeof force!=="boolean")throw new TypeError("[ConfirmDialog:RemoveListeners] force is not a boolean");
+                if(force==null||!force){
+                    if(ConfirmDialog._running_)throw new Error("[ConfirmDialog:setup] a dialog is still pending");
+                }else await ConfirmDialog._exit_(true);
+                ConfirmDialog._dialog_.removeEventListener("cancel",async ev=>{"use strict";ev.preventDefault();ConfirmDialog._abort_.click();});
+                ConfirmDialog._confirm_.removeEventListener("click",async()=>ConfirmDialog._exit_(false));
+                ConfirmDialog._abort_.removeEventListener("click",async()=>ConfirmDialog._exit_(true));
+            }
+        }(confirmMenu,confirmText,confirmConfirm,confirmAbort));
+
         //~ game logic (after DOM loaded and elements exist as variables)
         /**
          * ## Ends the rund by showing the {@linkcode finMenu}
@@ -1025,34 +1100,6 @@
                 return letter;
             }));
         };
-        /**
-         * ## shows a dialog that displays the {@linkcode action} to confirm
-         * does nothing if aborted
-         * @param {string} action - the action to confirm
-         * @param {(aborted:boolean)=>void} callback - a (strict, passive) function called when the {@linkcode action} was confirmed or aborted
-         */
-        const confirmDialog=(action,callback)=>{
-            "use strict";
-            if(action==null||callback==null)return;
-            confirmText.textContent=action;
-            /**
-             * ## close the {@linkcode confirmMenu} and call the {@linkcode callback} function
-             * @param {boolean} aborted - value for the {@linkcode callback} (`true` means aborted)
-             */
-            const exit=aborted=>{
-                "use strict";
-                confirmMenu.close();
-                callback(aborted);
-                confirmConfirm.removeEventListener("click",()=>exit(false));
-                confirmAbort.removeEventListener("click",()=>exit(true));
-                confirmMenu.removeEventListener("cancel",ev=>{"use strict";ev.preventDefault();confirmAbort.click();});
-            };
-            confirmConfirm.addEventListener("click",()=>exit(false),{passive:true});
-            confirmAbort.addEventListener("click",()=>exit(true),{passive:true});
-            confirmMenu.addEventListener("cancel",ev=>{"use strict";ev.preventDefault();confirmAbort.click();},{passive:false});
-            confirmMenu.showModal();
-        }
-
         /**
          * ## removes all words from {@linkcode settingsWordList} and {@linkcode confWordList} that contain {@linkcode char}
          * @param {string} char - a letter from the alphabet
@@ -1188,8 +1235,10 @@
                 updateFails();
                 updateLocalStorage();
             };
-            if(Date.now()-startTime>20000)confirmDialog(`Abandon ${formatTimer(Date.now()-startTime)} of progress and start a new round?`,confirmFnc);
-            else confirmFnc(false);
+            if(Date.now()-startTime>20000){
+                if(confirmDialog.Running)confirmFnc(true);
+                else confirmDialog.Setup(`Abandon ${formatTimer(Date.now()-startTime)} of progress and start a new round?`,confirmFnc);
+            }else confirmFnc(false);
         },{passive:true});
         settingsButton.addEventListener("click",()=>{
             "use strict";
@@ -1463,7 +1512,7 @@
         },{passive:true});
         settingsReset.addEventListener("click",()=>{
             "use strict";
-            confirmDialog("Delete all settings and reload the page?",aborted=>{
+            if(!confirmDialog.Running)confirmDialog.Setup("Delete all settings and reload the page?",aborted=>{
                 "use strict";
                 if(aborted)return;
                 clearLocalStorage();
