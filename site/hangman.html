@@ -202,7 +202,8 @@
             padding: .2rem .5rem;
             border-radius: .4rem;
         }
-        div#settingsWordList{
+        div#settingsWordList,
+        div#importViewWordList{
             display: flex;
             flex-direction: column;
             min-height: 1rem;
@@ -211,12 +212,14 @@
             margin: .3rem 0;
         }
         div#settingsWordList>div>input{float: right;}
-        div#settingsWordList>div>span{
+        div#settingsWordList>div>span,
+        div#importViewWordList>div>span{
             display: inline-block;
             width: 9rem;
             overflow: overlay;
             user-select: text;
         }
+        div#importViewWordList>div>span{white-space: pre;}
         input#settingsCharInput,
         input#settingsWordInput{width: 10rem;}
         label[for="settingsCharAlt"]{
@@ -236,7 +239,8 @@
             border-style: inset;
             color: #0F0;
         }
-        div#settingsCharList{
+        div#settingsCharList,
+        div#importViewCharList{
             display: flex;
             flex-wrap: wrap;
             gap: .3rem;
@@ -250,7 +254,18 @@
             font-family: consolas, monospace;
             font-size: medium;
         }
-        div#settingsCharList>input.unhide{background-color: #333;}
+        div#importViewCharList>span{
+            background-color: #000;
+            border: 2px outset #000;
+            border-radius: .4rem;
+            font-family: consolas, monospace;
+            font-size: medium;
+            padding: 0 .3rem;
+            user-select: text;
+            white-space: pre;
+        }
+        div#settingsCharList>input.unhide,
+        div#importViewCharList>span.unhide{background-color: #333;}
         dialog#settingsMenu>h2{grid-area: 1/1/2/3;}
         fieldset#settingsChar{grid-area: 2/1/3/2;}
         fieldset#settingsWord{grid-area: 2/2/3/3;}
@@ -289,42 +304,6 @@
         span#finWordGuess>span.hidden,
         span#finWordIni>span.hidden{color: #040;}
         span#finGuesses>span.fail{color: #F44;}
-        div#importViewCharList{
-            display: flex;
-            flex-wrap: wrap;
-            gap: .3rem;
-            min-height: 1rem;
-            max-height: 10rem;
-            max-width: 13rem;
-            overflow: overlay;
-            margin: .3rem 0;
-        }
-        div#importViewCharList>span{
-            background-color: #000;
-            border: 2px outset #000;
-            border-radius: .4rem;
-            font-family: consolas, monospace;
-            font-size: medium;
-            padding: 0 .3rem;
-            user-select: text;
-            white-space: pre;
-        }
-        div#importViewCharList>span.unhide{background-color: #333;}
-        div#importViewWordList{
-            display: flex;
-            flex-direction: column;
-            min-height: 1rem;
-            max-height: 10rem;
-            overflow: overlay;
-            margin: .3rem 0;
-        }
-        div#importViewWordList>div>span{
-            display: inline-block;
-            width: 9rem;
-            overflow: overlay;
-            user-select: text;
-            white-space: pre;
-        }
         dialog#importMenu>fieldset:first-of-type{background-color: #111;}
         fieldset#importDataView>div{
             display: grid;
