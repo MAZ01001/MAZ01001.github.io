@@ -253,7 +253,7 @@
          * @param {number} n - a number
          * @returns {number} the clamped number
          */
-        const clamp01=n=>n>1?1:n<0?0:n;
+        const Clamp01=n=>n>1?1:n<0?0:n;
         /**
          * ## set CSS variables `--scroll-shadow-top`, `-left`, `-bottom`, and `-right` of {@linkcode el} when it overflows
          * @param {HTMLElement} el - An HTML element
@@ -263,10 +263,10 @@
          */
         const StyleOverflowFor=(el,blendStart,colorRGB,alphaMax)=>{
             "use strict";
-            el.style.setProperty("--scroll-shadow-top",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01(el.scrollTop/blendStart)})`);
-            el.style.setProperty("--scroll-shadow-left",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01(el.scrollLeft/blendStart)})`);
-            el.style.setProperty("--scroll-shadow-bottom",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01((el.scrollHeight-(el.scrollTop+el.clientHeight))/blendStart)})`);
-            el.style.setProperty("--scroll-shadow-right",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*clamp01((el.scrollWidth-(el.scrollLeft+el.clientWidth))/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-top",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*Clamp01(el.scrollTop/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-left",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*Clamp01(el.scrollLeft/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-bottom",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*Clamp01((el.scrollHeight-(el.scrollTop+el.clientHeight))/blendStart)})`);
+            el.style.setProperty("--scroll-shadow-right",`rgb(${colorRGB[0]} ${colorRGB[1]} ${colorRGB[2]} / ${alphaMax*Clamp01((el.scrollWidth-(el.scrollLeft+el.clientWidth))/blendStart)})`);
         };
         window.addEventListener("load",()=>{
             "use strict";
