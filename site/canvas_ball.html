@@ -278,20 +278,19 @@
             })(canvas.font),
             docFontSize=Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
         document.body.appendChild(canvasHTML);
-        canvasHTML.width=innerWidth;
-        canvasHTML.height=innerHeight;
+        canvasHTML.style.width="100vw";
+        canvasHTML.style.height="100vh";
+        canvasHTML.width=Math.trunc(window.innerWidth*window.devicePixelRatio);
+        canvasHTML.height=Math.trunc(window.innerHeight*window.devicePixelRatio);
         window.addEventListener("resize",()=>{
             "use strict";
-            canvasHTML.width=innerWidth;
-            canvasHTML.height=innerHeight;
+            canvasHTML.width=Math.trunc(window.innerWidth*window.devicePixelRatio);
+            canvasHTML.height=Math.trunc(window.innerHeight*window.devicePixelRatio);
         },{passive:true});
-        let direction=[
-                rng.bool,
-                rng.bool
-            ],
+        let direction=[rng.bool,rng.bool],
             position=(ballSize=>[
-                rng.range(ballSize,window.innerWidth-ballSize),
-                rng.range(ballSize,window.innerHeight-ballSize)
+                rng.range(ballSize,canvasHTML.width-ballSize),
+                rng.range(ballSize,canvasHTML.height-ballSize)
             ])((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*ballSizePercent*0.5),
             lastFrameTime=0,
             colorHue=0x78,
@@ -311,40 +310,60 @@
         /**@type {(deltaTime:number)=>void} - renders one frame on `canvas`*/
         const draw=deltaTime=>{
             "use strict";
+            // TODO fade(alphaMultiplier) ← 0-1 float
+            //! all bellow blocks have the same result → fade out but never full transparent
+                //? ↓ bad - creating image data every frame - better with `{willReadFrequently:true}` in first `getContext("2d")` but canvas will then be on CPU only
+                //// const cnvColor=canvas.getImageData(0,0,canvasHTML.width,canvasHTML.height,{colorSpace:"srgb"});
+                //// for(let i=3;i<cnvColor.data.length;i+=4)cnvColor.data[i]*=.95;
+                //// canvas.putImageData(cnvColor,0,0);
+                //? ↓ good
+                //// const gco=canvas.globalCompositeOperation;
+                //// canvas.globalCompositeOperation="destination-in";
+                //// canvas.fillStyle="rgb(0 0 0 / 0.95)";
+                //// canvas.fillRect(0,0,canvasHTML.width,canvasHTML.height);
+                //// canvas.globalCompositeOperation=gco;
+                //? ↓ better
+                //// const gco=canvas.globalCompositeOperation;
+                //// canvas.globalCompositeOperation="copy";
+                //// canvas.globalAlpha=.95;
+                //// canvas.drawImage(canvasHTML,0,0);
+                //// canvas.globalCompositeOperation=gco;
+                //// canvas.globalAlpha=1;
+            //! can't work (with canvas alone) because of how alpha gets multiplied and float precision so it never reaches zero alpha
             if(!keepCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
             const ballRadius=((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*(ballSizePercent>0?ballSizePercent:.2))*0.5;
             //~ ball position (possibly overshoot)
-            if(ballSizePercent===1&&window.innerWidth<window.innerHeight)position[0]=ballRadius;
+            if(ballSizePercent===1&&canvasHTML.width<canvasHTML.height)position[0]=ballRadius;
             else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
-            if(ballSizePercent===1&&window.innerHeight<window.innerWidth)position[1]=ballRadius;
+            if(ballSizePercent===1&&canvasHTML.height<canvasHTML.width)position[1]=ballRadius;
             else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
             //~ ball trajectory calculation (clamp position)
-            const limitRight=window.innerWidth-ballRadius,
-                limitDown=window.innerHeight-ballRadius,
-                boundWidth=window.innerWidth-(ballRadius*2),
-                boundHeight=window.innerHeight-(ballRadius*2);
+            const limitRight=canvasHTML.width-ballRadius,
+                limitDown=canvasHTML.height-ballRadius,
+                boundWidth=canvasHTML.width-(ballRadius*2),
+                boundHeight=canvasHTML.height-(ballRadius*2);
             //~ X overshoot right/left
             if(position[0]>=limitRight){
                 const xFields=Math.floor((position[0]-ballRadius)/boundWidth);
                 position[0]=ballRadius+((position[0]-ballRadius)%boundWidth);
-                if(xFields&1===1)position[0]=window.innerWidth-position[0];
+                if(xFields&1===1)position[0]=canvasHTML.width-position[0];
                 direction[0]=false;
             }else if(position[0]<=ballRadius){
                 const xFields=Math.floor((ballRadius-position[0])/boundWidth);
                 position[0]=ballRadius+((ballRadius-position[0])%boundWidth);
-                if(xFields&1===0)position[0]=window.innerWidth-position[0];
+                if(xFields&1===0)position[0]=canvasHTML.width-position[0];
                 direction[0]=true;
             }
             //~ Y overshoot down/up
             if(position[1]>=limitDown){
                 const yFields=Math.floor((position[1]-ballRadius)/boundHeight);
                 position[1]=ballRadius+((position[1]-ballRadius)%boundHeight);
-                if(yFields&1===1)position[1]=window.innerHeight-position[1];
+                if(yFields&1===1)position[1]=canvasHTML.height-position[1];
                 direction[1]=false;
             }else if(position[1]<=ballRadius){
                 const yFields=Math.floor((ballRadius-position[1])/boundHeight);
                 position[1]=ballRadius+((ballRadius-position[1])%boundHeight);
-                if(yFields&1===0)position[1]=window.innerHeight-position[1];
+                if(yFields&1===0)position[1]=canvasHTML.height-position[1];
                 direction[1]=true;
             }
             // TODO add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
