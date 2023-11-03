@@ -100,6 +100,8 @@
             gap: .7rem;
             place-items: safe center;
             place-content: safe center;
+            overflow: auto;
+            scrollbar-gutter: stable both-edges;
         }
         dialog input{
             background-color: #111;
@@ -148,7 +150,8 @@
             min-width: 20rem;
             max-width: 60rem;
             max-height: 20rem;
-            overflow-y: overlay;
+            overflow-y: auto;
+            scrollbar-gutter: stable both-edges;
             user-select: text;
         }
         span#displayWord>span{
@@ -163,7 +166,8 @@
             min-width: 20rem;
             max-width: 30rem;
             max-height: 20rem;
-            overflow-y: overlay;
+            overflow-y: auto;
+            scrollbar-gutter: stable both-edges;
             display: flex;
             flex-wrap: wrap;
             gap: .3rem;
