@@ -16,7 +16,7 @@
     <meta name="msapplication-config" content="../img/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     <title>Screensaver</title>
-    <script>CSS?.registerProperty?.({name:"--rainbowanglecolor",syntax:"<angle>",inherits:false,initialValue:"120deg"});</script>
+    <script>CSS?.registerProperty({name:"--rainbowanglecolor",syntax:"<angle>",inherits:false,initialValue:"120deg"});</script>
     <style>
         @keyframes rainbowcolor{
             from{--rainbowanglecolor: 0deg;}
@@ -235,7 +235,7 @@
                     }
                 }else document.body.style.backgroundColor=_tmpVal_;
             }
-            return Object.freeze([
+            return[
                 (_tmpVal_=args.get("keepCanvas"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
                 (_tmpVal_=args.get("fps"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
                 (_tmpVal_=args.get("seed"))==null?undefined:new RNG(_tmpVal_),
@@ -257,7 +257,7 @@
                 (_tmpVal_=args.get("txtSmallCaps"))==null?undefined:(_tmpVal_===""||_tmpVal_==="1"||_tmpVal_==="true"),
                 (_tmpVal_=args.get("txtWeight"))==null?undefined:(/^(?:[a-zA-Z-]+|[1-9][0-9]{0,2}|1000)$/.test(_tmpVal_)?_tmpVal_:undefined),
                 (_tmpVal_=args.get("txtStretch"))==null?undefined:(/^[a-zA-Z-]+$/.test(_tmpVal_)?_tmpVal_:undefined)
-            ]);
+            ];
         })();
         //~  _____      _
         //~ /  ___|    | |
