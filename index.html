@@ -95,21 +95,22 @@
             overflow: hidden;
             transform: translate(-50%, -50%);
             height: max(100vh,1000px);
+            filter: drop-shadow(0px 0px .4rem #0A0);
             filter: drop-shadow(0px 0px .4rem oklch(75% 0.127 var(--rainbowanglecolor)));
             animation: shadowcolor 3s linear -1s infinite normal backwards running;
             user-select: none;
             pointer-events: none;
         }
         @keyframes textflicker{
-            0%   {--textshadowcolorglow: #020;}
-            1%   {--textshadowcolorglow: #0C0;}
-            2.5% {--textshadowcolorglow: #040;}
-            4.5% {--textshadowcolorglow: #090;}
-            30%  {--textshadowcolorglow: #060;}
-            50%  {--textshadowcolorglow: #0A0;}
-            70%  {--textshadowcolorglow: #080;}
-            95%  {--textshadowcolorglow: #0C0;}
-            100% {--textshadowcolorglow: #0F0;}
+            0%   {--colorflicker: #020;}
+            1%   {--colorflicker: #0C0;}
+            2.5% {--colorflicker: #040;}
+            4.5% {--colorflicker: #090;}
+            30%  {--colorflicker: #060;}
+            50%  {--colorflicker: #0A0;}
+            70%  {--colorflicker: #080;}
+            95%  {--colorflicker: #0C0;}
+            100% {--colorflicker: #0F0;}
         }
         div#projects{
             display: flex;
@@ -117,13 +118,13 @@
             place-items: safe center;
         }
         div#projects>a{
-            --textshadowcolorglow:#070;
+            --colorflicker:#070;
             color: #0C0;
             font-size: 2rem;
             font-weight: bold;
             text-decoration: none;
             text-shadow: .2rem .3rem .2rem #000;
-            filter: drop-shadow(0px 0px 10px var(--textshadowcolorglow));
+            filter: drop-shadow(0px 0px 10px var(--colorflicker));
             animation: textflicker 5s linear 0s infinite running;
         }
         div#projects>a:not(:last-child)::after{
@@ -177,13 +178,13 @@
             border-top: .1rem solid #070;
             border-radius: .1rem;
         }
-        @keyframes textglow{to{--textshadowcolorglow: #F90;}}
+        @keyframes textglow{to{--colorglow: #F90;}}
         h1,h2{
-            --textshadowcolorglow: #D60;
+            --colorglow: #D60;
             color: #F90;
             font-family: 'Times New Roman', Times, serif;
             text-shadow: .2rem .3rem .2rem #000;
-            filter: drop-shadow(0px 0px 15px var(--textshadowcolorglow));
+            filter: drop-shadow(0px 0px 15px var(--colorglow));
             animation: textglow 2s cubic-bezier(.45,.05,.55,.95) 0s infinite alternate running;
         }
         h1{
@@ -275,41 +276,41 @@
     <div id="box">
         <h1>MAZ<small>01001</small></h1>
         <div id="social">
-            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ01001"title="MAZ">YouTube</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/MAZ01001"title="MAZ01001">GitHub</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://steamcommunity.com/id/MAZ01001"title="MAZ01001">Steam</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/maz01001"title="MAZ01001">Twitch</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ_VOD"title="YouTube/MAZ_VOD">VOD</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://soundcloud.com/maz00101/likes"title="MAZ (Likes)">SoundCloud</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://maz10001.newgrounds.com/"title="MAZ10001">NewGrounds</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://coub.com/maz00101"title="MAZ">Coub</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ01001" title="MAZ">YouTube</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/MAZ01001" title="MAZ01001">GitHub</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://steamcommunity.com/id/MAZ01001" title="MAZ01001">Steam</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/maz01001" title="MAZ01001">Twitch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@MAZ_VOD" title="YouTube/MAZ_VOD">VOD</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://soundcloud.com/maz00101/likes" title="MAZ (Likes)">SoundCloud</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://maz10001.newgrounds.com/" title="MAZ10001">NewGrounds</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://coub.com/maz00101" title="MAZ">Coub</a>
             <hr>
-            <a target="_blank" rel="noopener noreferrer" href="https://maz01001.itch.io/"title="MAZ01001">Itch</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://scratch.mit.edu/users/MAZ01001/"title="MAZ01001">Scratch</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://stackoverflow.com/users/13282166/maz"title="MAZ">Stack Overflow</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.construct.net/en/users/198467/maz01001"title="MAZ01001">Construct</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/maz01001/"title="@maz01001">Instagram</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.deviantart.com/maz00001"title="MAZ00001">DeviantArt</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.reddit.com/user/MAZ00101"title="u/MAZ00101">Reddit</a>
-            <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/MAZ_01001"title="@MAZ_01001">Twitter</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://maz01001.itch.io/" title="MAZ01001">Itch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://scratch.mit.edu/users/MAZ01001/" title="MAZ01001">Scratch</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://stackoverflow.com/users/13282166/maz" title="MAZ">Stack Overflow</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.construct.net/en/users/198467/maz01001" title="MAZ01001">Construct</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/maz01001/" title="@maz01001">Instagram</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.deviantart.com/maz00001" title="MAZ00001">DeviantArt</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.reddit.com/user/MAZ00101" title="u/MAZ00101">Reddit</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/MAZ_01001" title="@MAZ_01001">Twitter</a>
         </div>
         <h2>CodingProjects</h2>
         <div id="projects">
-            <a target="_self" rel="noopener noreferrer" href="./site/hangman"title="A simple word guessing game">Hangman</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/snake"title="Snake game with ASCII graphics">ASCII Snake</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/enigma"title="The Enigma cipher machine">Enigma</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/biginttype_calc"title="Calculator for arbitrary-length-integers">Arbitrary-integer calculator</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/code_error_correction"title="ECC encoding (self correcting messages)">Error correction codes</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/satisfactory_u3_flowchart"title="Unofficial flowchart for Satisfactory U3">Satisfactory U3 flowchart</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/dice"title="A simple random number generator">Dice</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/canvas_ball"title="Simple screensaver with a bouncing ball">Ball screensaver</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/vector_field"title="A colorful vector field [P5.js]">Vector field</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/math_function_drawer"title="Polynomial visualizer [P5.js]">Math Function Drawer</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/3d_card_example"title="CSS 3D-Card example">3D-Card example</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/context_menu_example"title="HTML/JS Context menu example">Context menu example</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/touch_example"title="JS Touch example">Touch example</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/pascals_triangle"title="Prints out Pascal's Triangle">Pascals Triangle</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/pi_day_2021"title="Approximating PI with 100'000 random numbers and GCD for PI day 2021 [P5.js]">PI-Day 2021</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/hangman" title="A simple word guessing game">Hangman</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/snake" title="Snake game with ASCII graphics">ASCII Snake</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/enigma" title="The Enigma cipher machine">Enigma</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/biginttype_calc" title="Calculator for arbitrary-length-integers">Arbitrary-integer calculator</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/code_error_correction" title="ECC encoding (self correcting messages)">Error correction codes</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/satisfactory_u3_flowchart" title="Unofficial flowchart for Satisfactory U3">Satisfactory U3 flowchart</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/dice" title="A simple random number generator">Dice</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/canvas_ball" title="Simple screensaver with a bouncing ball">Ball screensaver</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/vector_field" title="A colorful vector field [P5.js]">Vector field</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/math_function_drawer" title="Polynomial visualizer [P5.js]">Math Function Drawer</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/3d_card_example" title="CSS 3D-Card example">3D-Card example</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/context_menu_example" title="HTML/JS Context menu example">Context menu example</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/touch_example" title="JS Touch example">Touch example</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/pascals_triangle" title="Prints out Pascal's Triangle">Pascals Triangle</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/pi_day_2021" title="Approximating PI with 100'000 random numbers and GCD for PI day 2021 [P5.js]">PI-Day 2021</a>
         </div>
     </div>
     <script>
