@@ -32,9 +32,44 @@
             overflow: hidden;
             animation: rainbowcolor 6s linear -2s infinite normal none paused;
         }
+        canvas#canvas{
+            width: 100vw;
+            height: 100vh;
+        }
+        div#resizer{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            translate: -50% -50%;
+            display: flex;
+            flex-direction: column;
+            place-items: center;
+            place-content: center;
+            width: 80vw;
+            height: 75vh;
+            overflow: hidden;
+            background-color: #000A;
+            color: #0F0;
+            text-shadow: 0 0 .5rem #0A0;
+            font: 2rem "consolas", monospace;
+            border: 1px outset #000;
+            border-radius: 1rem;
+            user-select: none;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-out, visibility 0s 1s;
+        }
+        div#resizer.show{
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 100ms ease-in;
+        }
     </style>
 </head>
 <body>
+    <canvas id="canvas">Your browser does not support the canvas element</canvas>
+    <div id="resizer"><p>Canvas <span id="resizeWidth">-</span> * <span id="resizeHeight">-</span> px</p></div>
     <script>
         "use strict";
         //~ ______ _   _ _____
@@ -193,6 +228,9 @@
         //~  \___/\_| \_\_____/ \_| |_/_|  \__, |\__,_|_| |_| |_|\___|_| |_|\__|___/
         //~                                 __/ |
         //~                                |___/
+        // TODO remove `imgOverlay` and `colorSpeed`
+        // TODO create `color` for ball color which can be `transparent` and `hue(60)` (deg per sec) similar to `bgColor` with `rainbow(6s)`
+        // TODO create `delay` to add delay in milliseconds (float) after each draw call ~ can be used to set max FPS
         const[//~ defaults
             keepCanvas=false,
             showFPS=false,
@@ -267,7 +305,10 @@
         //~ \____/ \___|\__|\__,_| .__/
         //~                      | |
         //~                      |_|
-        const canvasHTML=document.createElement("canvas"),
+        const canvasHTML=document.getElementById("canvas"),
+            resizer=document.getElementById("resizer"),
+            resizeWidth=document.getElementById("resizeWidth"),
+            resizeHeight=document.getElementById("resizeHeight"),
             img=document.createElement("img"),
             canvas=canvasHTML.getContext("2d",{colorSpace:"srgb"}),
             /**@type {[string, string]} [ font size (with unit), font family/s ]*/
@@ -277,15 +318,21 @@
                 return[size,family];
             })(canvas.font),
             docFontSize=Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-        document.body.appendChild(canvasHTML);
-        canvasHTML.style.width="100vw";
-        canvasHTML.style.height="100vh";
+        let resizing=false,
+            resizeTimeout=NaN;
         canvasHTML.width=Math.trunc(window.innerWidth*window.devicePixelRatio);
         canvasHTML.height=Math.trunc(window.innerHeight*window.devicePixelRatio);
         window.addEventListener("resize",()=>{
             "use strict";
-            canvasHTML.width=Math.trunc(window.innerWidth*window.devicePixelRatio);
-            canvasHTML.height=Math.trunc(window.innerHeight*window.devicePixelRatio);
+            clearTimeout(resizeTimeout);
+            resizer.classList.toggle("show",resizing=true);
+            resizeWidth.textContent=Math.trunc(window.innerWidth*window.devicePixelRatio).toString();
+            resizeHeight.textContent=Math.trunc(window.innerHeight*window.devicePixelRatio).toString();
+            resizeTimeout=setTimeout(()=>{
+                canvasHTML.width=Math.trunc(window.innerWidth*window.devicePixelRatio);
+                canvasHTML.height=Math.trunc(window.innerHeight*window.devicePixelRatio);
+                resizer.classList.toggle("show",resizing=false);
+            },0x1F4);
         },{passive:true});
         let direction=[rng.bool,rng.bool],
             position=(ballSize=>[
@@ -295,9 +342,31 @@
             lastFrameTime=0,
             colorHue=0x78,
             drawImg=false,
-            fps=0x3C;
-        if(canvas.imageSmoothingEnabled=!ballImgPixelArt)canvas.imageSmoothingQuality="high";
+            /** last few frame times (fixed to size 8) */
+            fps=new class{
+                /** @param {number} size - size of the stored list */
+                constructor(size){
+                    this._arr_=new Float64Array(size);
+                    this._avg_=(this._len_=(this._pos_=0));
+                }
+                /**
+                * ## Add a new frame time to the list (converted to FPS and pre-calculate rounded sum of all stored FPS)
+                * @param {number} ft - new frame time (time in milliseconds from last to current frame) to add to the list
+                * @returns {number} {@linkcode ft} (unchanged) for chaining
+                */
+                add(ft){
+                    this._arr_[this._pos_=(this._pos_+1)%this._arr_.length]=0x3E8/ft;
+                    if(this._len_<this._arr_.length)this._len_++;
+                    this._avg_=0;
+                    for(let i=0;i<this._len_;i++)this._avg_+=this._arr_[i];
+                    this._avg_=Math.round(this._avg_/this._arr_.length);
+                    return ft;
+                }
+                valueOf(){return this._avg_;}
+                toString(){return this._avg_.toString();}
+            }(8);
         if(ballImg!=null){
+            img.loading="eager";
             img.addEventListener("load",()=>{drawImg=true},{passive:true,once:true});
             img.src=ballImg;
         }
@@ -307,36 +376,18 @@
         //~ | | | | '__/ _` \ \ /\ / /
         //~ | |/ /| | | (_| |\ V  V /
         //~ |___/ |_|  \__,_| \_/\_/
-        /**@type {(deltaTime:number)=>void} - renders one frame on `canvas`*/
-        const draw=deltaTime=>{
+        /**
+         * ## Renders one frame on {@linkcode canvas}
+         * @param {number} deltaTimeSec - the time in seconds from last to current frame
+         */
+        const draw=deltaTimeSec=>{
             "use strict";
-            // TODO fade(alphaMultiplier) ← 0-1 float
-            //! all bellow blocks have the same result → fade out but never full transparent
-                //? ↓ bad - creating image data every frame - better with `{willReadFrequently:true}` in first `getContext("2d")` but canvas will then be on CPU only
-                //// const cnvColor=canvas.getImageData(0,0,canvasHTML.width,canvasHTML.height,{colorSpace:"srgb"});
-                //// for(let i=3;i<cnvColor.data.length;i+=4)cnvColor.data[i]*=.95;
-                //// canvas.putImageData(cnvColor,0,0);
-                //? ↓ good
-                //// const gco=canvas.globalCompositeOperation;
-                //// canvas.globalCompositeOperation="destination-in";
-                //// canvas.fillStyle="rgb(0 0 0 / 0.95)";
-                //// canvas.fillRect(0,0,canvasHTML.width,canvasHTML.height);
-                //// canvas.globalCompositeOperation=gco;
-                //? ↓ better
-                //// const gco=canvas.globalCompositeOperation;
-                //// canvas.globalCompositeOperation="copy";
-                //// canvas.globalAlpha=.95;
-                //// canvas.drawImage(canvasHTML,0,0);
-                //// canvas.globalCompositeOperation=gco;
-                //// canvas.globalAlpha=1;
-            //! can't work (with canvas alone) because of how alpha gets multiplied and float precision so it never reaches zero alpha
-            if(!keepCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
             const ballRadius=((canvasHTML.width>canvasHTML.height?canvasHTML.height:canvasHTML.width)*(ballSizePercent>0?ballSizePercent:.2))*0.5;
             //~ ball position (possibly overshoot)
             if(ballSizePercent===1&&canvasHTML.width<canvasHTML.height)position[0]=ballRadius;
-            else position[0]=position[0]+ballSpeed*deltaTime*(direction[0]?1:-1);
+            else position[0]=position[0]+ballSpeed*deltaTimeSec*(direction[0]?1:-1);
             if(ballSizePercent===1&&canvasHTML.height<canvasHTML.width)position[1]=ballRadius;
-            else position[1]=position[1]+ballSpeed*deltaTime*(direction[1]?1:-1);
+            else position[1]=position[1]+ballSpeed*deltaTimeSec*(direction[1]?1:-1);
             //~ ball trajectory calculation (clamp position)
             const limitRight=canvasHTML.width-ballRadius,
                 limitDown=canvasHTML.height-ballRadius,
@@ -366,6 +417,29 @@
                 if(yFields&1===0)position[1]=canvasHTML.height-position[1];
                 direction[1]=true;
             }
+            // TODO fade(alphaMultiplier) ← 0-1 float
+            //! all bellow blocks have the same result → fade out but never full transparent
+                //? ↓ bad - creating image data every frame - better with `{willReadFrequently:true}` in first `getContext("2d")` but canvas will then be on CPU only
+                //// const cnvColor=canvas.getImageData(0,0,canvasHTML.width,canvasHTML.height,{colorSpace:"srgb"});
+                //// for(let i=3;i<cnvColor.data.length;i+=4)cnvColor.data[i]*=.95;
+                //// canvas.putImageData(cnvColor,0,0);
+                //? ↓ good
+                //// const gco=canvas.globalCompositeOperation;
+                //// canvas.globalCompositeOperation="destination-in";
+                //// canvas.fillStyle="rgb(0 0 0 / 0.95)";
+                //// canvas.fillRect(0,0,canvasHTML.width,canvasHTML.height);
+                //// canvas.globalCompositeOperation=gco;
+                //? ↓ better
+                //// const gco=canvas.globalCompositeOperation;
+                //// canvas.globalCompositeOperation="copy";
+                //// canvas.globalAlpha=.95;
+                //// canvas.drawImage(canvasHTML,0,0);
+                //// canvas.globalCompositeOperation=gco;
+                //// canvas.globalAlpha=1;
+            //! can't work (with canvas alone) because of how alpha gets multiplied and float precision so it never reaches zero alpha
+            // TODO => offscreen canvas the size of the ball/img with alpha and draw that on the main canvas at current position (aligned center on position)
+            if(!keepCanvas)canvas.clearRect(0,0,canvasHTML.width,canvasHTML.height);
+            if(canvas.imageSmoothingEnabled=!ballImgPixelArt)canvas.imageSmoothingQuality="high";
             // TODO add support for GIFs - see https://github.com/MAZ01001/GIF_decoder
             //~ draw ball &/ img
             if(ballSizePercent>0){
@@ -383,10 +457,9 @@
                         canvas.lineWidth=3;
                         canvas.stroke();
                     }
-                    colorHue=(colorHue+colorSpeed*deltaTime)%0x168;
+                    colorHue=(colorHue+colorSpeed*deltaTimeSec)%0x168;
                     canvas.fillStyle=colorRGB?`hsl(${colorHue} 100% 50%)`:`oklch(75% 0.127 ${colorHue})`;
                     canvas.fill();
-                    canvas.closePath();
                     if(drawImg){
                         canvas.beginPath();
                         canvas.arc(position[0],position[1],ballRadius,0,Math.PI*2);
@@ -404,31 +477,37 @@
                 canvas.beginPath();
                 const ballTextFontSize=ballRadius*2*ballTextHeight;
                 canvas.font=`${ballTextFontStyle} ${ballTextFontSmallCaps?"small-caps":"normal"} ${ballTextFontWeight} ${ballTextFontStretch} ${ballTextFontSize+"px"} ${ballTextFontFamily}`;
-                const textX=position[0]-(canvas.measureText(ballText).width*.5),
-                    textY=position[1]+(ballTextFontSize/3);
+                canvas.textAlign="center";
+                canvas.textBaseline="middle";
                 if(ballTextStrokeWidth!==0){
                     canvas.strokeStyle=ballTextStroke;
                     canvas.lineWidth=ballTextStrokeWidth*ballTextFontSize/0xF;
-                    canvas.strokeText(ballText,textX,textY);
+                    canvas.strokeText(ballText,position[0],position[1]);
                 }
                 canvas.fillStyle=ballTextFill;
-                canvas.fillText(ballText,textX,textY);
-                canvas.closePath();
+                canvas.fillText(ballText,position[0],position[1]);
             }
             //~ draw fps
             if(showFPS){
-                canvas.beginPath();
+                const txt=`fps ${fps.toString().padStart(3,' ')}`;
                 canvas.font="20px consolas,monospace";
-                canvas.lineWidth=2;
+                canvas.textAlign="left";
+                canvas.textBaseline="top";
                 canvas.strokeStyle="#000";
-                canvas.fillStyle="#0f0";
-                canvas.strokeText(`fps ${fps}`,15,30);
-                canvas.fillText(`fps ${fps}`,15,30);
-                canvas.closePath();
+                if(keepCanvas){
+                    canvas.beginPath();
+                    canvas.lineCap="round";
+                    canvas.lineWidth=24;
+                    canvas.moveTo(23,25);
+                    canvas.lineTo(canvas.measureText(txt).width+7,25);
+                    canvas.stroke();
+                }else{
+                    canvas.lineWidth=2;
+                    canvas.strokeText(txt,15,15);
+                }
+                canvas.fillStyle="#0F0";
+                canvas.fillText(txt,15,15);
             }
-            // TODO HMTL progress bar to show (if possible) when corner hits occur (oscillate) ~ math: https://youtu.be/vflsgevXVTY
-            canvas.lineWidth=1;
-            canvas.strokeStyle="#000";
         }
         //~  _
         //~ | |
@@ -438,16 +517,15 @@
         //~ \_____/\___/ \___/| .__/
         //~                   | |
         //~                   |_|
-        let _previousFrameTimestamp_=0,
-            _previousFPS_=[];
+        let _previousFrameTimestamp_=0;
         const animationLoop=frameTimestamp=>{
             "use strict";
-            const frameTime=frameTimestamp-_previousFrameTimestamp_;
+            if(!resizing&&frameTimestamp!==_previousFrameTimestamp_){
+                const frameTime=frameTimestamp-_previousFrameTimestamp_;
+                //~ wait 100ms before starting to draw ~ let fps stabilize
+                if(frameTimestamp>0x64)draw(fps.add(frameTime)/0x3E8);
+            }
             _previousFrameTimestamp_=frameTimestamp;
-            fps=_previousFPS_.length===0?0:Math.round(_previousFPS_.reduce((o,v)=>o+v)/_previousFPS_.length);
-            if(frameTimestamp>0x64)draw(frameTime/0x3E8);
-            for(let i=Math.min(_previousFPS_.length,9);i>0;i--)_previousFPS_[i]=_previousFPS_[i-1];
-            _previousFPS_[0]=Math.round(0x3E8/frameTime);
             window.requestAnimationFrame(animationLoop);
         }
         window.requestAnimationFrame(animationLoop);
