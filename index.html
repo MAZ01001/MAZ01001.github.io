@@ -206,6 +206,13 @@
             color: #0F0;
         }
         ::selection:window-inactive{color: #0A0;}
+        @supports not selector(::-webkit-scrollbar){
+            *{
+                scrollbar-width: thin;
+                scrollbar-color: #0A07 transparent;
+            }
+            *:hover{scrollbar-color: #0A0 transparent;}
+        }
         ::-webkit-scrollbar{
             width: 1.2rem;
             height: 1.2rem;
@@ -214,38 +221,37 @@
         ::-webkit-scrollbar-thumb:horizontal:window-inactive{border-bottom-style: dashed;}
         ::-webkit-scrollbar-thumb:vertical{
             background: transparent;
-            border-right: .2rem solid #000;
+            border-right: .3rem solid #0A0;
             border-radius: 0;
         }
-        ::-webkit-scrollbar-thumb:hover:vertical,
         :hover::-webkit-scrollbar-thumb:vertical{
             background-color: #000;
             box-shadow: inset .4rem 0 .4rem 0 #0A0;
             border: none;
-            border-top-left-radius: 1.4rem;
-            border-bottom-left-radius: 1.4rem;
+            border-top-left-radius: 1rem;
+            border-bottom-left-radius: 1rem;
         }
         ::-webkit-scrollbar-thumb:horizontal{
             background: transparent;
-            border-bottom: .2rem solid #000;
+            border-bottom: .3rem solid #0A0;
             border-radius: 0;
         }
-        ::-webkit-scrollbar-thumb:hover:horizontal,
         :hover::-webkit-scrollbar-thumb:horizontal{
             background-color: #000;
             box-shadow: inset 0 .4rem .4rem 0 #0A0;
             border: none;
-            border-top-left-radius: 1.4rem;
-            border-top-right-radius: 1.4rem;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
         }
-        ::-webkit-scrollbar-thumb:hover:vertical,
-        :hover::-webkit-scrollbar-thumb:hover:vertical{box-shadow: inset .4rem 0 .4rem 0 #0F0;}
-        ::-webkit-scrollbar-thumb:hover:horizontal,
-        :hover::-webkit-scrollbar-thumb:hover:horizontal{box-shadow: inset 0 .4rem .4rem 0 #0F0;}
+        ::-webkit-scrollbar-thumb:hover:vertical{box-shadow: inset .4rem 0 .4rem 0 #0F0;}
+        ::-webkit-scrollbar-thumb:hover:horizontal{box-shadow: inset 0 .4rem .4rem 0 #0F0;}
         ::-webkit-scrollbar-track,
         ::-webkit-scrollbar-track-piece,
         ::-webkit-scrollbar-button,
-        ::-webkit-scrollbar-corner{background: transparent;}
+        ::-webkit-scrollbar-corner{
+            display: none;
+            background: transparent;
+        }
     </style>
     <script>
         /**
