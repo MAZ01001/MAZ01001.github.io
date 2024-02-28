@@ -2626,31 +2626,26 @@
                 }
             }
             /**
-             * __encode `this` number to a URL-save string__
+             * __encode `this` number to a signed binary string__
              * @returns {string} - encoded string
              * @throws {Error} _might throw an error caused by a too large string_
              */
-            toURL(){
-                let output=this.#sign?"+":"-";
-                for(let i=this.length-1;i>=0;i--)output+=String.fromCharCode(this.#digits[i]);
-                return encodeURIComponent(btoa(output));
-            }
+            toStringRAW(){return this.#digits.reduceRight((o,v)=>o+String.fromCharCode(v),this.#sign?"+":"-");}
             /**
              * __decodes a number from given string__
-             * @param {string} uriComponent - encoded string
+             * @param {string} signedBinaryString - encoded string
              * @returns {BigIntType} the new number
-             * @throws {EvalError} if `uriComponent` is not a valid number
+             * @throws {EvalError} if `signedBinaryString` is not a valid number
              * @throws {RangeError} - if new number would be longer than `BigIntType.MAX_SIZE`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            static fromURL(uriComponent="%2B%00"){
-                const input=atob(decodeURIComponent(uriComponent));
-                if(!/^[+-](?:\x00|[\x01-\xff][\x00-\xff]*)$/.test(input))throw new EvalError("[fromURL] uriComponent is not a valid number");
-                if(input.length-1>BigIntType.MAX_SIZE)throw new RangeError("[fromURL] would result in a number longer than MAX_SIZE");
-                const newDigits=new Uint8Array(input.length-1);
-                for(let i=0;i<newDigits.length;i++)newDigits[i]=input.charCodeAt(input.length-(i+1));
-                if(input[0]==="+")return new BigIntType(newDigits,0x100);
-                return new BigIntType(newDigits,0x100).neg();
+            static fromStringRAW(signedBinaryString){
+                if(!/^[+-](?:\x00|[\x01-\xff][\x00-\xff]*)$/.test(signedBinaryString))throw new EvalError("[fromURL] signedBinaryString is not a valid number");
+                if(signedBinaryString.length-1>BigIntType.MAX_SIZE)throw new RangeError("[fromURL] would result in a number longer than MAX_SIZE");
+                const newDigits=new Uint8Array(signedBinaryString.length-1);
+                for(let i=0;i<newDigits.length;i++)newDigits[i]=signedBinaryString.charCodeAt(signedBinaryString.length-(i+1));
+                if(signedBinaryString[0]==="-")return new BigIntType(newDigits,0x100).neg();
+                return new BigIntType(newDigits,0x100);
             }
         }//~ or just u know use the actual BigInt xD - it might not have all the base conversions and a few of the other methods here but it's probably faster since it's build in ^^
     </script>
@@ -2834,36 +2829,39 @@
         }
         function _stats_AtB_(){AtB.innerHTML=`A (${_NUMBERS.a.isEven()?"even":"odd"}) ${_NUMBERS.a.isGreaterThan(_NUMBERS.b)?'>':(_NUMBERS.a.isSmallerThan(_NUMBERS.b)?'<':(_NUMBERS.a.isEqualTo(_NUMBERS.b)?"==":"!="))} B (${_NUMBERS.b.isEven()?"even":"odd"})`;}
         /**__numbers as BigIntType objects stored in this convenient object__*/
-        let _NUMBERS=Object.freeze({
-                mem:Object.freeze([
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero,
-                    BigIntType.Zero
-                ]),
-                a:BigIntType.One,
-                b:BigIntType.Zero,
-                rand:Object.freeze({
-                    min:BigIntType.Zero,
-                    max:new BigIntType("1000000","10"),
-                }),
-                map:Object.freeze({
-                    min1:BigIntType.Zero,
-                    max1:new BigIntType("1000000","10"),
-                    min2:new BigIntType("1000000","10"),
-                    max2:BigIntType.Zero,
-                }),
+        const _NUMBERS=Object.freeze({
+            mem:Object.freeze([
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero,
+                BigIntType.Zero
+            ]),
+            a:BigIntType.One,
+            b:BigIntType.Zero,
+            rand:Object.freeze({
+                min:BigIntType.Zero,
+                max:new BigIntType("1000000","10"),
             }),
+            map:Object.freeze({
+                min1:BigIntType.Zero,
+                max1:new BigIntType("1000000","10"),
+                min2:new BigIntType("1000000","10"),
+                max2:BigIntType.Zero,
+            }),
+        });
+        let
             /**@type {number} current memory size of all numbers*/
-            _CURRENT_MEM_SIZE=500,
+            _CURRENT_MEM_SIZE=BigIntType.MAX_SIZE,
             /**@type {string} current radix of all numbers*/
-            _CURRENT_BASE="10";
+            _CURRENT_BASE="10",
+            /**@type {boolean} when `true` does not update the URL when {@linkcode _update_to_url} is called*/
+            _ABORT_URL_UPDATE=false;
         /**
          * __prints the `message` to the html-error-element__ \
          * auto resize to fit-content
@@ -2984,85 +2982,56 @@
             _update_to_url();
         }
         /**
-         * __parses a number from uri component__
-         * @param {string} uri - uri component - an empty string results in +0
-         * @param {number} [minMemory] - min memory for `BigIntType.MAX_SIZE` - _default `500`_
-         * @returns {Error|BigIntType} - an error or the number
+         * __load A and B form URL if possible__
+         * @param {boolean} [limit] - [optional] if given and `true` uses the current memory size while importing otherwise temporarily sets memory to its maximum and decreases it afterwards as much as possible
          */
-        function _parse_uri_number(uri,minMemory){
+        function _load_from_url(limit){
             "use strict";
-            if(uri==="")return BigIntType.Zero;
-            if(minMemory==null)minMemory=0x1F4;
-            BigIntType.MAX_SIZE=0x4000000;
-            let number;
-            try{number=BigIntType.fromURL(uri);}
-            catch(e){return e;}
-            switch(true){
-                case 0x1F4>=minMemory&&number.length<=0x1F4:BigIntType.MAX_SIZE=0x1F4;break;
-                case 0x3E8>=minMemory&&number.length<=0x3E8:BigIntType.MAX_SIZE=0x3E8;break;
-                case 0x1388>=minMemory&&number.length<=0x1388:BigIntType.MAX_SIZE=0x1388;break;
-                case 0x2710>=minMemory&&number.length<=0x2710:BigIntType.MAX_SIZE=0x2710;break;
-                case 0xC350>=minMemory&&number.length<=0xC350:BigIntType.MAX_SIZE=0xC350;break;
-                case 0x186A0>=minMemory&&number.length<=0x186A0:BigIntType.MAX_SIZE=0x186A0;break;
-                case 0x7A120>=minMemory&&number.length<=0x7A120:BigIntType.MAX_SIZE=0x7A120;break;
-                case 0xF4240>=minMemory&&number.length<=0xF4240:BigIntType.MAX_SIZE=0xF4240;break;
-                case 0x100000>=minMemory&&number.length<=0x100000:BigIntType.MAX_SIZE=0x100000;break;
-                case 0x989680>=minMemory&&number.length<=0x989680:BigIntType.MAX_SIZE=0x989680;break;
-                case 0x1000000>=minMemory&&number.length<=0x1000000:BigIntType.MAX_SIZE=0x1000000;break;
-                case 0x1312D00>=minMemory&&number.length<=0x1312D00:BigIntType.MAX_SIZE=0x1312D00;break;
-                case 0x2000000>=minMemory&&number.length<=0x2000000:BigIntType.MAX_SIZE=0x2000000;break;
-                case 0x2FAF080>=minMemory&&number.length<=0x2FAF080:BigIntType.MAX_SIZE=0x2FAF080;break;
-                case 0x4000000>=minMemory&&number.length<=0x4000000:BigIntType.MAX_SIZE=0x4000000;break;
-            }
-            return number;
-        }
-        /**__load A and B form URL if possible__*/
-        function _load_from_url(){
-            "use strict";
-            const urlArguments=window.location.search.substring(1).split('&');
-            let fetchA=null,fetchB=null,
-                minMemory=0x1F4;
-            for(const arg of urlArguments){
-                if(arg[0]==='A'&&arg[1]==='='){
-                    if(fetchA!=null)continue;
-                    const A=_parse_uri_number(arg.substring(2));
-                    if(A instanceof Error){
-                        if(A instanceof EvalError)_error_html("Error reading \"A\" from URL: could not decode to a BigIntType number");
-                        else if(A instanceof RangeError)_error_html("Error reading number A from URL: number is to large (> 64 MiB)");
-                        else if(A instanceof Error)_error_html(`Error reading number A from URL: {${A.name}} ${A.message}`);
-                        console.error(A);
-                    }else{
-                        fetchA=A;
-                        minMemory=BigIntType.MAX_SIZE;
-                    };
-                }else if(arg[0]==='B'&&arg[1]==='='){
-                    if(fetchB!=null)continue;
-                    const B=_parse_uri_number(arg.substring(2));
-                    if(B instanceof Error){
-                        if(B instanceof EvalError)_error_html("Error reading \"B\" from URL: could not decode to a BigIntType number");
-                        else if(B instanceof RangeError)_error_html("Error reading number B from URL: number is to large (> 64 MiB)");
-                        else if(B instanceof Error)_error_html(`Error reading number B from URL: {${A.name}} ${A.message}`);
-                        console.error(B);
-                    }else{
-                        fetchB=B;
-                        minMemory=BigIntType.MAX_SIZE;
-                    };
+            const urlSearch=new URLSearchParams(window.location.search),
+                mem=BigIntType.MAX_SIZE;
+            //~ temporarily set max-size to its maximum (64 MiB)
+            if(!(limit??false))BigIntType.MAX_SIZE=0x4000000;
+            let A=null,B=null;
+            if(urlSearch.has('A')){
+                try{A=BigIntType.fromStringRAW(atob(urlSearch.get('A')));}
+                catch(error){
+                    if(error instanceof EvalError)_error_html("Error reading \"A\" from URL: could not decode to a BigIntType number");
+                    else if(error instanceof RangeError)_error_html(`Error reading number A from URL: number is to large (over ${BigIntType.MAX_SIZE} Bytes)`);
+                    else if(error instanceof Error)_error_html(`Error reading number A from URL: {${error.name}} ${error.message}`);
+                    console.error(error);
+                    A=null;
                 }
             }
-            _CURRENT_MEM_SIZE=BigIntType.MAX_SIZE;
-            memory_size.value=_CURRENT_MEM_SIZE;
-            _NUMBERS.a.setEqualTo(fetchA??BigIntType.One);
-            _NUMBERS.b.setEqualTo(fetchB??BigIntType.Zero);
-            number_a.value=_NUMBERS.a.toString(_CURRENT_BASE);
-            number_b.value=_NUMBERS.b.toString(_CURRENT_BASE);
+            if(urlSearch.has('B')){
+                try{B=BigIntType.fromStringRAW(atob(urlSearch.get('B')));}
+                catch(error){
+                    if(error instanceof EvalError)_error_html("Error reading \"B\" from URL: could not decode to a BigIntType number");
+                    else if(error instanceof RangeError)_error_html(`Error reading number B from URL: number is to large (over ${BigIntType.MAX_SIZE} Bytes)`);
+                    else if(error instanceof Error)_error_html(`Error reading number B from URL: {${error.name}} ${error.message}`);
+                    console.error(error);
+                    B=null;
+                }
+            }
+            const reqMem=Math.max(A?.length??1,B?.length);
+            if(reqMem>mem)memory_size.value=(BigIntType.MAX_SIZE=reqMem);
+            else BigIntType.MAX_SIZE=mem;
+            if(A!=null)number_a.value=_NUMBERS.a.setEqualTo(A).toString(_CURRENT_BASE);
+            if(B!=null)number_b.value=_NUMBERS.b.setEqualTo(B).toString(_CURRENT_BASE);
         }
-        /**__updates or add A and B to the URL__*/
-        function _update_to_url(){
+        /**
+         * __updates or add A and B to the URL (aborts when {@linkcode _ABORT_URL_UPDATE} is `true`)__
+         * sets history state `{base: {@linkcode _CURRENT_BASE}, mem: {@linkcode _CURRENT_MEM_SIZE}}`
+         * @param {boolean} [replace] - [optional] if given and `true` replaces current URL-history otherwise adds a new entry
+         */
+        function _update_to_url(replace){
             "use strict";
-            const uri=window.location.search.substring(1).split('&').filter(v=>!/^[AB]=/.test(v));
-            uri.push(`A=${_NUMBERS.a.toURL()}`);
-            uri.push(`B=${_NUMBERS.b.toURL()}`);
-            window.history.replaceState(null,'',`?${uri.join('&')}`);
+            if(_ABORT_URL_UPDATE)return;
+            const url=new URL(window.location),
+                state={base:_CURRENT_BASE,mem:_CURRENT_MEM_SIZE};
+            url.searchParams.set('A',btoa(_NUMBERS.a.toStringRAW()));
+            url.searchParams.set('B',btoa(_NUMBERS.b.toStringRAW()));
+            if(replace??false)window.history.replaceState(state,'',url);
+            else window.history.pushState(state,'',url);
         }
         /**
          * __adds the given number to memory__
@@ -3113,21 +3082,43 @@
                     <label for="memory_size">max memory:</label>
                     <select id="memory_size">
                         <option disabled>Select memory size</option>
-                        <option value="500" selected>500 Byte</option>
-                        <option value="1000">1 Kilo Byte</option>
-                        <option value="5000">5 Kilo Byte</option>
-                        <option value="10000">10 Kilo Byte</option>
-                        <option value="50000">50 Kilo Byte</option>
-                        <option value="100000">100 Kilo Byte</option>
-                        <option value="500000">500 Kilo Byte</option>
-                        <option value="1000000">1 Mega Byte</option>
-                        <option value="1048576">1 Mebi Byte</option>
-                        <option value="10000000">10 Mega Byte</option>
-                        <option value="16777216">16 Mebi Byte</option>
-                        <option value="20000000">20 Mega Byte</option>
-                        <option value="33554432">32 Mebi Byte</option>
-                        <option value="50000000">50 Mega Byte</option>
-                        <option value="67108864">64 Mebi Byte</option>
+                        <option title="1 Byte" value="1">1 Byte</option>
+                        <option title="2 Bytes" value="2">2 Bytes</option>
+                        <option title="4 Bytes" value="4">4 Bytes</option>
+                        <option title="8 Bytes" value="8">8 Bytes</option>
+                        <option title="16 Bytes" value="16">16 Bytes</option>
+                        <option title="32 Bytes" value="32">32 Bytes</option>
+                        <option title="64 Bytes" value="64">64 Bytes</option>
+                        <option title="100 Bytes" value="100">100 Bytes</option>
+                        <option title="500 Bytes" value="500" selected>500 Bytes</option>
+                        <option title="1'000 Bytes" value="1000">1 Kilobyte</option>
+                        <option title="2↑10 = 1'024 Bytes" value="1024">1 Kibibyte</option>
+                        <option title="2'000 Bytes" value="2000">2 Kilobyte</option>
+                        <option title="2↑11 = 2'048 Bytes" value="2048">2 Kibibyte</option>
+                        <option title="4'000 Bytes" value="4000">4 Kilobyte</option>
+                        <option title="2↑12 = 4'096 Bytes" value="4096">4 Kibibyte</option>
+                        <option title="6'000 Bytes" value="6000">6 Kilobyte</option>
+                        <option title="8'000 Bytes" value="8000">8 Kilobyte</option>
+                        <option title="2↑13 = 8'192 Bytes" value="8192">8 Kibibyte</option>
+                        <option title="10'000 Bytes" value="10000">10 Kilobyte</option>
+                        <option title="2↑14 = 16'384 Bytes" value="16384">16 Kibibyte</option>
+                        <option title="32'000 Bytes" value="32000">32 Kilobyte</option>
+                        <option title="2↑15 = 32'768 Bytes" value="32768">32 Kibibyte</option>
+                        <option title="50'000 Bytes" value="50000">50 Kilobyte</option>
+                        <option title="2↑16 =  Bytes" value="">64 Kibibyte</option>
+                        <option title="100'000 Bytes" value="100000">100 Kilobyte</option>
+                        <option title="2↑17 =  Bytes" value="">128 Kibibyte</option>
+                        <option title="2↑18 =  Bytes" value="">256 Kibibyte</option>
+                        <option title="500'000 Bytes" value="500000">500 Kilobyte</option>
+                        <option title="2↑19 =  Bytes" value="">512 Kibibyte</option>
+                        <option title="1'000'000 Bytes" value="1000000">1 Megabyte</option>
+                        <option title="2↑20 = 1'048'576 Bytes" value="1048576">1 Mebibyte</option>
+                        <option title="10'000'000 Bytes" value="10000000">10 Megabyte</option>
+                        <option title="2↑24 = 16'777'216 Bytes" value="16777216">16 Mebibyte</option>
+                        <option title="20'000'000 Bytes" value="20000000">20 Megabyte</option>
+                        <option title="2↑25 = 33'554'432 Bytes" value="33554432">32 Mebibyte</option>
+                        <option title="50'000'000 Bytes" value="50000000">50 Megabyte</option>
+                        <option title="2↑26 = 67'108'864 Bytes" value="67108864">64 Mebibyte</option>
                     </select>
                 </div>
             </div>
@@ -3224,7 +3215,7 @@
                 </div>
                 <button id="bitAls" title="shifts the bits of A by set amount to the left">A &lt;&lt; = x</button>
                 <input type="number" id="bitAls_x" min="0" max="9007199254740991" class="number" title="amount for [A &lt;&lt; = x]" value="1">
-                <button id="bitArs" title="shifts the bits of A by set amount to the right">A &gt;&gt; = B</button>
+                <button id="bitArs" title="shifts the bits of A by set amount to the right">A &gt;&gt; = x</button>
                 <input type="number" id="bitArs_x" min="0" max="9007199254740991" class="number" title="amount for [A &gt;&gt; = x]" value="1">
                 <button id="gcdAB" title="set A to: greatest common divisor of A and B">GCD</button>
                 <button id="bitnoA" title="applies logical NOT to A">! A</button>
@@ -3338,7 +3329,7 @@
         _error_html("Errors may be displayed here...\ndouble click anywhere on the page (except here) to remove this message");
         _load_from_url();
         _stats_AtB_();
-        _update_to_url();
+        _update_to_url(true);
         BigIntType.HelloThere.logConsole("braille");
         console.log(
             "%c%s%c%s%c%s",
@@ -3350,6 +3341,34 @@
             "right here in the dev-tools console",
         );
         // ## event listeners
+        window.addEventListener("popstate",async ev=>{
+            "use strict";
+            loader.classList.remove("hid");
+            await _promise_delay(10);
+            _ABORT_URL_UPDATE=true;
+            if(typeof ev.state.base==="string"&&ev.state.base!==_CURRENT_BASE){
+                base_chooser.value=ev.state.base;
+                base_chooser.dispatchEvent(new InputEvent("change"));
+            }
+            if(typeof ev.state.mem==="number"&&ev.state.mem!==_CURRENT_MEM_SIZE){
+                for(let i=0;i<memory_size.options.length;i++){
+                    const option=memory_size.options[i];
+                    if(option.disabled)continue;
+                    const mem=Number(option.value);
+                    if(mem>=ev.state.mem){
+                        if(_NUMBERS.a.length>mem)_NUMBERS.a.setEqualTo(BigIntType.Zero);
+                        if(_NUMBERS.b.length>mem)_NUMBERS.b.setEqualTo(BigIntType.Zero);
+                        memory_size.value=option.value;
+                        memory_size.dispatchEvent(new InputEvent("change"));
+                        break;
+                    }
+                }
+            }
+            _ABORT_URL_UPDATE=false;
+            _load_from_url(true);
+            _stats_AtB_();
+            loader.classList.add("hid");
+        },{passive:true});
         document.addEventListener("dblclick",ev=>(ev.composedPath().every(v=>!Object.is(v,error_output)))?_error_html(""):null,{passive:true});
         base_chooser.addEventListener("input",ev=>{
             if(Number.isNaN(_string_to_base(base_chooser.value))){_error_css(base_chooser,"current input is not a valid base");}
@@ -3371,56 +3390,62 @@
             Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE);
             Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE);
             Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE);
+            _update_mem_ui();
+            _update_to_url();
         },{passive:true});
         memory_size.addEventListener("change",ev=>{
-            _CURRENT_MEM_SIZE=Number(memory_size.value);
-            BigIntType.MAX_SIZE=_CURRENT_MEM_SIZE;
-            /**@type {number} - counter for amount of reseted numbers*/
-            let r=0;
+            BigIntType.MAX_SIZE=(_CURRENT_MEM_SIZE=Number(memory_size.value));
+            let resets=0;
             if(_NUMBERS.a.length>BigIntType.MAX_SIZE){
                 _NUMBERS.a.setEqualTo(BigIntType.Zero);
                 number_a.value=_NUMBERS.a.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.b.length>BigIntType.MAX_SIZE){
                 _NUMBERS.b.setEqualTo(BigIntType.Zero);
                 number_b.value=_NUMBERS.b.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.rand.min.length>BigIntType.MAX_SIZE){
                 _NUMBERS.rand.min.setEqualTo(BigIntType.Zero);
                 Arandommin.value=_NUMBERS.rand.min.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.rand.max.length>BigIntType.MAX_SIZE){
                 _NUMBERS.rand.max.setEqualTo(BigIntType.Zero);
                 Arandommax.value=_NUMBERS.rand.max.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.map.min1.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.min1.setEqualTo(BigIntType.Zero);
                 Amapmin1.value=_NUMBERS.map.min1.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.map.max1.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.max1.setEqualTo(BigIntType.Zero);
                 Amapmax1.value=_NUMBERS.map.max1.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.map.min2.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.min2.setEqualTo(BigIntType.Zero);
                 Amapmin2.value=_NUMBERS.map.min2.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
             if(_NUMBERS.map.max2.length>BigIntType.MAX_SIZE){
                 _NUMBERS.map.max2.setEqualTo(BigIntType.Zero);
                 Amapmax2.value=_NUMBERS.map.max2.toString(_CURRENT_BASE);
-                r++;
+                resets++;
             }
-            if(r>0){
-                if(r===1){_error_html("{MemSizeError} reseted number because it was to large for selected memory size");}
-                else{_error_html("{MemSizeError} reseted numbers because they where to large for selected memory size");}
+            for(let i=0;i<_NUMBERS.mem.length;i++){
+                const mem=_NUMBERS.mem[i];
+                if(mem.length>BigIntType.MAX_SIZE){
+                    mem.setEqualTo(BigIntType.Zero);
+                    document.getElementById(`mem_slot_${i}`).value=mem.toString(_CURRENT_BASE);
+                    resets++;
+                }
             }
+            _update_to_url();
+            if(resets>0)_error_html("{MemSizeError} numbers have been reset because they where to large for selected memory size");
         },{passive:true});
         // ## numbers
         for(const _number of document.body.querySelectorAll("textarea.number")){
