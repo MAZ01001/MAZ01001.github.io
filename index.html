@@ -177,7 +177,8 @@
             filter: drop-shadow(0px 0px 10px var(--textshadowcolorglow));
             animation: textflicker 5s linear 0s infinite running;
         }
-        div#projects>a:not(:last-child)::after{
+        div#projects>a.hidden:not(.show){display: none;}
+        div#projects>a:not(:first-child)::before{
             display: block;
             content: "\204C   \1F666   \204D";
             white-space: pre;
@@ -324,21 +325,30 @@
         <div id="projects">
             <a target="_self" rel="noopener noreferrer" href="./site/hangman" title="A simple word guessing game">Hangman</a>
             <a target="_self" rel="noopener noreferrer" href="./site/snake" title="Snake game with ASCII graphics">ASCII Snake</a>
+            <a target="_self" rel="noopener noreferrer" href="./GIF_decoder/" title="GIF decoder and web player">GIF decoder/player</a>
             <a target="_self" rel="noopener noreferrer" href="./site/enigma" title="The Enigma cipher machine">Enigma</a>
-            <a target="_self" rel="noopener noreferrer" href="./GIF_decoder/" title="GIF decoder and web player">GIF decoder / player</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/biginttype_calc" title="Calculator for arbitrary-length-integers">Arbitrary-integer calculator</a>
+            <a target="_self" rel="noopener noreferrer" href="./AlmondBreadErkunder/" title="Simple Mandelbrot explorer">Mandelbrot</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/biginttype_calc" title="Calculator for arbitrary-length-integers">Big integer calculator</a>
             <a target="_self" rel="noopener noreferrer" href="./site/code_error_correction" title="ECC encoding (self correcting messages)">Error correction codes</a>
             <a target="_self" rel="noopener noreferrer" href="./site/satisfactory_u3_flowchart" title="Unofficial flowchart for Satisfactory U3">Satisfactory U3 flowchart</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/dice" title="A simple random number generator">Dice</a>
             <a target="_self" rel="noopener noreferrer" href="./site/canvas_ball" title="Simple screensaver with a bouncing ball">Ball screensaver</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/vector_field" title="A colorful vector field [P5.js]">Vector field</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/math_function_drawer" title="Polynomial visualizer [P5.js]">Math Function Drawer</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/3d_card_example" title="CSS 3D-Card example">3D-Card example</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/context_menu_example" title="HTML/JS Context menu example">Context menu example</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/touch_example" title="JS Touch example">Touch example</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/pascals_triangle" title="Prints out Pascal's Triangle">Pascals Triangle</a>
-            <a target="_self" rel="noopener noreferrer" href="./site/pi_day_2021" title="Approximating PI with 100'000 random numbers and GCD for PI day 2021 [P5.js]">PI-Day 2021</a>
+            <a target="_self" rel="noopener noreferrer" href="./site/dice" title="A simple random number generator">Dice</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/vector_field" title="A colorful vector field [P5.js]">Vector field</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/math_function_drawer" title="Polynomial visualizer [P5.js]">Math Function Drawer</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/3d_card_example" title="CSS 3D-Card example">3D-Card example</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/context_menu_example" title="HTML/JS Context menu example">Context menu example</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/touch_example" title="JS Touch example">Touch example</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/pascals_triangle" title="Prints out Pascal's Triangle">Pascals Triangle</a>
+            <a target="_self" rel="noopener noreferrer" class="hidden" href="./site/pi_day_2021" title="Approximating PI with 100'000 random numbers and GCD for PI day 2021 [P5.js]">PI-Day 2021</a>
         </div>
     </div>
+    <script>
+        document.addEventListener("keydown",ev=>{
+            "use strict";
+            if(ev.key!=="e"||ev.repeat)return;
+            ev.preventDefault();
+            document.body.querySelectorAll(".hidden").forEach(v=>v.classList.toggle("show"));
+        },{passive:false});
+    </script>
 </body>
 </html>
