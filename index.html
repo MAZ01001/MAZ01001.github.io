@@ -25,7 +25,7 @@
     <meta name="msapplication-config" content="./img/browserconfig.xml">
     <meta name="theme-color" content="#FF9900">
     <title>MAZ01001 Homepage</title>
-    <script>//! [ CSS.registerProperty() ] Chromium only (https://developer.mozilla.org/en-US/docs/Web/API/CSS/RegisterProperty#browser_compatibility)
+    <script>//! CSS:@property may not work in all browsers → https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static#browser_compatibility
         CSS.registerProperty({name:'--barsplus',syntax:'<length>',initialValue:'0px',inherits:false});
         CSS.registerProperty({name:'--rainbowanglecolor',syntax:'<angle>',initialValue:'120deg',inherits:false});
         CSS.registerProperty({name:'--turn',syntax:'<angle>',initialValue:'0deg',inherits:false});
@@ -51,7 +51,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) perspective(0);
+            translate: -50% -50%;
+            perspective: 0;
             height: max-content;
             width: max-content;
             box-sizing: border-box;
@@ -94,23 +95,23 @@
         }
         @keyframes shadowcolor{to{--rainbowanglecolor: 360deg;}}
         @keyframes rocking{
-            0%{--turn: 0deg}
-            25%{--turn: -10deg;}
-            75%{--turn: 10deg;}
-            100%{--turn: 0deg;}
+              0%{--turn:   0deg;}
+             25%{--turn: -10deg;}
+             75%{--turn:  10deg;}
+            100%{--turn:   0deg;}
         }
         @keyframes turn{
             from{--turn: 0deg;}
             to{--turn: 360deg;}
         }
         @keyframes turnhalf{
-            0%{--turn: 0deg;}
-            50%{--turn: 170deg;}
-            100%{--turn: 0deg;}
+              0%{--turn:   0deg;}
+             50%{--turn: 170deg;}
+            100%{--turn:   0deg;}
         }
         @keyframes turnhalfround{
-            0%{--turn: 0deg;}
-            25%{--turn: 200deg;}
+              0%{--turn:    0deg;}
+             25%{--turn:  200deg;}
             100%{--turn: -360deg;}
         }
         body>img{
@@ -120,9 +121,10 @@
             top: 50%;
             left: 50%;
             overflow: hidden;
-            transform: translate(-50%, -50%) rotate(var(--turn)) perspective(0);
+            translate: -50% -50%;
+            rotate: var(--turn);
+            perspective: 0;
             height: max(100vh,1000px);
-            image-rendering: pixelated;
             filter:
                 drop-shadow(0px 0px .2rem #0A0)
                 drop-shadow(0px 0px .6rem #0A0);
@@ -152,15 +154,15 @@
             pointer-events: none;
         }
         @keyframes textflicker{
-            0%   {--textshadowcolorglow: #020;}
-            1%   {--textshadowcolorglow: #0C0;}
-            2.5% {--textshadowcolorglow: #040;}
-            4.5% {--textshadowcolorglow: #090;}
-            30%  {--textshadowcolorglow: #060;}
-            50%  {--textshadowcolorglow: #0A0;}
-            70%  {--textshadowcolorglow: #080;}
-            95%  {--textshadowcolorglow: #0C0;}
-            100% {--textshadowcolorglow: #0F0;}
+              0%  {--textshadowcolorglow: #020;}
+              1%  {--textshadowcolorglow: #0C0;}
+              2.5%{--textshadowcolorglow: #040;}
+              4.5%{--textshadowcolorglow: #090;}
+             30%  {--textshadowcolorglow: #060;}
+             50%  {--textshadowcolorglow: #0A0;}
+             70%  {--textshadowcolorglow: #080;}
+             95%  {--textshadowcolorglow: #0C0;}
+            100%  {--textshadowcolorglow: #0F0;}
         }
         div#projects{
             display: flex;
@@ -176,6 +178,7 @@
             text-shadow: .2rem .3rem .2rem #000;
             filter: drop-shadow(0px 0px 10px var(--textshadowcolorglow));
             animation: textflicker 5s linear 0s infinite running;
+            perspective: 0;
         }
         div#projects>a.hidden:not(.show){display: none;}
         div#projects>a:not(:first-child)::before{
@@ -196,7 +199,7 @@
             animation-duration: 6s;
         }
         div#projects>a:nth-child(7n+6){animation-delay: 3s;}
-        div#projects>a:visited{color: #0A0;}/* can't edit more (https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector) */
+        div#projects>a:visited{color: #0A0;}/* can't edit more → https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector */
         div#projects>a:hover,
         div#projects>a:active{
             color: #0F0;
@@ -233,6 +236,7 @@
             text-shadow: .2rem .3rem .2rem #000;
             filter: drop-shadow(0px 0px 15px var(--textshadowcolorglow));
             animation: textglow 2s cubic-bezier(.45,.05,.55,.95) 0s infinite alternate running;
+            perspective: 0;
         }
         h1{font-size: 3rem;}
         h1::before{content: "\A9C1  ";}
