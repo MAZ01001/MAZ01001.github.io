@@ -1,51 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg width="23cm" height="36.454cm" enable-background="new" version="1.1" viewBox="0 0 230 364.54" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>MAZ Logo</title>
-    <defs>
-        <linearGradient id="linearGradientGold" x1="-120" x2="320" y1="150" y2="150" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#232803" offset="0"/>
-            <stop stop-color="#55490c" offset=".080316"/>
-            <stop stop-color="#886a16" offset=".16361"/>
-            <stop stop-color="#a68c29" offset=".22415"/>
-            <stop stop-color="#ccb54a" offset=".2847"/>
-            <stop stop-color="#ebdb66" offset=".34524"/>
-            <stop stop-color="#f0e36b" offset=".3823"/>
-            <stop stop-color="#f5ec70" offset=".41402"/>
-            <stop stop-color="#e3d55e" offset=".46745"/>
-            <stop stop-color="#d1be4c" offset=".51642"/>
-            <stop stop-color="#c6ad3f" offset=".54168"/>
-            <stop stop-color="#bb9c33" offset=".57195"/>
-            <stop stop-color="#a88e2a" offset=".6325"/>
-            <stop stop-color="#b99e37" offset=".66277"/>
-            <stop stop-color="#caae44" offset=".69805"/>
-            <stop stop-color="#d2bc4d" offset=".72832"/>
-            <stop stop-color="#daca56" offset=".75793"/>
-            <stop stop-color="#d5c24f" offset=".7872"/>
-            <stop stop-color="#d0bb49" offset=".81747"/>
-            <stop stop-color="#bb9c33" offset=".87802"/>
-            <stop stop-color="#896c1a" offset=".93489"/>
-            <stop stop-color="#564a0e" offset=".97329"/>
-            <stop stop-color="#232803" offset="1"/>
-        </linearGradient>
-    </defs>
-    <metadata>
-        <rdf:RDF>
-            <cc:Work rdf:about="">
-                <dc:format>image/svg+xml</dc:format>
-                <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-                <dc:title>MAZ Logo</dc:title>
-            </cc:Work>
-        </rdf:RDF>
-    </metadata>
-    <g fill="none">
-        <g transform="translate(15 49.542)" stroke="#000" stroke-opacity=".95327" stroke-width="30">
-            <path d="m0 5e-6 62.038 93.057 137.96-93.057v300h-200zm62.038 93.057 137.96 206.94" style="paint-order:normal"/>
-            <path d="m0 206.94h137.96l-137.96 93.057" stroke-linejoin="bevel"/>
-        </g>
-        <g transform="translate(15 49.542)" stroke="url(#linearGradientGold)" stroke-width="25">
-            <path d="m0 5e-6 62.038 93.057 137.96-93.057v300h-200zm62.038 93.057 137.96 206.94" style="paint-order:normal"/>
-            <path d="m0 206.94h137.96l-137.96 93.057" stroke-linejoin="bevel"/>
-        </g>
+<svg width="323.036" height="512" viewBox="-1000 -1000 1000 1000" xmlns="http://www.w3.org/2000/svg">
+  <title>MAZ Logo</title>
+  <defs>
+    <linearGradient id="GIMPgold" x1="-120" x2="320" y1="150" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#232803" offset="0"/>
+      <stop stop-color="#55490C" offset=".080316"/>
+      <stop stop-color="#886A16" offset=".16361"/>
+      <stop stop-color="#A68C29" offset=".22415"/>
+      <stop stop-color="#CCB54A" offset=".2847"/>
+      <stop stop-color="#EBDB66" offset=".34524"/>
+      <stop stop-color="#F0E36B" offset=".3823"/>
+      <stop stop-color="#F5EC70" offset=".41402"/>
+      <stop stop-color="#E3D55E" offset=".46745"/>
+      <stop stop-color="#D1BE4C" offset=".51642"/>
+      <stop stop-color="#C6AD3F" offset=".54168"/>
+      <stop stop-color="#BB9C33" offset=".57195"/>
+      <stop stop-color="#A88E2A" offset=".6325"/>
+      <stop stop-color="#B99E37" offset=".66277"/>
+      <stop stop-color="#CAAE44" offset=".69805"/>
+      <stop stop-color="#D2BC4D" offset=".72832"/>
+      <stop stop-color="#DACA56" offset=".75793"/>
+      <stop stop-color="#D5C24F" offset=".7872"/>
+      <stop stop-color="#D0BB49" offset=".81747"/>
+      <stop stop-color="#BB9C33" offset=".87802"/>
+      <stop stop-color="#896C1A" offset=".93489"/>
+      <stop stop-color="#564A0E" offset=".97329"/>
+      <stop stop-color="#232803" offset="1"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" transform="matrix(4.3478293,0,0,4.3478293,-1000,-1292.5)">
+    <g style="translate:15px 49.542px;stroke-width:30;stroke:#000">
+      <path paint-order="normal" d="m0,5e-6 62.038,93.057L199.998,5e-6V300h-200zm62.038,93.057 137.96,206.939995"/>
+      <path stroke-linejoin="bevel" d="M0,206.94H137.96L0,299.997"/>
     </g>
+    <g style="translate:15px 49.542px;stroke-width:25;stroke:url(#GIMPgold)">
+      <path paint-order="normal" d="m0,5e-6 62.038,93.057L199.998,5e-6V300h-200zm62.038,93.057 137.96,206.939995"/>
+      <path stroke-linejoin="bevel" d="M0,206.94H137.96L0,299.997"/>
+    </g>
+  </g>
 </svg>
