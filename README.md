@@ -3,6 +3,13 @@
 > my git [website](https://maz01001.github.io/ "https://MAZ01001.GitHub.io/") with random JS/CSS/HTML single-pages (can be used offline)
 > made for pc/chrome browser
 
+Linked pages, not in this repo:
+
+- [Gif decoder/player](https://maz01001.github.io/GIF_decoder "Open website") → [MAZ01001/GIF_decoder](https://github.com/MAZ01001/GIF_decoder "Open GitHub repository")
+- [Mandelbrot](https://maz01001.github.io/AlmondBreadErkunder "Open website") → [MAZ01001/AlmondBreadErkunder](https://github.com/MAZ01001/AlmondBreadErkunder "Open GitHub repository")
+
+----
+
 - [Hangman](#hangman)
 - [ASCII Snake](#ascii-snake)
 - [Enigma](#enigma)
