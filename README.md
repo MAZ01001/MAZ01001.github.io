@@ -1,9 +1,7 @@
 # MAZ01001.github.io
 
->
 > my git [website](https://maz01001.github.io/ "https://MAZ01001.GitHub.io/") with random JS/CSS/HTML single-pages (can be used offline)
 > made for pc/chrome browser
->
 
 - [Hangman](#hangman)
 - [ASCII Snake](#ascii-snake)
@@ -26,9 +24,7 @@
 
 ## [Hangman](./site/hangman.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/hangman "open https://maz01001.github.io/site/hangman")
->
 
 - __A simple word guessing game__
 - _no graphics (no actual hangman)_
@@ -56,9 +52,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [ASCII Snake](./site/snake.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/snake "open https://maz01001.github.io/site/snake")
->
 
 - snake game in ascii style ([direct port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp "snake_cmd-game.cpp ducumentation in the other-projects/README.md"))
 - right-click for more options
@@ -67,9 +61,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Enigma](./site/enigma.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/enigma "open https://maz01001.github.io/site/enigma")
->
 
 - almost like the real thing ft. loading screen
 - create enigma for encoding
@@ -88,9 +80,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Calculator for arbitrary-length-integers](./site/BigIntType_calc.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/BigIntType_calc "open https://maz01001.github.io/site/BigIntType_calc")
->
 
 - Calculator for arbitrary-length-integers
 - see [Math-js/BigIntType.js](https://github.com/MAZ01001/Math-Js#biginttypejs "BigIntType.js documentation in the Math-js/README.md") for a detailed description
@@ -99,9 +89,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Error Correction Codes](./site/code_error_correction.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/code_error_correction "open https://maz01001.github.io/site/code_error_correction")
->
 
 - made from a [3Blue1Brown video](https://youtu.be/X8jsijhllIA "How to send a self-correcting message (Hamming codes)")
   - also see [Ben Eater's video](https://youtu.be/h0jloehRKas "What is error correction? Hamming codes in hardware")
@@ -117,9 +105,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Unofficial Satisfactory U3 Flow Chart](./site/satisfactory_u3_flowchart.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/satisfactory_u3_flowchart "open https://maz01001.github.io/site/satisfactory_u3_flowchart")
->
 
 - interactive flow chart for the 3rd Update of [SATISFACTORY](https://www.satisfactorygame.com/ "official game website")
 
@@ -127,9 +113,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Small Dice](./site/dice.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/dice "open https://maz01001.github.io/site/dice")
->
 
 - dice for random numbers
 - choose min/max number of eyes (0-9)
@@ -140,19 +124,15 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Ball Screensaver](./site/canvas_ball.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/canvas_ball "open https://maz01001.github.io/site/canvas_ball")
->
 
 - a ball that moves diagonally across the screen and changes color
 - using only javascript (visuals via HTML5 canvas)
 - see below table for a lot of customizability via URL parameters
 
->
 > [!NOTE]\
 > If you can't see anything, your device might not support [OKLCH](https://oklch.com/ "OKLCH Color Picker & Conveter") colors.\
 > To fix this, use the URL parameter `colorRGB` for RGB colors.
->
 
 ### [Ball Screensaver] available URL parameters
 
@@ -192,9 +172,7 @@ Scroll [UP](#ball-screensaver) | [TOP](#maz01001githubio)
 
 ## [Vector Field](./site/vector_field.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/vector_field "open https://maz01001.github.io/site/vector_field")
->
 
 - vector objects
 - default points to mouse
@@ -211,9 +189,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Math Function Drawer](./site/math_function_drawer.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/math_function_drawer "open https://maz01001.github.io/site/math_function_drawer")
->
 
 - use sliders(show sliders button on the right) to set the coefficients
 - scroll or use sliders(top & left) to set scale (zoom)
@@ -224,9 +200,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [3D-Card example](./site/3d-card_example.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/3d-card_example "open https://maz01001.github.io/site/3d-card_example")
->
 
 - example of a 3d-card effect with HTML/JS/CSS
 
@@ -234,9 +208,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Context menu example](./site/context_menu_example.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/context_menu_example "open https://maz01001.github.io/site/context_menu_example")
->
 
 - example of a custom context menu using HTML/JS/CSS
 
@@ -244,9 +216,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Touch example](./site/touch_example.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/touch_example "open https://maz01001.github.io/site/touch_example")
->
 
 - example for detecting touch (not the best detection)
 
@@ -254,9 +224,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [Pascal's Triangle](./site/pascals_triangle.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/pascals_triangle "open https://maz01001.github.io/site/pascals_triangle")
->
 
 - choose the number of rows to generate
 
@@ -264,9 +232,7 @@ Scroll [TOP](#maz01001githubio)
 
 ## [4 PI-Day 2021](./site/pi-day_2021.html "view the source code")
 
->
 > [view the live webpage](https://maz01001.github.io/site/pi-day_2021 "open https://maz01001.github.io/site/pi-day_2021")
->
 
 - made from a [Coding Train coding-challenge video](https://youtu.be/EvS_a921dBo "Coding Challenge 161: Estimating π from Random Numbers with Euclid's Algorithm")
 - estimates PI with the [GCD](https://en.wikipedia.org/wiki/Greatest_common_divisor "Wikipedia: Greatest common divisor") of 100000 numbers
