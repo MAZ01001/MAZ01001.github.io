@@ -116,6 +116,8 @@ Scroll [TOP](#maz01001githubio)
 
 - interactive flow chart for the 3rd Update of [SATISFACTORY](https://www.satisfactorygame.com/ "official game website")
 
+> WIP interactive graph for 1.0 release: <https://github.com/MAZ01001/SatisfactoryFlowchart>
+
 Scroll [TOP](#maz01001githubio)
 
 ## [Small Dice](./site/dice.html "view the source code")
