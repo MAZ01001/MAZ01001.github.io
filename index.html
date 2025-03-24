@@ -349,8 +349,8 @@
         </div>
     </div>
     <script>
+        "use strict";
         document.addEventListener("keydown",ev=>{
-            "use strict";
             if(ev.key!=="e"||ev.repeat)return;
             ev.preventDefault();
             document.body.querySelectorAll(".hidden").forEach(v=>v.classList.toggle("show"));
