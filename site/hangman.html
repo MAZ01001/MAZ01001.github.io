@@ -1285,17 +1285,16 @@
             window.localStorage.setItem(`${storagePrefix}time`,JSON.stringify(Date.now()-startTime));
         },300);
         document.body.addEventListener("mousedown",()=>document.getSelection()?.empty(),{passive:true});
-        document.body.addEventListener("keypress",ev=>{
-            if(settingsMenu.open||finMenu.open||confirmMenu.open)return;
+        document.body.addEventListener("keydown",ev=>{
+            if(ev.repeat||settingsMenu.open||finMenu.open||confirmMenu.open)return;
             const key=ev.key.toLocaleUpperCase();
-            if(keyboardLetters.has(key)){
-                ev.preventDefault();
-                for(const letter of letterButtons.children)
-                    if(letter instanceof HTMLInputElement&&letter.value===key){
-                        letter.click();
-                        break;
-                    }
-            }
+            if(!keyboardLetters.has(key))return;
+            ev.preventDefault();
+            for(const letter of letterButtons.children)
+                if(letter instanceof HTMLInputElement&&letter.value===key){
+                    letter.click();
+                    break;
+                }
         },{passive:false});
 
         retryButton.addEventListener("click",()=>{
