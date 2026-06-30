@@ -5,6 +5,7 @@
 
 Linked pages, not in this repo:
 
+- [Hangman](https://maz01001.github.io/hangman "Open website") → [MAZ01001/hangman](https://github.com/MAZ01001/hangman "Open GitHub repository")
 - [Gif decoder/player](https://maz01001.github.io/GIF_decoder "Open website") → [MAZ01001/GIF_decoder](https://github.com/MAZ01001/GIF_decoder "Open GitHub repository")
 - [DND Dice & Statistics](https://maz01001.github.io/dice_stats/ "Open website") → [MAZ01001/dice_stats](https://github.com/MAZ01001/dice_stats "Open GitHub repository")
 - [Chance Calculator](https://maz01001.github.io/Math-Js/functionsjs_chanceAmount "Open website") → [MAZ01001/Math-Js/functionsjs_chanceAmount.html](https://github.com/MAZ01001/Math-Js#user-content-functionsjs-chanceamount "Open GitHub repository (and scroll to documentation)")
@@ -13,7 +14,6 @@ Linked pages, not in this repo:
 
 ----
 
-- [Hangman](#hangman)
 - [ASCII Snake](#ascii-snake)
 - [Enigma](#enigma)
 - [Calculator for arbitrary-length-integers](#calculator-for-arbitrary-length-integers)
@@ -31,34 +31,6 @@ Linked pages, not in this repo:
 - [4 PI-Day 2021](#4-pi-day-2021)
 
 ----
-
-## [Hangman](./site/hangman.html "view the source code")
-
-> [view the live webpage](https://maz01001.github.io/site/hangman "open https://maz01001.github.io/site/hangman")
-
-- __A simple word guessing game__
-- _no graphics (no actual hangman)_
-- guessing is case insensitive
-- full Unicode support (_allows for special symbols and Emojis_)
-- when clicking on "new round" when over 20 seconds of progress, it shows a confirm dialog (YES/NO)
-- customization (_settings_)
-  - custom alphabet
-    - keys can be set to always show and not be on the "keyboard" (_useful for spaces and punctuation_)
-  - custom word list
-  - set maximum allowed fails (_or disable loosing with `-1`_)
-  - set a percentage for how many letters of the word are uncovered at the start of the round (`0%` to `99%`)
-  - clear stored settings and reload page (_shows a confirm dialog (YES/NO)_)
-- current settings and progress is stored in browser local storage (_reload does not start a new round or reset settings_)
-- export current settings and progress to a JSON file
-- import settings and progress from saved JSON file
-  - shows data preview of selected save file
-    - _only shows time and fails of progress preview_
-  - choose to override, ignore, or combine current alphabet / word list with the imported
-  - choose to override or ignore imported rng-unhide / max-fails value
-  - choose to continue with saved progress or start a new round
-    - _can only be continues if alphabet, word list, and max fails are also imported_
-
-Scroll [TOP](#maz01001githubio)
 
 ## [ASCII Snake](./site/snake.html "view the source code")
 
