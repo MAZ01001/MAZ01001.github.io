@@ -10,12 +10,12 @@ Linked pages, not in this repo:
 - [DND Dice & Statistics](https://maz01001.github.io/dice_stats/ "Open website") → [MAZ01001/dice_stats](https://github.com/MAZ01001/dice_stats "Open GitHub repository")
 - [Chance Calculator](https://maz01001.github.io/Math-Js/functionsjs_chanceAmount "Open website") → [MAZ01001/Math-Js/functionsjs_chanceAmount.html](https://github.com/MAZ01001/Math-Js#user-content-functionsjs-chanceamount "Open GitHub repository (and scroll to documentation)")
 - FFmpeg → [MAZ01001/FFmpeg-resource](https://github.com/MAZ01001/FFmpeg-resource "Open GitHub repository")
+- [Enigma](https://maz01001.github.io/enigma "Open website") → [MAZ01001/enigma](https://github.com/MAZ01001/enigma "Open GitHub repository")
 - [Mandelbrot](https://maz01001.github.io/AlmondBreadErkunder "Open website") → [MAZ01001/AlmondBreadErkunder](https://github.com/MAZ01001/AlmondBreadErkunder "Open GitHub repository")
 
 ----
 
 - [ASCII Snake](#ascii-snake)
-- [Enigma](#enigma)
 - [Calculator for arbitrary-length-integers](#calculator-for-arbitrary-length-integers)
 - [Error Correction Codes](#error-correction-codes)
 - [Unofficial Satisfactory U3 Flow Chart](#unofficial-satisfactory-u3-flow-chart)
@@ -38,25 +38,6 @@ Linked pages, not in this repo:
 
 - snake game in ascii style ([direct port from c++](https://github.com/MAZ01001/other-projects#snake_cmd-gamecpp "snake_cmd-game.cpp ducumentation in the other-projects/README.md"))
 - right-click for more options
-
-Scroll [TOP](#maz01001githubio)
-
-## [Enigma](./site/enigma.html "view the source code")
-
-> [view the live webpage](https://maz01001.github.io/site/enigma "open https://maz01001.github.io/site/enigma")
-
-- almost like the real thing ft. loading screen
-- create enigma for encoding
-  - read from file
-  - configure
-    - give custom alphabet (Unicode supported)
-    - set number of weels (signal only goes one way)
-    - set number of plugs (auto maximum)
-- import enigma for decoding
-  - read from file
-  - mirror encoding enigma
-- set custom turning number
-- auto "turn" on every character that is encoded, one after another
 
 Scroll [TOP](#maz01001githubio)
 
