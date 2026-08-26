@@ -263,13 +263,14 @@
             text-align: center;
         }
     </style>
-    <script data-info="2023-05-22 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js by MAZ01001">
+    <script data-info="2026-08-26 from https://github.com/MAZ01001/Math-Js/blob/main/BigIntType.js by MAZ01001">
         "use strict";
         /**
-         * __Class for arbitrarily large integers with typed arrays__ \
-         * can natively convert `BigIntType` numbers to `BigInt` or `String` when needed
+         * # Arbitrarily large integers with typed arrays
+         * Can natively convert `BigIntType` numbers to `BigInt` or `String` when needed
          * @class
-         * @author MAZ <https://MAZ01001.GitHub.io/>
+         * @author MAZ <https://maz01001.github.io/>
+         * @link src <https://github.com/MAZ01001/Math-Js#biginttypejs>
          */
         class BigIntType{
             //~ property/method names starting with '#' are private - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields for details
@@ -300,13 +301,11 @@
             //~ for potentially larger numbers Uint16Array could be used ('cause 2**16*2**16 is still a save integer is js so save to compute)
             //~ but it is the same size in memory just potentially a longer number 'cause the index can go higher (a digit-array in base 65536 is 2x shorter than in base 256)
             //~ but with (2**53-1) digits (MAX_SAFE_INTEGER) and 1Byte (base 256) per digit - it is large enough (usually not more than 2GB can be allocated anyways...)
-            /**
-             * @type {number} - maximum possible length of a number _(excluding sign)_ - originally `500` = 0.5KB in RAM
-             */
-            static #MAX_SIZE=0x1F4;
-            /**@returns {number} _current_ maximum possible length of a number _(excluding sign)_*/
+            /**@type {number} - maximum possible length of a number (_excluding sign_) - originally `500` = 0.5KB in RAM*/
+            static #MAX_SIZE=500;
+            /**@returns {number} _current_ maximum possible length of a number (_excluding sign_)*/
             static get MAX_SIZE(){return BigIntType.#MAX_SIZE;}
-            /**@throws {RangeError} - if setting this to a number that is not an integer in range `[1-67108864]` - _( `67108864` = 64MiB in RAM )_*/
+            /**@throws {RangeError} - if setting this to a number that is not an integer in range `[1-67108864]` (_`67108864` = 64MiB in RAM_)*/
             static set MAX_SIZE(n){
                 //~ technically, max is 9007199254740991 (Number.MAX_SAFE_INTEGER) but with 1 Byte each entry that's almost 8PiB ! for ONE number
                 //~ and chrome browser will only create typed arrays up to 2GiB ~
@@ -327,7 +326,7 @@
              * - base 7 ← `"septenary"`
              * - base 8 ← `'o'`, `"oct"`, `"octal"`, or `"3bit"`
              * - base 9 ← `"nonary"`
-             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, `"decimal"` or `"denary"`
+             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, or `"denary"`
              * - base 11 ← `"undecimal"`
              * - base 12 ← `"duodecimal"`, `"dozenal"`, or `"uncial"`
              * - base 13 ← `"tridecimal"`
@@ -443,81 +442,81 @@
                     case"septenary":return 7;
                     case'o':case"oct":case"octal":case"3bit":return 8;
                     case"nonary":return 9;
-                    case'd':case"dec":case"decimal":case"decimal":case"denary":return 0xA;
-                    case"undecimal":return 0xB;
-                    case"duodecimal":case"dozenal":case"uncial":return 0xC;
-                    case"tridecimal":return 0xD;
-                    case"tetradecimal":return 0xE;
-                    case"pentadecimal":return 0xF;
-                    case'h':case"hex":case"hexadecimal":case"sexadecimal":case"4bit":return 0x10;
-                    case"heptadecimal":return 0x11;
-                    case"octodecimal":return 0x12;
-                    case"enneadecimal":return 0x13;
-                    case"vigesimal":return 0x14;
-                    case"unvigesimal":return 0x15;
-                    case"duovigesimal":return 0x16;
-                    case"trivigesimal":return 0x17;
-                    case"tetravigesimal":return 0x18;
-                    case"pentavigesimal":return 0x19;
-                    case"hexavigesimal":return 0x1A;
-                    case"heptavigesimal":case"septemvigesimal":return 0x1B;
-                    case"octovigesimal":return 0x1C;
-                    case"enneavigesimal":return 0x1D;
-                    case"trigesimal":return 0x1E;
-                    case"untrigesimal":return 0x1F;
-                    case"duotrigesimal":case"5bit":return 0x20;
-                    case"tritrigesimal":return 0x21;
-                    case"tetratrigesimal":return 0x22;
-                    case"pentatrigesimal":return 0x23;
-                    case't':case"txt":case"text":case"hexatrigesimal":return 0x24;
-                    case"heptatrigesimal":return 0x25;
-                    case"octotrigesimal":return 0x26;
-                    case"enneatrigesimal":return 0x27;
-                    case"quadragesimal":return 0x28;
-                    case"duoquadragesimal":return 0x2A;
-                    case"pentaquadragesimal":return 0x2D;
-                    case"septaquadragesimal":return 0x2F;
-                    case"octoquadragesimal":return 0x30;
-                    case"enneaquadragesimal":return 0x31;
-                    case"quinquagesimal":return 0x32;
-                    case"duoquinquagesimal":return 0x34;
-                    case"tetraquinquagesimal":return 0x36;
-                    case"hexaquinquagesimal":return 0x38;
-                    case"heptaquinquagesimal":return 0x39;
-                    case"octoquinquagesimal":return 0x3A;
-                    case"sexagesimal":case"sexagenary":return 0x3C;
-                    case"duosexagesimal":return 0x3E;
-                    case"tetrasexagesimal":case"6bit":return 0x40;
-                    case"duoseptuagesimal":return 0x48;
-                    case"octogesimal":return 0x50;
-                    case"unoctogesimal":return 0x51;
-                    case"pentoctogesimal":return 0x55;
-                    case"enneaoctogesimal":return 0x59;
-                    case"nonagesimal":return 0x5A;
-                    case"unnonagesimal":return 0x5B;
-                    case"duononagesimal":return 0x5C;
-                    case"trinonagesimal":return 0x5D;
-                    case"tetranonagesimal":return 0x5E;
-                    case"pentanonagesimal":return 0x5F;
-                    case"hexanonagesimal":return 0x60;
-                    case"septanonagesimal":return 0x61;
-                    case"centesimal":return 0x64;
-                    case"centevigesimal":return 0x78;
-                    case"centeunvigesimal":return 0x79;
-                    case"centepentavigesimal":return 0x7D;
-                    case"centeoctovigesimal":case"7bit":return 0x80;
-                    case"centetetraquadragesimal":return 0x90;
-                    case"centenovemsexagesimal":return 0xA9;
-                    case"centepentoctogesimal":return 0xB9;
-                    case"centehexanonagesimal":return 0xC4;
-                    case"duocentesimal":return 0xC8;
-                    case"duocentedecimal":return 0xD2;
-                    case"duocentehexidecimal":return 0xD8;
-                    case"duocentepentavigesimal":return 0xE1;
-                    case"duocentehexaquinquagesimal":case"byte":case"8bit":return 0x100;
+                    case'd':case"dec":case"decimal":case"denary":return 10;
+                    case"undecimal":return 11;
+                    case"duodecimal":case"dozenal":case"uncial":return 12;
+                    case"tridecimal":return 13;
+                    case"tetradecimal":return 14;
+                    case"pentadecimal":return 15;
+                    case'h':case"hex":case"hexadecimal":case"sexadecimal":case"4bit":return 16;
+                    case"heptadecimal":return 17;
+                    case"octodecimal":return 18;
+                    case"enneadecimal":return 19;
+                    case"vigesimal":return 20;
+                    case"unvigesimal":return 21;
+                    case"duovigesimal":return 22;
+                    case"trivigesimal":return 23;
+                    case"tetravigesimal":return 24;
+                    case"pentavigesimal":return 25;
+                    case"hexavigesimal":return 26;
+                    case"heptavigesimal":case"septemvigesimal":return 27;
+                    case"octovigesimal":return 28;
+                    case"enneavigesimal":return 29;
+                    case"trigesimal":return 30;
+                    case"untrigesimal":return 31;
+                    case"duotrigesimal":case"5bit":return 32;
+                    case"tritrigesimal":return 33;
+                    case"tetratrigesimal":return 34;
+                    case"pentatrigesimal":return 35;
+                    case't':case"txt":case"text":case"hexatrigesimal":return 36;
+                    case"heptatrigesimal":return 37;
+                    case"octotrigesimal":return 38;
+                    case"enneatrigesimal":return 39;
+                    case"quadragesimal":return 40;
+                    case"duoquadragesimal":return 42;
+                    case"pentaquadragesimal":return 45;
+                    case"septaquadragesimal":return 47;
+                    case"octoquadragesimal":return 48;
+                    case"enneaquadragesimal":return 49;
+                    case"quinquagesimal":return 50;
+                    case"duoquinquagesimal":return 52;
+                    case"tetraquinquagesimal":return 54;
+                    case"hexaquinquagesimal":return 56;
+                    case"heptaquinquagesimal":return 57;
+                    case"octoquinquagesimal":return 58;
+                    case"sexagesimal":case"sexagenary":return 60;
+                    case"duosexagesimal":return 62;
+                    case"tetrasexagesimal":case"6bit":return 64;
+                    case"duoseptuagesimal":return 72;
+                    case"octogesimal":return 80;
+                    case"unoctogesimal":return 81;
+                    case"pentoctogesimal":return 85;
+                    case"enneaoctogesimal":return 89;
+                    case"nonagesimal":return 90;
+                    case"unnonagesimal":return 91;
+                    case"duononagesimal":return 92;
+                    case"trinonagesimal":return 93;
+                    case"tetranonagesimal":return 94;
+                    case"pentanonagesimal":return 95;
+                    case"hexanonagesimal":return 96;
+                    case"septanonagesimal":return 97;
+                    case"centesimal":return 100;
+                    case"centevigesimal":return 120;
+                    case"centeunvigesimal":return 121;
+                    case"centepentavigesimal":return 125;
+                    case"centeoctovigesimal":case"7bit":return 128;
+                    case"centetetraquadragesimal":return 144;
+                    case"centenovemsexagesimal":return 169;
+                    case"centepentoctogesimal":return 185;
+                    case"centehexanonagesimal":return 196;
+                    case"duocentesimal":return 200;
+                    case"duocentedecimal":return 210;
+                    case"duocentehexidecimal":return 216;
+                    case"duocentepentavigesimal":return 225;
+                    case"duocentehexaquinquagesimal":case"byte":case"8bit":return 256;
                     case"braille":return 0;//~ braille-pattern (unicode)
-                    case"trecentesimal":return 0x12C;
-                    case"trecentosexagesimal":return 0x168;
+                    case"trecentesimal":return 300;
+                    case"trecentosexagesimal":return 360;
                     case"9bit":return 0x200;
                     case"10bit":return 0x400;
                     case"11bit":return 0x800;
@@ -563,21 +562,22 @@
              * @throws {RangeError} if `base` is not a save integer or bigger than `36`
              */
             static #REGEXP_STRING(base){
-                base=Math.abs(Number(base));if(!Number.isSafeInteger(base)||base>0x10)throw RangeError("[REGEXP_STRING] base is out of range");
+                base=Math.abs(Number(base));
+                if(!Number.isSafeInteger(base)||base>36)throw RangeError("[REGEXP_STRING] base is out of range");
                 switch(Number(base)){//~ special cases
-                    case 0:return/^([+-]?)((?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+(?:_(?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+)*)$/;//~ base 256 in braille-patterns
+                    case 0:return/^([+-]?)((?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+(?:_(?:\u2800|[\u2801-\u28FF][\u2800-\u28FF]*)+)*)$/u;//~ base 256 in braille-patterns
                     case 1:return/^([+-]?)(0+(?:_0+)*)$/;//~ length is the number value -1, so "0" is 0, "00" is 1, "000" is 2, etc.
                     case 2:return/^([+-]?)(?:0b)?((?:0|1[01]*)+(?:_(?:0|1[01]*)+)*)$/i;
                     case 8:return/^([+-]?)(?:0o)?((?:0|[1-7][0-7]*)+(?:_(?:0|[1-7][0-7]*)+)*)$/i;
-                    case 0x10:return/^([+-]?)(?:0x)?((?:0|[1-9A-F][0-9A-F]*)+(?:_(?:0|[1-9A-F][0-9A-F]*)+)*)$/i;
+                    case 16:return/^([+-]?)(?:0x)?((?:0|[1-9A-F][0-9A-F]*)+(?:_(?:0|[1-9A-F][0-9A-F]*)+)*)$/i;
                 }
                 const add_char_seperator=characters=>`(?:${characters})+(?:_(?:${characters})+)*`,
                     construct_regexp=(number_regexp,flag='')=>new RegExp(`^([+-]?)(${number_regexp})$`,flag);
-                if(base<=0xA){//~ base 2-10
+                if(base<=10){//~ base 2-10
                     const characters=`0|[1-${base-1}][0-${base-1}]*`;
                     return construct_regexp(add_char_seperator(characters));
-                }else if(base<=0x10){//~ base 11-36
-                    const characters=`0|[1-9A-${String.fromCharCode(0x36+base)}][0-9A-${String.fromCharCode(0x36+base)}]*`;
+                }else if(base<=36){//~ base 11-36
+                    const characters=`0|[1-9A-${String.fromCharCode(54+base)}][0-9A-${String.fromCharCode(54+base)}]*`;
                     return construct_regexp(add_char_seperator(characters),'i');
                 }
                 return /^([+-]?)(0?)$/i;
@@ -616,7 +616,7 @@
              * @returns {BigIntType} biggest possible number according to `MAX_SIZE`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            static get MAX_VALUE(){return new BigIntType(new Uint8Array(BigIntType.MAX_SIZE).fill(0xFF),0x100);}
+            static get MAX_VALUE(){return new BigIntType(new Uint8Array(BigIntType.MAX_SIZE).fill(255),256);}
             /**
              * @readonly
              * @returns {BigIntType} "Hello There" in Braille - see `toString("braille")`
@@ -624,8 +624,8 @@
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             static get HelloThere(){
-                if(BigIntType.MAX_SIZE<0x16)throw new RangeError("[HelloThere] MAX_SIZE is to small");
-                return new BigIntType(Uint8Array.of(0x41,0xEF,0x85,0x5F,0x41,0xEF,0x47,0x67,1,0xB9,0,0,0x47,0xCF,0x40,0xC7,0x40,0xC7,0x41,0xEF,0x47,0x67),0x100);
+                if(BigIntType.MAX_SIZE<22)throw new RangeError("[HelloThere] MAX_SIZE is to small");
+                return new BigIntType(Uint8Array.of(65,239,133,95,65,239,71,103,1,185,0,0,71,207,64,199,64,199,65,239,71,103),256);
             }
             /**
              * @readonly
@@ -634,27 +634,27 @@
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             static get Infinity(){
-                if(BigIntType.MAX_SIZE<0x81)throw new RangeError("[Infinity] MAX_SIZE is to small");
-                return new BigIntType(Uint8Array.of(...new Uint8Array(0x80),1),0x100);
+                if(BigIntType.MAX_SIZE<129)throw new RangeError("[Infinity] MAX_SIZE is to small");
+                return new BigIntType(Uint8Array.of(...new Uint8Array(128),1),256);
             }
             /**
              * @readonly
              * @returns {BigIntType} `0`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            static get Zero(){return new BigIntType(Uint8Array.of(0),0x100);}
+            static get Zero(){return new BigIntType(Uint8Array.of(0),256);}
             /**
              * @readonly
              * @returns {BigIntType} `1`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            static get One(){return new BigIntType(Uint8Array.of(1),0x100);}
+            static get One(){return new BigIntType(Uint8Array.of(1),256);}
             /**
              * @readonly
              * @returns {BigIntType} `2`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            static get Two(){return new BigIntType(Uint8Array.of(2),0x100);}
+            static get Two(){return new BigIntType(Uint8Array.of(2),256);}
             /**
              * @readonly
              * @returns {BigIntType} `-1`
@@ -691,7 +691,7 @@
              * - base 7 ← `"septenary"`
              * - base 8 ← `'o'`, `"oct"`, `"octal"`, or `"3bit"`
              * - base 9 ← `"nonary"`
-             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, `"decimal"` or `"denary"`
+             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, or `"denary"`
              * - base 11 ← `"undecimal"`
              * - base 12 ← `"duodecimal"`, `"dozenal"`, or `"uncial"`
              * - base 13 ← `"tridecimal"`
@@ -798,7 +798,7 @@
              * @throws {RangeError} if `num` exceedes `MAX_SIZE` ( after conversion in base 256 )
              * @throws {RangeError} _if some Array could not be allocated ( system-specific & memory size )_
              */
-            constructor(num='1',base=0xA){
+            constructor(num='1',base=10){
                 /**@type {string|bigint|number|number[]|Uint8Array} current digits array - content and type might change*/
                 let currentDigits=num,
                     /**@type {number} current base of `currentDigits` - value might change*/
@@ -815,28 +815,28 @@
                         count++;
                     });
                     if(currentDigits.length!==count)throw new SyntaxError("[new BigIntType] num (array) has empty entries / holes");
-                    if(currentBase<=0x100)currentDigits=Uint8Array.from(currentDigits);
+                    if(currentBase<=256)currentDigits=Uint8Array.from(currentDigits);
                 }else if(typeof currentDigits==="number"){
                     if(!Number.isInteger(currentDigits))throw new RangeError("[new BigIntType] num is not an integer");
-                    currentDigits=currentDigits.toString(0x10);
-                    currentBase=0x10;
+                    currentDigits=currentDigits.toString(16);
+                    currentBase=16;
                 }else if(typeof currentDigits==="bigint"){
-                    currentDigits=currentDigits.toString(0x10);
-                    currentBase=0x10;
+                    currentDigits=currentDigits.toString(16);
+                    currentBase=16;
                 }else currentDigits=String(currentDigits).toUpperCase();
                 if(currentBase===0&&typeof currentDigits!=="string")throw new SyntaxError("[new BigIntType] base \"braille\" requires num to be a string");
                 if(typeof currentDigits==="string"){
-                    if(currentBase<=0x24){
+                    if(currentBase<=36){
                         /**@type {RegExpMatchArray|null} - sign and number from string or `null` if no match*/
                         let _match=currentDigits.match(BigIntType.#REGEXP_STRING(currentBase));
                         if(!_match)throw new SyntaxError(`[new BigIntType] num (string) does not have the correct format for base ${currentBase===0?'256 (braille)':currentBase}`);
                         this.#sign=_match[1]!=='-';
                         _match[2]=_match[2].replace('_','');
                         if(currentBase===0){//~ braille-pattern
-                            currentBase=0x100;
+                            currentBase=256;
                             currentDigits=Uint8Array.from(_match[2].split('').reverse(),v=>v.charCodeAt(0)-0x2800);
                         }else if(currentBase===1){//~ length-1 = numerical value
-                            currentBase=0x10;
+                            currentBase=16;
                             currentDigits=Uint8Array.from((_match[2].length-1).toString(currentBase).split('').reverse(),v=>Number.parseInt(v,currentBase));
                         }else currentDigits=Uint8Array.from(_match[2].split('').reverse(),v=>Number.parseInt(v,currentBase));
                     }else{
@@ -855,11 +855,11 @@
                                 }
                         }
                         this.#sign=_match[1]!=='-';
-                        if(currentBase<=0x100)currentDigits=Uint8Array.from(_digits,Number);
+                        if(currentBase<=256)currentDigits=Uint8Array.from(_digits,Number);
                         else currentDigits=Array.from(_digits,Number);
                     }
                 }else if(currentBase===1){//~ length-1 = numerical value
-                    currentBase=0x10;
+                    currentBase=16;
                     currentDigits=Uint8Array.from((currentDigits.length-1).toString(currentBase).split('').reverse(),v=>Number.parseInt(v,currentBase));
                 }
                 //! here type of currentDigits is Uint8Array or number[] when base > 256
@@ -884,13 +884,14 @@
                                 +((currentDigits[i*4+2]??0)<<4)
                                 +((currentDigits[i*4+3]??0)<<6);
                     break;
-                    case 0x10://~ 2* digits are 1 8bit digit
+                    case 16://~ 2* digits are 1 8bit digit
                         this.#digits=new Uint8Array(Math.ceil(currentDigits.length/2));
                         for(let i=0;i<this.length;i++)
                             this.#digits[i]=currentDigits[i*2]
                                 +((currentDigits[i*2+1]??0)<<4);
                     break;
-                    case 0x100://~ copy memory adress of original
+                    case 256://~ copy memory adress of original
+                        //@ts-ignore currentDigits type here is Uint8Array only
                         this.#digits=currentDigits;
                     break;
                     case 0x10000://~ each digit is two 8bit digits (2**(2*8) = 65536)
@@ -999,14 +1000,14 @@
              * _may be +/- `Infinity`_
              * @returns {Number} `this` number as a `Number` type
              */
-            toNumber(){return this.isFinite()?Number.parseInt(this.toString(0x10),0x10):(this.#sign?Infinity:-Infinity);}
+            toNumber(){return this.isFinite()?Number.parseInt(this.toString(16),16):(this.#sign?Infinity:-Infinity);}
             /**
              * __converts `this` number to `BigInt` type__
              * @returns {bigint} `this` number as a `BigInt` type
              */
             toBigInt(){
-                if(this.#sign)return BigInt(this.toString(0x10));
-                const out=BigInt(this.abs().toString(0x10))*-1n;
+                if(this.#sign)return BigInt(this.toString(16));
+                const out=BigInt(this.abs().toString(16))*-1n;
                 this.neg();
                 return out;
             }
@@ -1039,7 +1040,7 @@
              * - base 7 ← `"septenary"`
              * - base 8 ← `'o'`, `"oct"`, `"octal"`, or `"3bit"`
              * - base 9 ← `"nonary"`
-             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, `"decimal"` or `"denary"`
+             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, or `"denary"`
              * - base 11 ← `"undecimal"`
              * - base 12 ← `"duodecimal"`, `"dozenal"`, or `"uncial"`
              * - base 13 ← `"tridecimal"`
@@ -1142,7 +1143,7 @@
              * @throws {SyntaxError} if `base` is not an available option _( outside the range of [0;2-4294967296] (incl.) )_
              * @throws {RangeError} - _if the string could not be allocated ( system-specific & memory size )_
              */
-            toString(base=0x10){
+            toString(base=16){
                 let out="";
                 base=BigIntType.#strBase(base);
                 if(Number.isNaN(base)||base===1)throw new SyntaxError("[toString] base is not an available option");
@@ -1158,11 +1159,11 @@
                         out=this.#digits[this.length-1].toString(4);
                         for(let i=this.length-2;i>=0;i--)out+=this.#digits[i].toString(4).padStart(4,'0');
                     break;
-                    case 0x10://~ [16] 2* digits are 1 8bit digit
-                        out="0x"+this.#digits[this.length-1].toString(0x10).toUpperCase();
-                        for(let i=this.length-2;i>=0;i--)out+=this.#digits[i].toString(0x10).toUpperCase().padStart(2,'0');
+                    case 16://~ [16] 2* digits are 1 8bit digit
+                        out="0x"+this.#digits[this.length-1].toString(16).toUpperCase();
+                        for(let i=this.length-2;i>=0;i--)out+=this.#digits[i].toString(16).toUpperCase().padStart(2,'0');
                     break;
-                    case 0x100://~ [256]
+                    case 256://~ [256]
                         for(let i=this.length-1;i>=0;i--)out+=String(this.#digits[i])+(i!==0?',':'');
                     break;
                     case 0x10000://~ [65536] each digit is two 8bit digits (2**(2*8))
@@ -1177,7 +1178,7 @@
                             out=String(
                                 this.#digits[i]
                                 +(this.#digits[i+1]<<8)
-                                +(this.#digits[i+2]<<0x10)
+                                +(this.#digits[i+2]<<16)
                             )+(i!==0?',':'')+out;
                     break;
                     case 0x100000000://~ [4294967296] each digit is four 8bit digits (2**(4*8))
@@ -1186,12 +1187,12 @@
                                 //~ ()>>>0 to make the 32bit number unsigned (it is 32bit because of the use of bitwise operations - but also default signed so realy only 31bit)
                                 (this.#digits[i]>>>0)
                                 +((this.#digits[i+1]<<8)>>>0)
-                                +((this.#digits[i+2]<<0x10)>>>0)
-                                +((this.#digits[i+3]<<0x18)>>>0)
+                                +((this.#digits[i+2]<<16)>>>0)
+                                +((this.#digits[i+3]<<24)>>>0)
                             )+(i!==0?',':'')+out;
                     break;
                     default:
-                        if(base>=0xB&&base<=0x24){//~ i.e. use `Number.parseInt(X,base)` and `N.toString(base).toUpperCase()`
+                        if(base>=11&&base<=36){//~ i.e. use `Number.parseInt(X,base)` and `N.toString(base).toUpperCase()`
                             /**@type {string[]} - digit-array for output in base `base`*/
                             let bN=['0'];
                             for(let i=this.length-1;i>=0;i--)
@@ -1270,7 +1271,7 @@
                                         }else bN[0]=String(Number(bN[0])|1);
                                     }
                                 }
-                            out=bN.reverse().join(base<=0xA?'':',');
+                            out=bN.reverse().join(base<=10?'':',');
                         }
                 }
                 if(!this.#sign)out='-'+out;
@@ -1306,7 +1307,7 @@
              * - base 7 ← `"septenary"`
              * - base 8 ← `'o'`, `"oct"`, `"octal"`, or `"3bit"`
              * - base 9 ← `"nonary"`
-             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, `"decimal"` or `"denary"`
+             * - base 10 ← `'d'`, `"dec"`, `"decimal"`, or `"denary"`
              * - base 11 ← `"undecimal"`
              * - base 12 ← `"duodecimal"`, `"dozenal"`, or `"uncial"`
              * - base 13 ← `"tridecimal"`
@@ -1409,7 +1410,7 @@
              * @throws {SyntaxError} if `base` is not an available option _( outside the range of [0;2-4294967296] (incl.) )_
              * @throws {RangeError} - _if the string could not be allocated ( system-specific & memory size )_
              */
-            logConsole(base=0x10){
+            logConsole(base=16){
                 base=BigIntType.#strBase(base);
                 if(Number.isNaN(base)||base===1)throw new SyntaxError("[logConsole] base is not an available option");
                 console.log(
@@ -1427,7 +1428,7 @@
              * @returns {BigIntType} a copy of `this` number
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            copy(){return this.#sign?new BigIntType(this.#digits.slice(),0x100):new BigIntType(this.#digits.slice(),0x100).neg();}
+            copy(){return this.#sign?new BigIntType(this.#digits.slice(),256):new BigIntType(this.#digits.slice(),256).neg();}
             /**
              * __copy values from `this` to `n`__
              * @param {BigIntType} n - number to set equal to `this` (will be modified)
@@ -1697,103 +1698,114 @@
                 return !this.isAbsGreaterThanAbs(n);
             }
             /**
-             * __determines if `this` number is finite (`Number`)__ \
-             * i.e. smaller or equal to `Number.MAX_VALUE` or `1.79769e308` (close to `2**1024-1`) \
-             * _less or equal to `0xFFFFFFFFFFFFFBFF <120* FF>`_ \
-             * if this is true `this` number can be converted into a normal `Number` (lossy conversion if `isSafeInteger` is false)
-             * @returns {boolean} `true` if `this` number is finite (`Number`)
+             * ## Determines if `this` number is finite ({@linkcode Number})
+             * i.e. smaller or equal to {@linkcode Number.MAX_VALUE} ~ `1.79e308` (almost `2**1024-1`) \
+             * _checks for less or equal to `0xFFFFFFFFFFFFFBFF...<120* FF>`_ \
+             * if this is true `this` number can be converted into a normal {@linkcode Number} (lossy conversion if `isSafeInteger` is false)
+             * @returns {boolean} `true` if `this` number is finite and `false` otherwise
              */
             isFinite(){
-                //~ it should be numbers up to `2**1024-1` but since floating point numbers are very imprecise at that scale (about `0XFFFFFFFFFFFFF8FF <120* FF>` step size) the limit is a little below that
-                //~ `2**1024-1` === `Infinity` so the actual limit is at `Number.MAX_VALUE` === `0xFFFFFFFFFFFFFBFF <120* FF>` === `0xFFFFFFFFFFFFF400 <120* 00>`
-                if(this.length!==0x80)return this.length<0x80;
-                return this.#digits[0x79]<=0xFB;
+                //~ it should be numbers up to `2**1024-1` but since floating point numbers are very imprecise at that scale (about `0x7FF...<120* FF>` step size) the limit is a little below that
+                //~ `2**1024-1` === `Infinity` so the actual limit is at `Number.MAX_VALUE` === `0xFFFFFFFFFFFFFBFF...<120* FF>` === `0xFFFFFFFFFFFFF400...<118* 00>...0001`
+                //~ 0xFFFFFFFFFFFFFBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                //~ 179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497791
+                //~ 0xFFFFFFFFFFFFF400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+                //~ 179769313486231560835325876058105298516207002341652166261661174625869553267292326574530099287946549246750631490335877017522087105926987962906277604735569213290190919152394180476217125334960946356387261286640198029037799514183602981511756283727771403830521483963923935633133642802139091669457927874464075218945
+                if(this.length<128)return true;
+                if(this.length!==128)return false;
+                for(let i=127;i>121;--i)
+                    if(this.#digits[i]!==255)return true;
+                return this.#digits[121]<252;
             }
             /**
-             * __determines if `this` number is a safe integer (`Number`)__ \
-             * i.e. smaller or equal to `9007199254740991` (`2**53−1`) \
-             * if this is true `this` number can be converted into a normal `Number` (lossless conversion)
-             * @returns {boolean} `true` if `this` number is a safe integer (`Number`)
+             * ## Determines if `this` number is a safe integer ({@linkcode Number})
+             * i.e. smaller or equal to {@linkcode Number.MAX_SAFE_INTEGER} (`9007199254740991` / `2**53−1` / `0x1FFFFFFFFFFFFF`) \
+             * if this is `true` `this` number can be (lossless) converted into a normal {@linkcode Number}
+             * @returns {boolean} `true` if `this` number is a safe integer and `false` otherwise
              */
             isSafeInteger(){
-                if(this.length!==7)return this.length<7;
-                return this.#digits[6]<=0x1F;
+                if(this.length===7)return this.#digits[6]<32;
+                return this.length<7;
             }
             /**
-             * __checks if `this` number is a power of two__ \
-             * ie has only one bit on \
-             * does include 1 but not 0
-             * @returns {boolean} true if `this` number is a power of two and false otherwise
+             * ## Checks if `this` number is a power of two
+             * ie has only one bit set
+             * @returns {boolean} `true` if `this` number is a power of two and `false` otherwise
              */
-            isPowerOfTwo(){
-                if(this.isZero())return false;
-                if((this.#digits[this.length-1]&(this.#digits[this.length-1]-1))!==0)return false;
-                for(let i=0;i<this.length-1;i++)
+            isPowerOf2(){
+                const msb=this.#digits[this.length-1];
+                if(
+                    msb!==128
+                    &&msb!==64
+                    &&msb!==32
+                    &&msb!==16
+                    &&msb!==8
+                    &&msb!==4
+                    &&msb!==2
+                    &&msb!==1
+                )return false;
+                for(let i=0;i<this.length-1;++i)
                     if(this.#digits[i]!==0)return false;
                 return true;
             }
             /**
-             * __checks if `this` number is a power of 256 (base)__ \
-             * does include 1 but not 0
-             * @returns {boolean} true if `this` number is a power of 256 (base) and false otherwise
+             * ## Checks if `this` number is a power of 256 (base)
+             * @returns {boolean} `true` if `this` number is a power of 256 and `false` otherwise
              */
-            isPowerOfBase(){
-                if(this.isZero())return false;
+            isPowerOf256(){
                 if(this.#digits[this.length-1]!==1)return false;
                 for(let i=0;i<this.length-1;i++)
                     if(this.#digits[i]!==0)return false;
                 return true;
             }
             /**
-             * __removes leading zeros from `digits`__
+             * ### [internal] Removes all leading zeros from {@linkcode digits}
+             * A leading zero is a most significant digit-block (8-bit) with just 0s
              * @param {Uint8Array} digits - digits array
-             * @returns {Uint8Array} if `digits` has no leading zeros returns unmodified else creates a new digits array with no leading zeros
+             * @returns {Uint8Array} if {@linkcode digits} has no leading zeros it's the same reference otherwise a new digits array
              */
             static #removeLeadingZeros(digits){
                 if(digits[digits.length-1]!==0)return digits;
                 let maxIndex=digits.length-1;
-                for(;maxIndex>0&&digits[maxIndex]===0;maxIndex--);
+                for(;maxIndex>0&&digits[maxIndex]===0;--maxIndex);
                 return digits.slice(0,maxIndex+1);
             }
             /**
-             * __increment given `digits` by one__
+             * ### [internal] increment given `digits` by one
              * @param {Uint8Array} digits - a digits array
              * @returns {Uint8Array} a new digits array
              */
             static #calcInc(digits){
                 let newDigits=new Uint8Array(digits.length+1);
                 newDigits.set(digits);
-                for(let i=0;newDigits[i]++===0xFF;i++);
+                for(let i=0;newDigits[i]++===255;++i);
                 return newDigits[newDigits.length-1]===0?newDigits.slice(0,newDigits.length-1):newDigits;
             }
             /**
-             * __decrement given `digits` by one__
+             * ### [internal] decrement given `digits` by one
              * @param {Uint8Array} digits - a digits array
-             * @returns {readonly[Uint8Array,number]} a new digits array and its sign (-1|0|1)
+             * @returns {[Uint8Array,number]} a new digits array and its new sign (-1|0|1)
              */
             static #calcDec(digits){
-                if(digits.length===1&&digits[0]===0)return Object.freeze([Uint8Array.of(1),-1]);
-                if(digits.length===1&&digits[0]===1)return Object.freeze([Uint8Array.of(0),0]);
+                if(digits.every(v=>v===0))return[Uint8Array.of(1),-1];
+                if(digits.every((v,i)=>v===0||i===0&&v===1))return[Uint8Array.of(0),0];
                 let newDigits=digits.slice();
-                for(let i=0;newDigits[i]--===0;i++);
-                return Object.freeze([
-                    BigIntType.#removeLeadingZeros(newDigits),
-                    newDigits.length===1&&newDigits[0]===0?0:1
-                ]);
+                for(let i=0;newDigits[i]--===0;++i);
+                return[BigIntType.#removeLeadingZeros(newDigits),1];
             }
             /**
-             * __increments `this` number once__ \
+             * ## increments `this` number once
              * _modifies the original_
              * @returns {BigIntType} `this + 1`
              * @throws {RangeError} - if new number would be longer than `BigIntType.MAX_SIZE`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             inc(){
-                if(this.#sign){//~ (+)++
+                if(this.#sign){//~ ++(+)
                     let calcDigits=BigIntType.#calcInc(this.#digits);
                     if(calcDigits.length>BigIntType.MAX_SIZE)throw new RangeError("[inc] would result in a number longer than MAX_SIZE");
                     this.#digits=calcDigits;
-                }else{//~ (-)++
+                }else{//~ ++(-)
                     let[calcDigits,calcSign]=BigIntType.#calcDec(this.#digits);
                     if(calcDigits.length>BigIntType.MAX_SIZE)throw new RangeError("[inc] would result in a number longer than MAX_SIZE");
                     this.#digits=calcDigits;
@@ -1809,12 +1821,12 @@
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             dec(){
-                if(this.#sign){//~ (+)--
+                if(this.#sign){//~ --(+)
                     let[calcDigits,calcSign]=BigIntType.#calcDec(this.#digits);
                     if(calcDigits.length>BigIntType.MAX_SIZE)throw new RangeError("[dec] would result in a number longer than MAX_SIZE");
                     this.#digits=calcDigits;
                     if(calcSign===-1)this.#sign=false;
-                }else{//~ (-)--
+                }else{//~ --(-)
                     let calcDigits=BigIntType.#calcInc(this.#digits);
                     if(calcDigits.length>BigIntType.MAX_SIZE)throw new RangeError("[inc] would result in a number longer than MAX_SIZE");
                     this.#digits=calcDigits;
@@ -1829,39 +1841,33 @@
              * @returns {boolean} true if `A < B`
              */
             static #calcIsSmallerThan(A,B){
-                for(let i=Math.max(A.length,B.length);i>=0;i--)
+                for(let i=Math.max(A.length,B.length)-1;i>=0;--i)
                     if((A[i]??0)!==(B[i]??0))return(A[i]??0)<(B[i]??0);
                 return false;
             }
             /**
-             * __adds two numbers together__
+             * ### [internal] Adds two numbers together
              * @param {Uint8Array} A - first addend digits array
              * @param {Uint8Array} B - second addend digits array
-             * @returns {Uint8Array} `A + B` (new digits array)
+             * @returns {Uint8Array} new digits array = {@linkcode A} + {@linkcode B} (without leading zeros)
              */
             static #calcAdd(A,B){
                 let newDigits=new Uint8Array(Math.max(A.length,B.length)+1);
-                for(let i=0,overflow=false;i<newDigits.length;i++)overflow=(newDigits[i]=(A[i]??0)+(B[i]??0)+(overflow?1:0))>0xFF;
-                return newDigits[newDigits.length-1]===1?newDigits:newDigits.slice(0,newDigits.length-1);
+                for(let i=0,carry=false;i<newDigits.length;++i)carry=(newDigits[i]=(A[i]??0)+(B[i]??0)+(carry?1:0))>255;
+                return BigIntType.#removeLeadingZeros(newDigits);
             }
             /**
-             * __subtracts two numbers from one another__
+             * ### [internal] subtracts two numbers from one another
              * @param {Uint8Array} A - minuend digits array
              * @param {Uint8Array} B - subtrahend digits array
-             * @returns {readonly[Uint8Array,boolean]} `A - B` (new digits array and its sign)
+             * @returns {[Uint8Array,boolean]} new digits array (and new sign) = {@linkcode A} - {@linkcode B} (without leading zeros)
              */
             static #calcSub(A,B){
-                if(A.length===B.length&&A.every((v,i)=>B[i]===v))return Object.freeze([Uint8Array.of(0),true]);
-                let newSign=true;
-                if(BigIntType.#calcIsSmallerThan(A,B)){
-                    [A,B]=[B,A];
-                    newSign=false;
-                }
+                let inv=BigIntType.#calcIsSmallerThan(A,B);
+                if(inv)[A,B]=[B,A];
                 let newDigits=A.slice();
-                for(let i=0;i<newDigits.length;i++)
-                    if((newDigits[i]-=(B[i]??0))<0)
-                        for(let j=i+1;newDigits[j]--===0;j++);
-                return Object.freeze([BigIntType.#removeLeadingZeros(newDigits),newSign]);
+                for(let i=0,carry=false;i<newDigits.length;++i)carry=(newDigits[i]-=(B[i]??0)+(carry?1:0))<0;
+                return[BigIntType.#removeLeadingZeros(newDigits),!inv];
             }
             /**
              * __adds another number to `this` one__ \
@@ -1910,44 +1916,64 @@
                 return this;
             }
             /**
-             * __Rounding types__
+             * @typedef {typeof BigIntType.ROUND[keyof typeof BigIntType.ROUND]} ROUND_TYPE see {@linkcode BigIntType.ROUND}
+             *//**
+             * @typedef {keyof{[P in keyof typeof BigIntType.ROUND as typeof BigIntType.ROUND[P] extends T?P:never]:any}} ROUND_TYPE_KEY<T> key (string) of any {@linkcode ROUND_TYPE} value type (combinations also work) | see {@linkcode BigIntType.ROUND}
+             * @template {ROUND_TYPE} T
+             *//**
+             * ## [enum] Rounding types
              * @readonly
-             * @enum {number} rounding types - for more info see https://upload.wikimedia.org/wikipedia/commons/8/8a/Comparison_rounding_graphs_SMIL.svg \
+             * @enum {number} rounding types - for more info see [Wikipedia](https://upload.wikimedia.org/wikipedia/commons/8/8a/Comparison_rounding_graphs_SMIL.svg) \
              * ![graph preview](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Comparison_rounding_graphs_SMIL.svg/240px-Comparison_rounding_graphs_SMIL.svg.png "preview of the graph from the link above")
              */
-            static get Round(){return{
-                /**@readonly @type {number} round towards -infinity @example +1.5 → +1 || -2.5 → -3*/      NEAR_DOWN:0,
-                /**@readonly @type {number} round towards +infinity @example +1.5 → +2 || -2.5 → -2*/      NEAR_UP:1,
-                /**@readonly @type {number} round towards zero @example +1.5 → +1 || -2.5 → -2*/           NEAR_ZERO:2,
-                /**@readonly @type {number} round away from zero @example +1.5 → +2 || -2.5 → -3*/         NEAR_INF:3,
-                /**@readonly @type {number} round to nearest even integer @example +1.5 → +2 || -2.5 → -2*/NEAR_EVEN:4,
-                /**@readonly @type {number} round to nearest odd integer @example +1.5 → +1 || -2.5 → -3*/ NEAR_ODD:5,
-                /**@readonly @type {number} floor (towards -infinity) @example +1.5 → +1 || -2.5 → -3*/    FLOOR:6,
-                /**@readonly @type {number} ceil (towards +infinity) @example +1.5 → +2 || -2.5 → -2*/     CEIL:7,
-                /**@readonly @type {number} trunc (towards zero) @example +1.5 → +1 || -2.5 → -2*/         TRUNC:8,
-                /**@readonly @type {number} raise (away from zero) @example +1.5 → +2 || -2.5 → -3*/       RAISE:9,
-            };}
+            static ROUND=Object.freeze({
+                /**#### round towards -infinity           @example +1.5 → +1 || -2.5 → -3*/NEAR_DOWN:0,
+                /**#### round towards +infinity           @example +1.5 → +2 || -2.5 → -2*/NEAR_UP:1,
+                /**#### round towards zero                @example +1.5 → +1 || -2.5 → -2*/NEAR_ZERO:2,
+                /**#### round away from zero              @example +1.5 → +2 || -2.5 → -3*/NEAR_INF:3,
+                /**#### round to nearest even integer     @example +1.5 → +2 || -2.5 → -2*/NEAR_EVEN:4,
+                /**#### round to nearest odd integer      @example +1.5 → +1 || -2.5 → -3*/NEAR_ODD:5,
+                /**#### floor (truncate towards -infinity)@example +1.5 → +1 || -2.5 → -3*/FLOOR:6,
+                /**#### ceil (truncate towards +infinity) @example +1.5 → +2 || -2.5 → -2*/CEIL:7,
+                /**#### trunc (truncate towards zero)     @example +1.5 → +1 || -2.5 → -2*/TRUNC:8,
+                /**#### raise (truncate away from zero)   @example +1.5 → +2 || -2.5 → -3*/RAISE:9,
+            });
+            static{//? testing JSDoc
+                /**
+                 * @param {T} val
+                 * @returns {ROUND_TYPE extends T?null:ROUND_TYPE_KEY<T>}
+                 * @template {ROUND_TYPE} T
+                 */
+                const KeyOf=val=>Object.entries(this.ROUND).find(v=>v[1]===val)?.[0]??null;
+                /**@type {0}*/let zero=0;
+                let a = KeyOf(zero);                  // <0>(val: 0) => "NEAR_DOWN"
+                let b = KeyOf(1);                     // <1>(val: 1) => "NEAR_UP"
+                let c = KeyOf(BigIntType.ROUND.FLOOR);// <6>(val: 6) => "FLOOR"
+                let e = KeyOf(-1);                    // (not assignable) <ROUND_TYPE>(val: ROUND_TYPE) => null
+                let f = KeyOf(NaN);                   // (not assignable) <ROUND_TYPE>(val: ROUND_TYPE) => null
+                let g = KeyOf("");                    // (not assignable) <ROUND_TYPE>(val: ROUND_TYPE) => null
+            }
             /**
              * __calculate if rounding up is needed__
              * @param {boolean} even - if the number is even
              * @param {boolean} sign - the sign of the number
-             * @param {number} decimal - decimal part for rounding [0-255] (first digit after decimal point)
-             * @param {number} rounding - rounding type to use _default `BigIntType.Round.NEAR_INF`_ \
-             * for info on different rounding types see {@link BigIntType.Round}
+             * @param {number} decimal - decimal part for rounding [0..255] (first digit after decimal point)
+             * @param {ROUND_TYPE} rounding - rounding type to use _default `BigIntType.ROUND.NEAR_INF`_ \
+             * for info on different rounding types see {@link BigIntType.ROUND}
              * @returns {boolean} true when rounding up and false otherwise
              */
-            static #roundUp(even,sign,decimal,rounding=BigIntType.Round.NEAR_INF){
+            static #roundUp(even,sign,decimal,rounding=BigIntType.ROUND.NEAR_INF){
                 switch(rounding){
-                    case BigIntType.Round.NEAR_DOWN:return decimal>0x80||(!sign&&decimal===0x80);
-                    case BigIntType.Round.NEAR_UP:return decimal>0x80||(sign&&decimal===0x80);
-                    case BigIntType.Round.NEAR_ZERO:return decimal>0x80;
-                    case BigIntType.Round.NEAR_INF:return decimal>=0x80;
-                    case BigIntType.Round.NEAR_EVEN:return decimal>0x80||(decimal===0x80&&!even);
-                    case BigIntType.Round.NEAR_ODD:return decimal>0x80||(decimal===0x80&&even);
-                    case BigIntType.Round.FLOOR:return !sign&&decimal!==0;
-                    case BigIntType.Round.CEIL:return sign&&decimal!==0;
-                    case BigIntType.Round.TRUNC:return false;
-                    case BigIntType.Round.RAISE:return decimal!==0;
+                    case BigIntType.ROUND.NEAR_DOWN:return decimal>128||(!sign&&decimal===128);
+                    case BigIntType.ROUND.NEAR_UP:return decimal>128||(sign&&decimal===128);
+                    case BigIntType.ROUND.NEAR_ZERO:return decimal>128;
+                    case BigIntType.ROUND.NEAR_INF:return decimal>=128;
+                    case BigIntType.ROUND.NEAR_EVEN:return decimal>128||(!even&&decimal===128);
+                    case BigIntType.ROUND.NEAR_ODD:return decimal>128||(even&&decimal===128);
+                    case BigIntType.ROUND.FLOOR:return !sign&&decimal!==0;
+                    case BigIntType.ROUND.CEIL:return sign&&decimal!==0;
+                    case BigIntType.ROUND.TRUNC:return false;
+                    case BigIntType.ROUND.RAISE:return decimal!==0;
                 }
                 return false;
             }
@@ -1956,17 +1982,17 @@
              * _shifts the digits by `x` amount, positive=left, with `rounding` in respect to base 256_ \
              * _modifies the original_
              * @param {number} x - exponent - save integer
-             * @param {number} rounding - rounding type to use _default `BigIntType.Round.NEAR_INF`_ \
-             * for info on different rounding types see {@link BigIntType.Round}
+             * @param {ROUND_TYPE} rounding - rounding type to use _default `BigIntType.ROUND.NEAR_INF`_ \
+             * for info on different rounding types see {@link BigIntType.ROUND}
              * @returns {BigIntType} `round( this * 256**x )` (`this` modified - sign is not affected)
              * @throws {TypeError} - if `x` is not a save integer
              * @throws {SyntaxError} - if `rounding` is not a valid option (see `rounding`s doc.)
              * @throws {RangeError} - if new number would be longer than `BigIntType.MAX_SIZE`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            timesBaseToThePowerOf(x,rounding=BigIntType.Round.NEAR_INF){
+            timesBaseToThePowerOf(x,rounding=BigIntType.ROUND.NEAR_INF){
                 x=Number(x);if(!Number.isSafeInteger(x))throw new TypeError("[times256ToThePowerOf] x is not a save integer");
-                if(!Object.values(BigIntType.Round).includes(rounding))throw new SyntaxError("[times256ToThePowerOf] rounding is not a valid option");
+                if(!Object.values(BigIntType.ROUND).includes(rounding))throw new SyntaxError("[times256ToThePowerOf] rounding is not a valid option");
                 if(this.isZero()||x===0)return this;
                 if(x<0){
                     x=Math.abs(x);
@@ -1995,8 +2021,9 @@
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             bitShiftR(x=1){
+                // TODO make param type BigIntType but max save_integer*8 in size (0xFF_FF_FF_FF_FF_FF_F8) - convert to number for byteshift method
                 x=Number(x);if(x<0||!Number.isSafeInteger(x))throw new TypeError("[bitshiftR] x is not a positive save integer");
-                this.timesBaseToThePowerOf(-(Math.floor(x/8)),BigIntType.Round.TRUNC);
+                this.timesBaseToThePowerOf(-(Math.floor(x/8)),BigIntType.ROUND.TRUNC);
                 x&=7;
                 if(x===0)return this;
                 //~ shift right x bits for each digit and add the right x bits from next digit to the left of current digit (digits are 8bit)
@@ -2015,9 +2042,10 @@
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             bitShiftL(x=1){
+                // TODO make param type BigIntType but max save_integer*8 in size (0xFF_FF_FF_FF_FF_FF_F8) - convert to number for byteshift method
                 x=Number(x);if(x<0||!Number.isSafeInteger(x))throw new TypeError("[bitshiftL] x is not a positive save integer");
                 if(Math.floor(x/8)+this.length>BigIntType.MAX_SIZE)throw new RangeError(`[bitshiftL] would result in a number longer than MAX_SIZE`);
-                this.timesBaseToThePowerOf(Math.floor(x/8),BigIntType.Round.TRUNC);
+                this.timesBaseToThePowerOf(Math.floor(x/8),BigIntType.ROUND.TRUNC);
                 x&=7;
                 if(x===0)return this;
                 let calcDigits=new Uint8Array(this.length+1);
@@ -2036,7 +2064,7 @@
             static #calcOneBitShiftL(digits){
                 let newDigits=new Uint8Array(digits.length+1);
                 //~ shift left one bit for each digit and add the left most bit from next digit to the right of current digit (digits are 8bit)
-                for(let i=newDigits.length-1;i>=0;i--)newDigits[i]=((digits[i]??0)<<1)|(((digits[i-1]??0)&0x80)>>>7);
+                for(let i=newDigits.length-1;i>=0;i--)newDigits[i]=((digits[i]??0)<<1)|(((digits[i-1]??0)&128)>>>7);
                 return BigIntType.#removeLeadingZeros(newDigits);
             }
             /**
@@ -2102,14 +2130,14 @@
             /**
              * __calculates half of `this` number__ \
              * _modifies the original_
-             * @param {number} rounding - rounding type to use - _default `BigIntType.Round.NEAR_INF`_ \
-             * for info on different rounding types see {@link BigIntType.Round}
+             * @param {ROUND_TYPE} rounding - rounding type to use - _default `BigIntType.ROUND.NEAR_INF`_ \
+             * for info on different rounding types see {@link BigIntType.ROUND}
              * @returns {BigIntType} `round( this / 2 )` (`this` modified)
              * @throws {SyntaxError} - if `rounding` is not a valid option
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            half(rounding=BigIntType.Round.NEAR_INF){
-                if(!Object.values(BigIntType.Round).includes(rounding))throw new SyntaxError("[half] rounding is not a valid option");
+            half(rounding=BigIntType.ROUND.NEAR_INF){
+                if(!Object.values(BigIntType.ROUND).includes(rounding))throw new SyntaxError("[half] rounding is not a valid option");
                 if(this.isZero())return this;
                 let calcDigits=new Uint8Array(this.length);
                 //~ bitshift right by one - shift right one bit for each digit and add the right most bit from next digit to the left of current digit (digits are 8bit)
@@ -2142,21 +2170,26 @@
             static #calcDivRest(A,B){
                 let Q=new Uint8Array(A.length+1),
                     R=new Uint8Array(B.length+1);
+                /* TODO implement
+                    when n.isPowerOfTwo() than remainder = this&(n-1) (ignoring sign)
+                    quotient should be the the number bitshifted right bitlength(n-1) times
+                    ! byteshift first then bitshift rest
+                */
                 //~ [i,j] for bit position / [k,m,l] other for-loop indexes / [z] the result of last R-B calculation
                 for(let i=A.length-1,j=7,k=0,m=0,l=0,z=0;i>=0;(j===0?(--i,j=7):--j)){
                     //~ R<<=1
-                    for(k=R.length-1;k>=0;k--)R[k]=(R[k]<<1)|(((R[k-1]??0)&0x80)>>>7);
+                    for(k=R.length-1;k>=0;--k)R[k]=(R[k]<<1)|(((R[k-1]??0)&128)>>>7);
                     R[0]|=(A[i]&(1<<j))>>>j;
                     //~ R>=B
                     if(R[R.length-1]>0||!BigIntType.#calcIsSmallerThan(R,B)){
                         //~ R-=B
-                        for(l=R.length-1;l>=0;l--){
+                        for(l=R.length-1;l>=0;--l){
                             z=R[l]-(B[l]??0);
                             if(z<0){
-                                R[l]=0x100+z;
+                                R[l]=256+z;
                                 //~ minus carry
-                                for(m=l+1;R[m]===0;R[m++]=0xFF);
-                                R[m]--;
+                                for(m=l+1;R[m]===0;R[m++]=255);
+                                --R[m];
                             }else R[l]=z;
                         }
                         Q[i]|=1<<j;
@@ -2175,29 +2208,26 @@
                 if(remainder.length===1&&remainder[0]===0)return 0;
                 let remainderDoubled=BigIntType.#calcOneBitShiftL(remainder);
                 //~ remainder*2 < divisor ? 1 : remainder*2 === divisor ? 128 : 255
-                return BigIntType.#calcIsSmallerThan(remainderDoubled,divisor)?1:remainderDoubled.length===divisor.length&&remainderDoubled.every((v,i)=>v===divisor[i])?0x80:0xFF;
+                return BigIntType.#calcIsSmallerThan(remainderDoubled,divisor)?1:remainderDoubled.length===divisor.length&&remainderDoubled.every((v,i)=>v===divisor[i])?128:255;
             }
             /**
              * __divides another number from `this` one__ \
              * _modifies the original_
              * @param {BigIntType} n - divisor (must not be zero)
-             * @param {number} rounding - rounding type to use - _default `BigIntType.Round.NEAR_INF`_ \
-             * for info on different rounding types see {@link BigIntType.Round}
+             * @param {ROUND_TYPE} rounding - rounding type to use - _default `BigIntType.ROUND.NEAR_INF`_ \
+             * for info on different rounding types see {@link BigIntType.ROUND}
              * @returns {BigIntType} `round( this / n )` (`this` modified)
              * @throws {TypeError} - if `n` is not an instance of `BigIntType`
              * @throws {SyntaxError} - if `rounding` is not a valid option
              * @throws {RangeError} - if `n` is `0`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            div(n,rounding=BigIntType.Round.NEAR_INF){
+            div(n,rounding=BigIntType.ROUND.NEAR_INF){
                 if(!(n instanceof BigIntType))throw new TypeError("[div] n is not an instance of BigIntType");
-                if(!Object.values(BigIntType.Round).includes(rounding))throw new SyntaxError("[div] rounding is not a valid option");
+                if(!Object.values(BigIntType.ROUND).includes(rounding))throw new SyntaxError("[div] rounding is not a valid option");
                 if(n.isZero())throw new RangeError("[div] n is 0");
-                if(this.isZero()||n.isOne()){
-                    this.#sign=this.#sign===n.#sign;
-                    return this.#sign?this:this.neg();
-                }
-                if(n.isPowerOfBase())this.timesBaseToThePowerOf(1-n.length,rounding);
+                if(this.isZero()||n.isOne())return n.#sign?this:this.neg();
+                if(n.isPowerOf256())this.timesBaseToThePowerOf(1-n.length,rounding);
                 else if(this.isAbsSmallerThanAbs(n))
                     //~ round with fraction: 0 + this / n → 1 or 0
                     this.#digits=Uint8Array.of(BigIntType.#roundUp(true,this.#sign===n.#sign,BigIntType.#decimalFromFraction(this.#digits,n.#digits),rounding)?1:0);
@@ -2212,23 +2242,28 @@
                 return this;
             }
             /**
-             * __Modulo types__
+             * @typedef {typeof BigIntType.MODULO[keyof typeof BigIntType.MODULO]} MODULO_TYPE see {@linkcode BigIntType.MODULO}
+             *//**
+             * @typedef {keyof{[P in keyof typeof BigIntType.MODULO as typeof BigIntType.MODULO[P] extends T?P:never]:any}} MODULO_TYPE_KEY<T> key (string) of any {@linkcode MODULO_TYPE} value type (combinations also work) | see {@linkcode BigIntType.MODULO}
+             * @template {MODULO_TYPE} T
+             *//**
+             * ## [enum] Modulo types
              * @readonly
              * @enum {number} modulo types - for more info see https://en.wikipedia.org/wiki/Modulo
              */
-            static get ModuloType(){return{
-                /**@readonly @type {number} division rounded towards -infinity*/      ROUND_NEAR_DOWN:0,
-                /**@readonly @type {number} division rounded towards +infinity*/      ROUND_NEAR_UP:1,
-                /**@readonly @type {number} division rounded towards zero*/           ROUND_NEAR_ZERO:2,
-                /**@readonly @type {number} division rounded away from zero*/         ROUND_NEAR_INF:3,
-                /**@readonly @type {number} division rounded to nearest even integer*/ROUND_NEAR_EVEN:4,
-                /**@readonly @type {number} division rounded to nearest odd integer*/ ROUND_NEAR_ODD:5,
-                /**@readonly @type {number} floored division (towards -infinity)*/    FLOOR:6,
-                /**@readonly @type {number} ceiled division (towards +infinity)*/     CEIL:7,
-                /**@readonly @type {number} truncated division (towards zero)*/       TRUNC:8,
-                /**@readonly @type {number} raised division (away from zero)*/        RAISE:9,
-                //~ enum values must match `BigIntType.Round` up to this point
-                /**@readonly @type {number} euclidean division (positive remainder)*/ EUCLID:0xA,
+            static MODULO=Object.freeze({
+                /**#### division rounded towards -infinity*/      ROUND_NEAR_DOWN:0,
+                /**#### division rounded towards +infinity*/      ROUND_NEAR_UP:1,
+                /**#### division rounded towards zero*/           ROUND_NEAR_ZERO:2,
+                /**#### division rounded away from zero*/         ROUND_NEAR_INF:3,
+                /**#### division rounded to nearest even integer*/ROUND_NEAR_EVEN:4,
+                /**#### division rounded to nearest odd integer*/ ROUND_NEAR_ODD:5,
+                /**#### floored division (towards -infinity)*/    FLOOR:6,
+                /**#### ceiled division (towards +infinity)*/     CEIL:7,
+                /**#### truncated division (towards zero)*/       TRUNC:8,
+                /**#### raised division (away from zero)*/        RAISE:9,
+                //~ enum values must match `BigIntType.ROUND` up to this point
+                /**#### euclidean division (positive remainder)*/ EUCLID:10,
                 /* ---- examples ----
                     ~~~~ 3 % 5 → 3 / 5 = 0 + 3 / 5 → round up
                     +3  +5  = trunc{ +3 } floor{ +3 } euclid{ +3 } round{ -2 } ceil{ -2 } raise{ -2 }
@@ -2261,64 +2296,64 @@
                     -0  +3  = trunc{ -0 } floor{ +0 } euclid{ +0 } round{ -0 } ceil{ -0 } raise{ +0 }
                     -0  -3  = trunc{ -0 } floor{ -0 } euclid{ +0 } round{ -0 } ceil{ +0 } raise{ +0 }
                 */
-            };}
+            });
             /**
              * __calculates modulo `n` of `this` number__ \
              * _modifies the original_
              * @param {BigIntType} n - second number (must not be zero)
-             * @param {number} type - modulo type to use - _default `BigIntType.ModuloType.EUCLID`_ \
-             * for info on different modulo types see {@link BigIntType.ModuloType}
+             * @param {MODULO_TYPE} type - modulo type to use - _default `BigIntType.MODULO.EUCLID`_ \
+             * for info on different modulo types see {@link BigIntType.MODULO}
              * @returns {BigIntType} `this % n` with respect to `type`
              * @throws {TypeError} - if `n` is not a `BigIntType`
              * @throws {RangeError} - if `n` is `0`
              * @throws {SyntaxError} - if `type` is not a valid option
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            modulo(n,type=BigIntType.ModuloType.EUCLID){
+            modulo(n,type=BigIntType.MODULO.EUCLID){
                 if(!(n instanceof BigIntType))throw new TypeError("[modulo] n is not an instance of BigIntType");
-                if(!Object.values(BigIntType.ModuloType).includes(type))throw new SyntaxError("[modulo] type is not a valid option");
+                if(!Object.values(BigIntType.MODULO).includes(type))throw new SyntaxError("[modulo] type is not a valid option");
                 if(n.isZero())throw new RangeError("[modulo] n is 0");
                 //~ calc A / B → Q + R/B or 0 + A/B when A < B
                 let[quotient,remainder]=BigIntType.#calcIsSmallerThan(this.#digits,n.#digits)?[Uint8Array.of(0),this.#digits.slice()]:BigIntType.#calcDivRest(this.#digits,n.#digits),
                     calcSign=true;
                 const fractionDecimal=BigIntType.#decimalFromFraction(remainder,n.#digits);
                 switch(type){
-                    case BigIntType.ModuloType.ROUND_NEAR_DOWN:
-                    case BigIntType.ModuloType.ROUND_NEAR_UP:
-                    case BigIntType.ModuloType.ROUND_NEAR_ZERO:
-                    case BigIntType.ModuloType.ROUND_NEAR_INF:
-                    case BigIntType.ModuloType.ROUND_NEAR_EVEN:
-                    case BigIntType.ModuloType.ROUND_NEAR_ODD:
+                    case BigIntType.MODULO.ROUND_NEAR_DOWN:
+                    case BigIntType.MODULO.ROUND_NEAR_UP:
+                    case BigIntType.MODULO.ROUND_NEAR_ZERO:
+                    case BigIntType.MODULO.ROUND_NEAR_INF:
+                    case BigIntType.MODULO.ROUND_NEAR_EVEN:
+                    case BigIntType.MODULO.ROUND_NEAR_ODD:
                         //~ A-B*round(A/B) → when rounding up inverse sign which is otherwise sign from A
                         if(BigIntType.#roundUp(this.#sign===n.#sign,(quotient[0]&1)===0,fractionDecimal,type)){
-                            if(fractionDecimal===0xFF)remainder=BigIntType.#calcDec(remainder)[0];
+                            if(fractionDecimal===255)remainder=BigIntType.#calcDec(remainder)[0];
                             calcSign=!this.#sign
                         }else calcSign=this.#sign;
                     break;
-                    case BigIntType.ModuloType.FLOOR:
+                    case BigIntType.MODULO.FLOOR:
                         calcSign=n.#sign;
                         if(this.#sign!==n.#sign)
                             if(fractionDecimal===1)remainder=BigIntType.#calcInc(remainder);
-                            else if(fractionDecimal===0xFF)remainder=BigIntType.#calcDec(remainder)[0];
+                            else if(fractionDecimal===255)remainder=BigIntType.#calcDec(remainder)[0];
                     break;
-                    case BigIntType.ModuloType.CEIL:
+                    case BigIntType.MODULO.CEIL:
                         calcSign=!n.#sign;
                         if(this.#sign===n.#sign)
                             if(fractionDecimal===1)remainder=BigIntType.#calcInc(remainder);
-                            else if(fractionDecimal===0xFF)remainder=BigIntType.#calcDec(remainder)[0];
+                            else if(fractionDecimal===255)remainder=BigIntType.#calcDec(remainder)[0];
                     break;
-                    case BigIntType.ModuloType.TRUNC:
+                    case BigIntType.MODULO.TRUNC:
                         calcSign=this.#sign;
                     break;
-                    case BigIntType.ModuloType.RAISE:
+                    case BigIntType.MODULO.RAISE:
                         calcSign=!this.#sign;
                         if(fractionDecimal===1)remainder=BigIntType.#calcInc(remainder);
-                        else if(fractionDecimal===0xFF)remainder=BigIntType.#calcDec(remainder)[0];
+                        else if(fractionDecimal===255)remainder=BigIntType.#calcDec(remainder)[0];
                     break;
-                    case BigIntType.ModuloType.EUCLID:
+                    case BigIntType.MODULO.EUCLID:
                         if(!this.#sign)
                             if(fractionDecimal===1)remainder=BigIntType.#calcInc(remainder);
-                            else if(fractionDecimal===0xFF)remainder=BigIntType.#calcDec(remainder)[0];
+                            else if(fractionDecimal===255)remainder=BigIntType.#calcDec(remainder)[0];
                     break;
                 }
                 this.#sign=calcSign;
@@ -2349,6 +2384,7 @@
                 Y.set(B);
                 return[X,Y];
             }
+            // TODO add toom-3 as another fast multiplication algorithm: https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication
             /**
              * __Karatsubas Multiplication Algorithm__ \
              * uses recursion !
@@ -2361,17 +2397,24 @@
             static #calcKaratsuba(X,Y){
                 if(X.every(v=>v===0)||Y.every(v=>v===0))return Uint8Array.of(0);
                 //~ assume here that`X` and `Y` are of same length and the length is a power of 2
-                //~ small enough to conpute savely with JS-Number ([!] from 8bit unsigned integer to 52bit signed save integer ~ trunc to 32bit signed integer during bitwise operations ~ need 16bit un-/signed for potential overflow [!])
+                //~ small enough to compute savely with JS-Number ([!] from 8bit unsigned integer to 53bit signed save integer ~ trunc to 32bit signed integer during bitwise operations ~ need 16bit un-/signed for potential overflow [!])
                 if(X.length===1){
                     const product=X[0]*Y[0];
-                    if(product>0xFF)return Uint8Array.of(product&0xFF,product>>>8);
+                    if(product>255)return Uint8Array.of(product&255,product>>>8);
                     return Uint8Array.of(product);
                 }
+                // TODO make iterative insteayd of recursive
                 let Xl=X.slice(0,Math.floor(X.length*.5)),Xh=X.slice(Math.floor(X.length*.5)),
                     Yl=Y.slice(0,Math.floor(Y.length*.5)),Yh=Y.slice(Math.floor(Y.length*.5));
                 let P3Calc1=BigIntType.#calcAdd(Xh,Xl),
                     P3Calc2=BigIntType.#calcAdd(Yh,Yl);
-                //! on a maximum this function calls itself, I think, `MAX_SIZE*1.5` times. That might be to many ie. Error !
+                // FIXME to many recursions - for-loop with some extra variables
+                // start iterating on lowest recursion (without recursion ~ in a for loop)
+                // > loop pairs [0,1],[2,3],...,[l-2,l-1]
+                // > then pairs [01,23],[45,67],...,[l-4,l-2]
+                // > then pairs [0123,4567],[891011,12131415],...,[l-8,l-4]
+                // > then pairs [01234567,89101112131415],...,[l-16,l-8]
+                // > then pairs ~ [l-32,l-16]
                 let [P1,P2,P3]=[
                     BigIntType.#calcKaratsuba(Xh,Yh),
                     BigIntType.#calcKaratsuba(Xl,Yl),
@@ -2453,7 +2496,7 @@
                     this.#sign=this.#sign===n.#sign;
                     return this;
                 }
-                if(n.isPowerOfTwo()){
+                if(n.isPowerOf2()){
                     //~ byteshift left by n.length-1
                     if(this.length+n.length-1>BigIntType.MAX_SIZE)throw new RangeError("[mul] would result in a number longer than MAX_SIZE");
                     let calcDigits=new Uint8Array(this.length+n.length);
@@ -2468,7 +2511,7 @@
                     this.#sign=this.#sign===n.#sign;
                     return this;
                 }
-                if(this.isPowerOfTwo()){
+                if(this.isPowerOf2()){
                     //~ byteshift left by n.length-1
                     if(n.length+this.length-1>BigIntType.MAX_SIZE)throw new RangeError("[mul] would result in a number longer than MAX_SIZE");
                     let calcDigits=new Uint8Array(n.length+this.length);
@@ -2538,14 +2581,14 @@
                 return this;
             }
             /**
-             * __translate `this` number from one range to another__ \
+             * ## Translate `this` number from one range to another
              * _modifies the original_
              * @param {BigIntType} initialLow - initial lower bound
              * @param {BigIntType} initialHigh - initial higher bound
              * @param {BigIntType} finalLow - final lower bound
              * @param {BigIntType} finalHigh - final higher bound
-             * @param {number} rounding - rounding type to use - _default `BigIntType.Round.NEAR_INF`_ \
-             * for info on different rounding types see {@link BigIntType.Round}
+             * @param {ROUND_TYPE} rounding - rounding type to use - _default `BigIntType.ROUND.NEAR_INF`_ \
+             * for info on different rounding types see {@link BigIntType.ROUND}
              * @param {boolean} limit - if `true` caps the result to the final bound
              * @returns {BigIntType} `this` in `finalLow` to `finalHigh` range (rounded/caped as set) (`this` modified)
              * @throws {TypeError} - if `initialLow`,`initialHigh`,`finalLow` or `finalHigh` are not instances of `BigIntType`
@@ -2554,14 +2597,14 @@
              * @throws {RangeError} - if new number would be longer than `BigIntType.MAX_SIZE`
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
-            mapRange(initialLow,initialHigh,finalLow,finalHigh,rounding=BigIntType.Round.NEAR_INF,limit=false){
+            mapRange(initialLow,initialHigh,finalLow,finalHigh,rounding=BigIntType.ROUND.NEAR_INF,limit=false){
                 if(!(initialLow instanceof BigIntType))throw new TypeError("[mapRange] initialLow is not an instance of BigIntType");
                 if(!(initialHigh instanceof BigIntType))throw new TypeError("[mapRange] initialHigh is not an instance of BigIntType");
                 if(!(finalLow instanceof BigIntType))throw new TypeError("[mapRange] finalLow is not an instance of BigIntType");
                 if(!(finalHigh instanceof BigIntType))throw new TypeError("[mapRange] finalHigh is not an instance of BigIntType");
                 if(initialLow.isEqualTo(initialHigh))throw new RangeError("[mapRange] initialLow and initialHigh are the same value");
                 if(finalLow.isEqualTo(finalHigh))return this.setEqualTo(finalLow);
-                if(!Object.values(BigIntType.Round).includes(rounding))throw new SyntaxError("[mapRange] rounding is not a valid option");
+                if(!Object.values(BigIntType.ROUND).includes(rounding))throw new SyntaxError("[mapRange] rounding is not a valid option");
                 if(limit){
                     if(initialLow.isSmallerThan(initialHigh)){
                         if(this.isSmallerThan(initialLow))return this.setEqualTo(finalLow);
@@ -2586,7 +2629,7 @@
                 return this;
             }
             /**
-             * __calculates the greatest common divisor of `a` and `b`__ \
+             * ## Calculates the greatest common divisor of {@linkcode A} and {@linkcode B}
              * does not use the sign and will allways return a positive number greater or equal to 1
              * @param {BigIntType} A - first number
              * @param {BigIntType} B - second number
@@ -2598,13 +2641,13 @@
                 if(!(A instanceof BigIntType))throw new TypeError("[GCD] a is not an instance of BigIntType");
                 if(!(B instanceof BigIntType))throw new TypeError("[GCD] b is not an instance of BigIntType");
                 let[first,second]=A.isAbsSmallerThanAbs(B)?[B.#digits,A.#digits]:[A.#digits,B.#digits];
-                for(let last=new Uint8Array();last=BigIntType.#calcDivRest(first,second)[1],last.length>1||last[0]!==0;[first,second]=[second,last]);
-                return new BigIntType(second.slice(),0x100);
+                for(let last=BigIntType.#calcDivRest(first,second)[1];last.length>1||last[0]!==0;[first,second]=[second,last])last=BigIntType.#calcDivRest(first,second)[1];
+                return new BigIntType(second.slice(),256);
             }
             /**
              * __creates a random number using `Math.random()`'s binary output__ \
              * note: this is not a cryptographically secure random number \
-             * original random number generated is 52bit unsigned (`0` to `2**52-1`)
+             * original random number generated is 53bit unsigned (`0` to `2**53-1`)
              * @param {BigIntType} min - lower limit (included) - _default `0`_
              * @param {BigIntType} max - upper limit (included) - _default `2**1024` (`BigIntType.Infinity`)_
              * @returns {BigIntType} random number between `min` and `max`
@@ -2613,11 +2656,13 @@
              * @throws {RangeError} - _if some Array could not be allocated (system-specific & memory size)_
              */
             static randomInt(min=BigIntType.Zero,max=BigIntType.Infinity){
+                // TODO use custom PRNG to get random bytes ?!
+                //? https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/
                 try{
                     return new BigIntType(Uint8Array.from(Math.random().toString(2).substring(2),Number),2).mapRange(
-                        BigIntType.Zero,new BigIntType(Uint8Array.of(0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xF),0x100),
+                        BigIntType.Zero,new BigIntType(Uint8Array.of(255,255,255,255,255,255,15),256),
                         min,max,
-                        BigIntType.Round.NEAR_INF,
+                        BigIntType.ROUND.NEAR_EVEN,
                         true
                     );
                 }catch(error){
@@ -2644,8 +2689,12 @@
                 if(signedBinaryString.length-1>BigIntType.MAX_SIZE)throw new RangeError("[fromURL] would result in a number longer than MAX_SIZE");
                 const newDigits=new Uint8Array(signedBinaryString.length-1);
                 for(let i=0;i<newDigits.length;i++)newDigits[i]=signedBinaryString.charCodeAt(signedBinaryString.length-(i+1));
-                if(signedBinaryString[0]==="-")return new BigIntType(newDigits,0x100).neg();
-                return new BigIntType(newDigits,0x100);
+                if(signedBinaryString[0]==="-")return new BigIntType(newDigits,256).neg();
+                return new BigIntType(newDigits,256);
+            }
+            static{//~ make class and prototype immutable
+                Object.freeze(BigIntType.prototype);
+                Object.freeze(BigIntType);
             }
         }//~ or just u know use the actual BigInt xD - it might not have all the base conversions and a few of the other methods here but it's probably faster since it's build in ^^
     </script>
